@@ -1,0 +1,10 @@
+{
+  "id": "6ee2a89b-dc74-46f1-b0c8-98af3aa8be20",
+  "name": "YNT AccountAttribute Transform",
+  "type": "accountAttribute",
+  "attributes": {
+    "sourceName": "Point32Health-ActiveDirectory",
+    "attributeName": "whencreated"
+  },
+  "internal": false
+}

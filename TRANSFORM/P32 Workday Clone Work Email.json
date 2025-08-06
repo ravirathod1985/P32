@@ -1,0 +1,30 @@
+{
+  "id": "aab8ca8a-1f5a-4edc-ac38-ca2cd2b1979e",
+  "name": "P32 Workday Clone Work Email",
+  "type": "firstValid",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "Point32Health-ActiveDirectory",
+          "attributeName": "mail"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "sourceName": "Workday Clone",
+          "attributeName": "EMAIL_ADDRESS_WORK"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "value": "NO_EMAIL"
+        },
+        "type": "static"
+      }
+    ]
+  },
+  "internal": false
+}

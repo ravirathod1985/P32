@@ -1,0 +1,33 @@
+{
+  "id": "a7805370-a42d-4115-bd82-a96152ff30b9",
+  "name": "P32 EvaluateRoleAssignment Transform_V1",
+  "type": "dateCompare",
+  "attributes": {
+    "firstDate": {
+      "attributes": {
+        "input": {
+          "attributes": {
+            "sourceName": "Point32Health-ActiveDirectory",
+            "attributeName": "whencreated"
+          },
+          "type": "accountAttribute"
+        },
+        "inputFormat": "yyyyMMddHHmmss.Z",
+        "outputFormat": "ISO8601"
+      },
+      "type": "dateFormat"
+    },
+    "secondDate": {
+      "attributes": {
+        "input": "2023-07-20",
+        "inputFormat": "yyyy-MM-dd",
+        "outputFormat": "ISO8601"
+      },
+      "type": "dateFormat"
+    },
+    "operator": "gt",
+    "positiveCondition": "AssignRoles",
+    "negativeCondition": "DoNotAssignRole"
+  },
+  "internal": false
+}

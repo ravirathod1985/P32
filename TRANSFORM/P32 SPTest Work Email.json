@@ -1,0 +1,30 @@
+{
+  "id": "79558285-1b4b-4d55-b2dd-13772e5662fe",
+  "name": "P32 SPTest Work Email",
+  "type": "firstValid",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "WorkDay Flat File",
+          "attributeName": "EMAIL_ADDRESS_HOME"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "sourceName": "Point32Health-ActiveDirectory",
+          "attributeName": "mail"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "value": "NO_EMAIL"
+        },
+        "type": "static"
+      }
+    ]
+  },
+  "internal": false
+}

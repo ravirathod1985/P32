@@ -1,0 +1,31 @@
+{
+  "id": "840837ae-c499-42b0-a890-6602fc1854f2",
+  "name": "P32 Workday Clone User Name",
+  "type": "firstValid",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "Point32Health-ActiveDirectory",
+          "attributeName": "sAMAccountName"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "sourceName": "Workday Clone",
+          "attributeName": "USERID"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "sourceName": "Workday Clone",
+          "attributeName": "FILENUMBER"
+        },
+        "type": "accountAttribute"
+      }
+    ]
+  },
+  "internal": false
+}

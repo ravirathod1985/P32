@@ -1,0 +1,25 @@
+{
+  "id": "5a7043a3-bb2f-4d6d-b231-f35c40feacb4",
+  "name": "P32 DisplayName",
+  "type": "concat",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "WorkDay",
+          "attributeName": "FIRST_NAME"
+        },
+        "type": "accountAttribute"
+      },
+      " ",
+      {
+        "attributes": {
+          "sourceName": "WorkDay",
+          "attributeName": "LAST_NAME"
+        },
+        "type": "accountAttribute"
+      }
+    ]
+  },
+  "internal": false
+}

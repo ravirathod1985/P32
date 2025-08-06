@@ -1,0 +1,10 @@
+{
+  "id": "1659d09e-f57c-4836-bdf5-da83457cad02",
+  "name": "P32 Set ManagementLevel",
+  "type": "replace",
+  "attributes": {
+    "regex": "_",
+    "replacement": " "
+  },
+  "internal": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "c63c0ca0-fcf7-4f8e-9eef-cbcd81072885",
+  "name": "Test Format Date",
+  "type": "dateFormat",
+  "attributes": {
+    "inputFormat": "MM/dd/yy",
+    "outputFormat": "MM/dd/yyyy HH:mm:ss"
+  },
+  "internal": false
+}

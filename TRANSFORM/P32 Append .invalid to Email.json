@@ -1,0 +1,23 @@
+{
+  "id": "4a6c313b-2ca6-48e4-9192-26c532437885",
+  "name": "P32 Append .invalid to Email",
+  "type": "concat",
+  "attributes": {
+    "values": [
+      {
+        "type": "lower",
+        "attributes": {
+          "input": {
+            "type": "accountAttribute",
+            "attributes": {
+              "attributeName": "EMAIL_ADDRESS_WORK",
+              "sourceName": "WorkDay"
+            }
+          }
+        }
+      },
+      ".invalid"
+    ]
+  },
+  "internal": false
+}

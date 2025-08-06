@@ -1,0 +1,38 @@
+{
+  "id": "ed017f81-d88a-4182-812a-2cdc32315544",
+  "name": "P32 EvaluateRoleAssignment Transform_V3",
+  "type": "dateCompare",
+  "attributes": {
+    "firstDate": {
+      "attributes": {
+        "input": {
+          "attributes": {
+            "id": "YNT Concat Transform"
+          },
+          "type": "reference"
+        },
+        "inputFormat": "yyyy-MM-dd",
+        "outputFormat": "ISO8601"
+      },
+      "type": "dateFormat"
+    },
+    "secondDate": {
+      "attributes": {
+        "input": {
+          "attributes": {
+            "sourceName": "Workday",
+            "attributeName": "HIREDATE"
+          },
+          "type": "accountAttribute"
+        },
+        "inputFormat": "MM/dd/yyyy",
+        "outputFormat": "ISO8601"
+      },
+      "type": "dateFormat"
+    },
+    "operator": "lt",
+    "positiveCondition": "AssignRoles",
+    "negativeCondition": "DoNotAssignRole"
+  },
+  "internal": false
+}

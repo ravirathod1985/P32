@@ -1,0 +1,23 @@
+{
+  "id": "98b95fae-c463-4fa0-9e41-862f3c3504f1",
+  "name": "P32 SPTest HPHC Email",
+  "type": "firstValid",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "HPHC-ActiveDirectory",
+          "attributeName": "mail"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "value": "NO_EMAIL"
+        },
+        "type": "static"
+      }
+    ]
+  },
+  "internal": false
+}

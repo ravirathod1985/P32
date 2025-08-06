@@ -1,0 +1,29 @@
+{
+  "id": "6917ffef-95fd-4a30-917f-d8940c04afe2",
+  "name": "P32 Determine Worker Status",
+  "type": "static",
+  "attributes": {
+    "checkIsActive": {
+      "attributes": {
+        "values": [
+          {
+            "attributes": {
+              "attributeName": "WORKERSTATUS",
+              "sourceName": "WorkDay"
+            },
+            "type": "accountAttribute"
+          },
+          {
+            "attributes": {
+              "value": "0"
+            },
+            "type": "static"
+          }
+        ]
+      },
+      "type": "firstValid"
+    },
+    "value": "#if($checkIsActive=='0')Inactive#{else}Active#end"
+  },
+  "internal": false
+}

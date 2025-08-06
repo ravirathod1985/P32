@@ -1,0 +1,18 @@
+{
+  "id": "b741dd89-46d1-4250-b43c-3c3522cc6978",
+  "name": "P32 Append .invalid to Email for THP Salesforce",
+  "type": "concat",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "WorkDay",
+          "attributeName": "EMAIL_ADDRESS_WORK"
+        },
+        "type": "accountAttribute"
+      },
+      ".invalid"
+    ]
+  },
+  "internal": false
+}

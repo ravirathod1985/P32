@@ -1,0 +1,35 @@
+{
+  "id": "81e86051-6658-4ff8-a55a-acf0036b2508",
+  "name": "Normalize DisplayName",
+  "type": "concat",
+  "attributes": {
+    "values": [
+      {
+        "type": "normalizeNames",
+        "attributes": {
+          "input": {
+            "type": "accountAttribute",
+            "attributes": {
+              "attributeName": "FIRST_NAME",
+              "sourceName": "WorkDay"
+            }
+          }
+        }
+      },
+      " ",
+      {
+        "type": "normalizeNames",
+        "attributes": {
+          "input": {
+            "type": "accountAttribute",
+            "attributes": {
+              "attributeName": "LAST_NAME",
+              "sourceName": "WorkDay"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "internal": false
+}

@@ -1,0 +1,29 @@
+{
+  "id": "873dccaf-910e-4ec3-b11b-b652424e775c",
+  "name": "P32 isTermDatePopulated",
+  "type": "static",
+  "attributes": {
+    "checkIsPopulated": {
+      "attributes": {
+        "values": [
+          {
+            "attributes": {
+              "attributeName": "TERMINATION_DATE",
+              "sourceName": "WorkDay"
+            },
+            "type": "accountAttribute"
+          },
+          {
+            "attributes": {
+              "value": "no"
+            },
+            "type": "static"
+          }
+        ]
+      },
+      "type": "firstValid"
+    },
+    "value": "#if($checkIsPopulated=='no')no#{else}yes#end"
+  },
+  "internal": false
+}

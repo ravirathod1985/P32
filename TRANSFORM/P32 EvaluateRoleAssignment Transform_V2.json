@@ -1,0 +1,83 @@
+{
+  "id": "aaa38b72-9947-4aa0-82ad-659290951908",
+  "name": "P32 EvaluateRoleAssignment Transform_V2",
+  "type": "dateCompare",
+  "attributes": {
+    "firstDate": {
+      "attributes": {
+        "input": {
+          "attributes": {
+            "values": [
+              {
+                "attributes": {
+                  "input": {
+                    "attributes": {
+                      "sourceName": "Point32Health-ActiveDirectory",
+                      "attributeName": "whencreated"
+                    },
+                    "type": "accountAttribute"
+                  },
+                  "begin": 0,
+                  "end": 4
+                },
+                "type": "substring"
+              },
+              "-",
+              {
+                "attributes": {
+                  "input": {
+                    "attributes": {
+                      "sourceName": "Point32Health-ActiveDirectory",
+                      "attributeName": "whencreated"
+                    },
+                    "type": "accountAttribute"
+                  },
+                  "begin": 4,
+                  "end": 6
+                },
+                "type": "substring"
+              },
+              "-",
+              {
+                "attributes": {
+                  "input": {
+                    "attributes": {
+                      "sourceName": "Point32Health-ActiveDirectory",
+                      "attributeName": "whencreated"
+                    },
+                    "type": "accountAttribute"
+                  },
+                  "begin": 6,
+                  "end": 8
+                },
+                "type": "substring"
+              },
+              null
+            ]
+          }
+        },
+        "inputFormat": "yyyy-MM-dd",
+        "outputFormat": "ISO8601"
+      },
+      "type": "dateFormat"
+    },
+    "secondDate": {
+      "attributes": {
+        "input": {
+          "attributes": {
+            "sourceName": "Workday",
+            "attributeName": "HIREDATE"
+          },
+          "type": "accountAttribute"
+        },
+        "inputFormat": "MM/dd/yyyy",
+        "outputFormat": "ISO8601"
+      },
+      "type": "dateFormat"
+    },
+    "operator": "lt",
+    "positiveCondition": "AssignRoles",
+    "negativeCondition": "DoNotAssignRole"
+  },
+  "internal": false
+}

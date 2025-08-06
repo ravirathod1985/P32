@@ -1,0 +1,29 @@
+{
+  "id": "11e78e79-f4f0-4b15-b771-6d31b9527023",
+  "name": "P32 Workday Clone isTermDatePopulated",
+  "type": "static",
+  "attributes": {
+    "checkIsPopulated": {
+      "attributes": {
+        "values": [
+          {
+            "attributes": {
+              "attributeName": "TERMINATION_DATE",
+              "sourceName": "Workday Clone"
+            },
+            "type": "accountAttribute"
+          },
+          {
+            "attributes": {
+              "value": "no"
+            },
+            "type": "static"
+          }
+        ]
+      },
+      "type": "firstValid"
+    },
+    "value": "#if($checkIsPopulated=='no')no#{else}yes#end"
+  },
+  "internal": false
+}

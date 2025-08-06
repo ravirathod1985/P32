@@ -1,0 +1,46 @@
+{
+  "id": "c304e94b-c236-4026-a96e-c9b67c9acf21",
+  "name": "P32 SPTest Determine Hire Transform",
+  "type": "dateCompare",
+  "attributes": {
+    "firstDate": {
+      "attributes": {
+        "input": {
+          "attributes": {
+            "values": [
+              {
+                "attributes": {
+                  "attributeName": "HIREDATE",
+                  "sourceName": "Workday Flat File"
+                },
+                "type": "accountAttribute"
+              },
+              {
+                "attributes": {
+                  "value": "31/01/2100"
+                },
+                "type": "static"
+              }
+            ]
+          },
+          "type": "firstValid"
+        },
+        "inputFormat": "dd/mm/yyyy",
+        "outputFormat": "ISO8601"
+      },
+      "type": "dateFormat"
+    },
+    "secondDate": {
+      "attributes": {
+        "input": "2023-10-01",
+        "inputFormat": "yyyy-MM-dd",
+        "outputFormat": "ISO8601"
+      },
+      "type": "dateFormat"
+    },
+    "operator": "gt",
+    "positiveCondition": "Yes",
+    "negativeCondition": "No"
+  },
+  "internal": false
+}

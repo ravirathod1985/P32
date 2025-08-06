@@ -1,0 +1,29 @@
+{
+  "id": "3e7a73d9-f5fb-4587-8ccf-6379f4736325",
+  "name": "P32 SPTest isTermDatePopulated",
+  "type": "static",
+  "attributes": {
+    "checkIsPopulated": {
+      "attributes": {
+        "values": [
+          {
+            "attributes": {
+              "attributeName": "TERMINATION_DATE",
+              "sourceName": "WorkDay Flat File"
+            },
+            "type": "accountAttribute"
+          },
+          {
+            "attributes": {
+              "value": "no"
+            },
+            "type": "static"
+          }
+        ]
+      },
+      "type": "firstValid"
+    },
+    "value": "#if($checkIsPopulated=='no')no#{else}yes#end"
+  },
+  "internal": false
+}

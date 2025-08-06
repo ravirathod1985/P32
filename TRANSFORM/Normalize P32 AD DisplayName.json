@@ -1,0 +1,35 @@
+{
+  "id": "b1d41181-1fbd-40e6-8c2b-abab3d86360f",
+  "name": "Normalize P32 AD DisplayName",
+  "type": "concat",
+  "attributes": {
+    "values": [
+      {
+        "type": "normalizeNames",
+        "attributes": {
+          "input": {
+            "type": "accountAttribute",
+            "attributes": {
+              "attributeName": "PREFERRED_LAST_NAME",
+              "sourceName": "WorkDay"
+            }
+          }
+        }
+      },
+      ", ",
+      {
+        "type": "normalizeNames",
+        "attributes": {
+          "input": {
+            "type": "accountAttribute",
+            "attributes": {
+              "attributeName": "PREFERRED_FIRST_NAME",
+              "sourceName": "WorkDay"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "internal": false
+}

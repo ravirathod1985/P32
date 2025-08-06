@@ -1,0 +1,16 @@
+{
+  "id": "53b36889-854c-4c0c-9925-77246f2af4bb",
+  "name": "doesLastNameHaveSPTest - IndexOf",
+  "type": "indexOf",
+  "attributes": {
+    "substring": "sptest",
+    "input": {
+      "attributes": {
+        "attributeName": "LAST_NAME",
+        "sourceName": "WorkDay"
+      },
+      "type": "accountAttribute"
+    }
+  },
+  "internal": false
+}

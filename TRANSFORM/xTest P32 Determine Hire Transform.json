@@ -1,0 +1,44 @@
+{
+  "id": "477f4b9e-a9b7-445f-beb7-f86fe57e886d",
+  "name": "xTest P32 Determine Hire Transform",
+  "type": "static",
+  "attributes": {
+    "firstDate": {
+      "attributes": {
+        "input": {
+          "attributes": {
+            "values": [
+              {
+                "attributes": {
+                  "attributeName": "HIREDATE",
+                  "sourceName": "Workday"
+                },
+                "type": "accountAttribute"
+              },
+              {
+                "attributes": {
+                  "value": "01/31/1900"
+                },
+                "type": "static"
+              }
+            ]
+          },
+          "type": "firstValid"
+        },
+        "inputFormat": "mm/dd/yyyy",
+        "outputFormat": "ISO8601"
+      },
+      "type": "dateFormat"
+    },
+    "secondDate": {
+      "attributes": {
+        "input": "2023-08-24",
+        "inputFormat": "yyyy-MM-dd",
+        "outputFormat": "ISO8601"
+      },
+      "type": "dateFormat"
+    },
+    "value": "$firstDate $secondDate"
+  },
+  "internal": false
+}

@@ -1,0 +1,33 @@
+{
+  "id": "0d068cf4-11f5-464d-886e-029f6e3acc54",
+  "name": "EmailAddressesForServiceNow",
+  "type": "concat",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "THP-ActiveDirectory",
+          "attributeName": "mail"
+        },
+        "type": "accountAttribute"
+      },
+      "|",
+      {
+        "attributes": {
+          "sourceName": "Point32Health-ActiveDirectory",
+          "attributeName": "mail"
+        },
+        "type": "accountAttribute"
+      },
+      "|",
+      {
+        "attributes": {
+          "sourceName": "HPHC-ActiveDirectory",
+          "attributeName": "mail"
+        },
+        "type": "accountAttribute"
+      }
+    ]
+  },
+  "internal": false
+}

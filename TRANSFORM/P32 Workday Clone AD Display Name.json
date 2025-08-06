@@ -1,0 +1,25 @@
+{
+  "id": "e3628de4-e9db-460c-a96f-5d67ecb06d3f",
+  "name": "P32 Workday Clone AD Display Name",
+  "type": "concat",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "Workday Clone",
+          "attributeName": "LAST_NAME"
+        },
+        "type": "accountAttribute"
+      },
+      ", ",
+      {
+        "attributes": {
+          "sourceName": "Workday Clone",
+          "attributeName": "FIRST_NAME"
+        },
+        "type": "accountAttribute"
+      }
+    ]
+  },
+  "internal": false
+}

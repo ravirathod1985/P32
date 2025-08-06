@@ -1,0 +1,31 @@
+{
+  "id": "9b026fc7-74de-4347-8304-9c5005af6271",
+  "name": "P32 User Name",
+  "type": "firstValid",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "Point32Health-ActiveDirectory",
+          "attributeName": "sAMAccountName"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "sourceName": "WorkDay",
+          "attributeName": "USERID"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "sourceName": "WorkDay",
+          "attributeName": "FILENUMBER"
+        },
+        "type": "accountAttribute"
+      }
+    ]
+  },
+  "internal": false
+}

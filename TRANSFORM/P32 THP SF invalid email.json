@@ -1,0 +1,10 @@
+{
+  "id": "e4a60602-81a3-4dcf-8f89-84aa0482cd92",
+  "name": "P32 THP SF invalid email",
+  "type": "replace",
+  "attributes": {
+    "regex": ".invalid",
+    "replacement": ""
+  },
+  "internal": false
+}

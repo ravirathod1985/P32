@@ -1,0 +1,61 @@
+{
+  "id": "c3a383b4-9690-456d-8b36-7915cb6b19a3",
+  "name": "P32 ExtractP32AD AccountCreation Date Transform",
+  "type": "static",
+  "attributes": {
+    "Date": {
+      "attributes": {
+        "values": [
+          {
+            "attributes": {
+              "input": {
+                "attributes": {
+                  "sourceName": "Point32Health-ActiveDirectory",
+                  "attributeName": "whencreated"
+                },
+                "type": "accountAttribute"
+              },
+              "begin": 0,
+              "end": 4
+            },
+            "type": "substring"
+          },
+          "-",
+          {
+            "attributes": {
+              "input": {
+                "attributes": {
+                  "sourceName": "Point32Health-ActiveDirectory",
+                  "attributeName": "whencreated"
+                },
+                "type": "accountAttribute"
+              },
+              "begin": 4,
+              "end": 6
+            },
+            "type": "substring"
+          },
+          "-",
+          {
+            "attributes": {
+              "input": {
+                "attributes": {
+                  "sourceName": "Point32Health-ActiveDirectory",
+                  "attributeName": "whencreated"
+                },
+                "type": "accountAttribute"
+              },
+              "begin": 6,
+              "end": 8
+            },
+            "type": "substring"
+          },
+          null
+        ]
+      },
+      "type": "concat"
+    },
+    "value": "#if($Date=='--')2023-07-31#{else}$Date#end"
+  },
+  "internal": false
+}

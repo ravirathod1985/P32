@@ -1,0 +1,12 @@
+{
+  "id": "43548fa5-8de5-48e6-a69d-894d93641e22",
+  "name": "P32 Workday Clone Manager Email",
+  "type": "rule",
+  "attributes": {
+    "name": "Cloud Services Deployment Utility",
+    "operation": "getReferenceIdentityAttribute",
+    "uid": "manager",
+    "attributeName": "email"
+  },
+  "internal": false
+}

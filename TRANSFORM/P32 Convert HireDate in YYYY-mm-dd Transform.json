@@ -1,0 +1,64 @@
+{
+  "id": "95e40764-95f4-4f99-8e58-16cc3b8c7b3a",
+  "name": "P32 Convert HireDate in YYYY-mm-dd Transform",
+  "type": "static",
+  "attributes": {
+    "Date": {
+      "attributes": {
+        "values": [
+          {
+            "attributes": {
+              "input": {
+                "attributes": {
+                  "attributeName": "HIREDATE",
+                  "sourceName": "Workday"
+                },
+                "type": "accountAttribute"
+              },
+              "delimiter": "/",
+              "index": 2,
+              "throws": true
+            },
+            "type": "split"
+          },
+          "-",
+          {
+            "attributes": {
+              "input": {
+                "attributes": {
+                  "attributeName": "HIREDATE",
+                  "sourceName": "Workday"
+                },
+                "type": "accountAttribute"
+              },
+              "delimiter": "/",
+              "index": 0,
+              "throws": true
+            },
+            "type": "split"
+          },
+          "-",
+          {
+            "attributes": {
+              "input": {
+                "attributes": {
+                  "attributeName": "HIREDATE",
+                  "sourceName": "Workday"
+                },
+                "type": "accountAttribute"
+              },
+              "delimiter": "/",
+              "index": 1,
+              "throws": true
+            },
+            "type": "split"
+          },
+          null
+        ]
+      },
+      "type": "concat"
+    },
+    "value": "#if($Date=='--')1900-01-31#{else}$Date#end"
+  },
+  "internal": false
+}

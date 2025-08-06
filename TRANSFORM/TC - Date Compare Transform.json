@@ -1,0 +1,33 @@
+{
+  "id": "7ce20d6c-5a00-456e-8fb6-e506c848d4d2",
+  "name": "TC - Date Compare Transform",
+  "type": "dateCompare",
+  "attributes": {
+    "firstDate": {
+      "attributes": {
+        "expression": "-20d",
+        "roundUp": true,
+        "input": {
+          "attributes": {
+            "input": {
+              "attributes": {
+                "sourceName": "Workday Flat File",
+                "attributeName": "HIREDATE"
+              },
+              "type": "accountAttribute"
+            },
+            "inputFormat": "MM/dd/yyyy",
+            "outputFormat": "ISO8601"
+          },
+          "type": "dateFormat"
+        }
+      },
+      "type": "dateMath"
+    },
+    "secondDate": "now",
+    "operator": "gte",
+    "positiveCondition": "legacy",
+    "negativeCondition": "regular"
+  },
+  "internal": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "252ae2cc-551e-48cf-adf0-f96d351b5ce9",
+  "name": "P32 HPHC SF invalid email",
+  "type": "replace",
+  "attributes": {
+    "regex": ".sit",
+    "replacement": ""
+  },
+  "internal": false
+}

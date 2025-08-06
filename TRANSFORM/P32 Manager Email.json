@@ -1,0 +1,12 @@
+{
+  "id": "53851e26-627e-4e16-9762-799312d2481d",
+  "name": "P32 Manager Email",
+  "type": "rule",
+  "attributes": {
+    "name": "Cloud Services Deployment Utility",
+    "operation": "getReferenceIdentityAttribute",
+    "uid": "manager",
+    "attributeName": "email"
+  },
+  "internal": false
+}

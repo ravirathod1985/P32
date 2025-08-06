@@ -1,0 +1,29 @@
+{
+  "id": "aa72f238-4cab-4ddc-84d8-a0fa4ad29bc6",
+  "name": "P32 Workday Clone Worker Status",
+  "type": "static",
+  "attributes": {
+    "checkIsActive": {
+      "attributes": {
+        "values": [
+          {
+            "attributes": {
+              "attributeName": "WORKERSTATUS",
+              "sourceName": "Workday Clone"
+            },
+            "type": "accountAttribute"
+          },
+          {
+            "attributes": {
+              "value": "0"
+            },
+            "type": "static"
+          }
+        ]
+      },
+      "type": "firstValid"
+    },
+    "value": "#if($checkIsActive=='0')Inactive#{else}Active#end"
+  },
+  "internal": false
+}

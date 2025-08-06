@@ -1,0 +1,29 @@
+{
+  "id": "f8c8a7f9-6bef-419c-bf4a-33235ba54cb1",
+  "name": "P32 Worker Status",
+  "type": "static",
+  "attributes": {
+    "checkIsActive": {
+      "attributes": {
+        "values": [
+          {
+            "attributes": {
+              "attributeName": "WORKERSTATUS",
+              "sourceName": "WorkDay"
+            },
+            "type": "accountAttribute"
+          },
+          {
+            "attributes": {
+              "value": "0"
+            },
+            "type": "static"
+          }
+        ]
+      },
+      "type": "firstValid"
+    },
+    "value": "#if($checkIsActive=='0')Inactive#{else}Active#end"
+  },
+  "internal": false
+}

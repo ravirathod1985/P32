@@ -1,0 +1,23 @@
+{
+  "id": "a4946dcf-591c-4b6b-8cd8-6de0f817248c",
+  "name": "P32 UserID",
+  "type": "firstValid",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "Point32Health-ActiveDirectory",
+          "attributeName": "sAMAccountName"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "value": "NONE"
+        },
+        "type": "static"
+      }
+    ]
+  },
+  "internal": false
+}

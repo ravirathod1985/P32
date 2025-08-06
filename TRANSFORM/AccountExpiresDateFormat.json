@@ -1,0 +1,10 @@
+{
+  "id": "adaac469-7ad0-4d20-aae8-a60a5c254eab",
+  "name": "AccountExpiresDateFormat",
+  "type": "dateFormat",
+  "attributes": {
+    "inputFormat": "mm/dd/yyyy",
+    "outputFormat": "EPOCH_TIME_WIN32"
+  },
+  "internal": false
+}

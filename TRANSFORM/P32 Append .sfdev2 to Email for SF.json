@@ -1,0 +1,23 @@
+{
+  "id": "493dc66b-de1f-490b-aa6f-a39e4b9cda99",
+  "name": "P32 Append .sfdev2 to Email for SF",
+  "type": "concat",
+  "attributes": {
+    "values": [
+      {
+        "type": "lower",
+        "attributes": {
+          "input": {
+            "type": "accountAttribute",
+            "attributes": {
+              "attributeName": "EMAIL_ADDRESS_WORK",
+              "sourceName": "WorkDay"
+            }
+          }
+        }
+      },
+      ".sfdev2"
+    ]
+  },
+  "internal": false
+}

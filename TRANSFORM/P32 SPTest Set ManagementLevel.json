@@ -1,0 +1,10 @@
+{
+  "id": "ad190527-ad81-4332-bd78-87dd2aac72d8",
+  "name": "P32 SPTest Set ManagementLevel",
+  "type": "replace",
+  "attributes": {
+    "regex": "_",
+    "replacement": " "
+  },
+  "internal": false
+}

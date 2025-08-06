@@ -1,0 +1,61 @@
+{
+  "id": "c26a3291-c8ec-4364-be80-b898f12ca39d",
+  "name": "P32 ManagerDn",
+  "type": "static",
+  "attributes": {
+    "managerdn": {
+      "attributes": {
+        "nullvalue": {
+          "attributes": {
+            "value": "NULL"
+          },
+          "type": "static"
+        },
+        "adManager": {
+          "attributes": {
+            "values": [
+              {
+                "attributes": {
+                  "value": "$identity.getManager().getLinksByAppIdOrName(\"2c91808682c683220182cd4284c56b5e\", \"Point32Health-ActiveDirectory [source]\").get(0).getNativeIdentity()"
+                },
+                "type": "static"
+              },
+              {
+                "attributes": {
+                  "value": "NA"
+                },
+                "type": "static"
+              }
+            ],
+            "ignoreErrors": "true"
+          },
+          "type": "firstValid"
+        },
+        "lcmstate": {
+          "attributes": {
+            "values": [
+              {
+                "attributes": {
+                  "name": "cloudLifecycleState"
+                },
+                "type": "identityAttribute"
+              },
+              {
+                "attributes": {
+                  "value": "active"
+                },
+                "type": "static"
+              }
+            ],
+            "ignoreErrors": "true"
+          },
+          "type": "firstValid"
+        },
+        "value": "#if($lcmstate=='inactive')$nullvalue#else$adManager#end"
+      },
+      "type": "static"
+    },
+    "value": "#if($managerdn =='NULL' || $managerdn =='NA') #else$managerdn#end"
+  },
+  "internal": false
+}

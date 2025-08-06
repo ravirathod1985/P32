@@ -1,0 +1,29 @@
+{
+  "id": "25271a29-0c9f-4956-96f4-d04a60195708",
+  "name": "P32 SPTest SetIdentityAttribute Transform",
+  "type": "static",
+  "attributes": {
+    "isNoAccessUser": {
+      "attributes": {
+        "values": [
+          {
+            "attributes": {
+              "attributeName": "FILENUMBER",
+              "sourceName": "Workday"
+            },
+            "type": "accountAttribute"
+          },
+          {
+            "attributes": {
+              "value": "0"
+            },
+            "type": "static"
+          }
+        ]
+      },
+      "type": "firstValid"
+    },
+    "value": "#if($isNoAccessUser=='0' || $isNoAccessUser=='27286' )tanay.chouhan@point32health.org#{else}NO_EMAIL#end"
+  },
+  "internal": false
+}

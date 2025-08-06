@@ -1,0 +1,502 @@
+{
+  "id": "0406c2c9-c516-46c5-a735-5515f754f940",
+  "name": "P32 Determine LCS - LOA - test",
+  "type": "static",
+  "attributes": {
+    "todayIsAfterTermDate": {
+      "attributes": {
+        "negativeCondition": "no",
+        "positiveCondition": "yes",
+        "firstDate": "now",
+        "operator": "lte",
+        "secondDate": {
+          "attributes": {
+            "input": {
+              "attributes": {
+                "input": {
+                  "attributes": {
+                    "values": [
+                      {
+                        "attributes": {
+                          "attributeName": "TERMINATION_DATE",
+                          "sourceName": "WorkDay"
+                        },
+                        "type": "accountAttribute"
+                      },
+                      {
+                        "attributes": {
+                          "value": "12/31/2499"
+                        },
+                        "type": "static"
+                      }
+                    ]
+                  },
+                  "type": "firstValid"
+                },
+                "inputFormat": "MM/dd/yyyy",
+                "outputFormat": "ISO8601"
+              },
+              "type": "dateFormat"
+            },
+            "expression": "+180d/d",
+            "roundUp": false
+          },
+          "type": "dateMath"
+        }
+      },
+      "type": "dateCompare"
+    },
+    "workerStatus": {
+      "attributes": {
+        "attributeName": "WORKER_STATUS",
+        "sourceName": "WorkDay"
+      },
+      "type": "accountAttribute"
+    },
+    "todayIs6MonthsAfterTermDate": {
+      "attributes": {
+        "negativeCondition": "no",
+        "positiveCondition": "yes",
+        "firstDate": "now",
+        "operator": "gte",
+        "secondDate": {
+          "attributes": {
+            "input": {
+              "attributes": {
+                "input": {
+                  "attributes": {
+                    "values": [
+                      {
+                        "attributes": {
+                          "attributeName": "TERMINATION_DATE",
+                          "sourceName": "WorkDay"
+                        },
+                        "type": "accountAttribute"
+                      },
+                      {
+                        "attributes": {
+                          "value": "12/31/2499"
+                        },
+                        "type": "static"
+                      }
+                    ]
+                  },
+                  "type": "firstValid"
+                },
+                "inputFormat": "MM/dd/yyyy",
+                "outputFormat": "ISO8601"
+              },
+              "type": "dateFormat"
+            },
+            "expression": "+180d/d",
+            "roundUp": false
+          },
+          "type": "dateMath"
+        }
+      },
+      "type": "dateCompare"
+    },
+    "todayIsHireDateMinus20": {
+      "attributes": {
+        "negativeCondition": "no",
+        "positiveCondition": "yes",
+        "firstDate": "now",
+        "operator": "gte",
+        "secondDate": {
+          "attributes": {
+            "input": {
+              "attributes": {
+                "input": {
+                  "attributes": {
+                    "values": [
+                      {
+                        "attributes": {
+                          "attributeName": "HIREDATE",
+                          "sourceName": "WorkDay"
+                        },
+                        "type": "accountAttribute"
+                      },
+                      {
+                        "attributes": {
+                          "value": "12/31/2010"
+                        },
+                        "type": "static"
+                      }
+                    ]
+                  },
+                  "type": "firstValid"
+                },
+                "inputFormat": "MM/dd/yyyy",
+                "outputFormat": "ISO8601"
+              },
+              "type": "dateFormat"
+            },
+            "expression": "-20d/d",
+            "roundUp": false
+          },
+          "type": "dateMath"
+        }
+      },
+      "type": "dateCompare"
+    },
+    "isTermDateWithin15Days": {
+      "attributes": {
+        "negativeCondition": "no",
+        "positiveCondition": "yes",
+        "firstDate": {
+          "attributes": {
+            "expression": "now+15d",
+            "roundUp": false
+          },
+          "type": "dateMath"
+        },
+        "operator": "gte",
+        "secondDate": {
+          "attributes": {
+            "input": {
+              "attributes": {
+                "input": {
+                  "attributes": {
+                    "values": [
+                      {
+                        "attributes": {
+                          "attributeName": "TERMINATION_DATE",
+                          "sourceName": "WorkDay"
+                        },
+                        "type": "accountAttribute"
+                      },
+                      {
+                        "attributes": {
+                          "value": "12/31/2499"
+                        },
+                        "type": "static"
+                      }
+                    ]
+                  },
+                  "type": "firstValid"
+                },
+                "inputFormat": "MM/dd/yyyy",
+                "outputFormat": "ISO8601"
+              },
+              "type": "dateFormat"
+            },
+            "expression": "-20d/d",
+            "roundUp": false
+          },
+          "type": "dateMath"
+        }
+      },
+      "type": "dateCompare"
+    },
+    "todayIs14DaysAfterTermination": {
+      "attributes": {
+        "negativeCondition": "no",
+        "positiveCondition": "yes",
+        "firstDate": "now",
+        "operator": "gte",
+        "secondDate": {
+          "attributes": {
+            "input": {
+              "attributes": {
+                "input": {
+                  "attributes": {
+                    "values": [
+                      {
+                        "attributes": {
+                          "attributeName": "TERMINATION_DATE",
+                          "sourceName": "WorkDay"
+                        },
+                        "type": "accountAttribute"
+                      },
+                      {
+                        "attributes": {
+                          "value": "12/31/2499"
+                        },
+                        "type": "static"
+                      }
+                    ]
+                  },
+                  "type": "firstValid"
+                },
+                "inputFormat": "MM/dd/yyyy",
+                "outputFormat": "ISO8601"
+              },
+              "type": "dateFormat"
+            },
+            "expression": "+14d/d",
+            "roundUp": false
+          },
+          "type": "dateMath"
+        }
+      },
+      "type": "dateCompare"
+    },
+    "isTermDatePopulated": {
+      "attributes": {
+        "id": "P32 isTermDatePopulated"
+      },
+      "type": "reference"
+    },
+    "todayIsAfterHireDate": {
+      "attributes": {
+        "negativeCondition": "no",
+        "positiveCondition": "yes",
+        "firstDate": "now",
+        "operator": "gte",
+        "secondDate": {
+          "attributes": {
+            "input": {
+              "attributes": {
+                "values": [
+                  {
+                    "attributes": {
+                      "attributeName": "HIREDATE",
+                      "sourceName": "WorkDay"
+                    },
+                    "type": "accountAttribute"
+                  },
+                  {
+                    "attributes": {
+                      "value": "12/31/2010"
+                    },
+                    "type": "static"
+                  }
+                ]
+              },
+              "type": "firstValid"
+            },
+            "inputFormat": "MM/dd/yyyy",
+            "outputFormat": "ISO8601"
+          },
+          "type": "dateFormat"
+        }
+      },
+      "type": "dateCompare"
+    },
+    "whatIsFutureAction": {
+      "type": "firstValid",
+      "attributes": {
+        "values": [
+          {
+            "attributes": {
+              "attributeName": "FUTURE_ACTION",
+              "sourceName": "WorkDay"
+            },
+            "type": "accountAttribute"
+          },
+          {
+            "attributes": {
+              "value": "NA"
+            },
+            "type": "static"
+          }
+        ]
+      }
+    },
+    "todayIsBeforeTermDate": {
+      "attributes": {
+        "negativeCondition": "no",
+        "positiveCondition": "yes",
+        "firstDate": "now",
+        "operator": "lte",
+        "secondDate": {
+          "attributes": {
+            "input": {
+              "attributes": {
+                "values": [
+                  {
+                    "attributes": {
+                      "attributeName": "TERMINATION_DATE",
+                      "sourceName": "WorkDay"
+                    },
+                    "type": "accountAttribute"
+                  },
+                  {
+                    "attributes": {
+                      "value": "12/31/2499"
+                    },
+                    "type": "static"
+                  }
+                ]
+              },
+              "type": "firstValid"
+            },
+            "inputFormat": "MM/dd/yyyy",
+            "outputFormat": "ISO8601"
+          },
+          "type": "dateFormat"
+        }
+      },
+      "type": "dateCompare"
+    },
+    "hireDateIsAfterTermDate": {
+      "type": "dateCompare",
+      "attributes": {
+        "operator": "lt",
+        "positiveCondition": "yes",
+        "negativeCondition": "no",
+        "firstDate": {
+          "type": "dateFormat",
+          "attributes": {
+            "inputFormat": "MM/dd/yyyy",
+            "outputFormat": "ISO8601",
+            "requiresPeriodicRefresh": true,
+            "input": {
+              "type": "firstValid",
+              "attributes": {
+                "values": [
+                  {
+                    "attributes": {
+                      "attributeName": "TERMINATION_DATE",
+                      "sourceName": "WorkDay"
+                    },
+                    "type": "accountAttribute"
+                  },
+                  {
+                    "type": "static",
+                    "attributes": {
+                      "value": "01/01/2001"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "secondDate": {
+          "type": "dateFormat",
+          "attributes": {
+            "inputFormat": "MM/dd/yyyy",
+            "outputFormat": "ISO8601",
+            "requiresPeriodicRefresh": true,
+            "input": {
+              "type": "firstValid",
+              "attributes": {
+                "values": [
+                  {
+                    "attributes": {
+                      "attributeName": "HIREDATE",
+                      "sourceName": "WorkDay"
+                    },
+                    "type": "accountAttribute"
+                  },
+                  {
+                    "type": "static",
+                    "attributes": {
+                      "value": "12/31/2010"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "todayIsGteEstimatedEndDate": {
+      "type": "dateCompare",
+      "attributes": {
+        "operator": "gte",
+        "positiveCondition": "yes",
+        "negativeCondition": "no",
+        "firstDate": {
+          "type": "dateMath",
+          "attributes": {
+            "expression": "now/d",
+            "requiresPeriodicRefresh": true
+          }
+        },
+        "secondDate": {
+          "type": "dateFormat",
+          "attributes": {
+            "inputFormat": "yyyy-MM-dd",
+            "outputFormat": "ISO8601",
+            "requiresPeriodicRefresh": true,
+            "input": {
+              "type": "firstValid",
+              "attributes": {
+                "values": [
+                  {
+                    "attributes": {
+                      "attributeName": "CF_LOA_Estimated_End__c",
+                      "sourceName": "WorkDay"
+                    },
+                    "type": "accountAttribute"
+                  },
+                  {
+                    "type": "static",
+                    "attributes": {
+                      "value": "2000-31-12"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "isWorkerOnLeave": {
+      "attributes": {
+        "values": [
+          {
+            "attributes": {
+              "attributeName": "CF_Full_Leave__c",
+              "sourceName": "WorkDay"
+            },
+            "type": "accountAttribute"
+          },
+          {
+            "attributes": {
+              "value": "N"
+            },
+            "type": "static"
+          }
+        ]
+      },
+      "type": "firstValid"
+    },
+    "pendingAfterLastApproved": {
+      "attributes": {
+        "values": [
+          {
+            "attributes": {
+              "attributeName": "CF_LOA_Pending_After_Last_Approved__c",
+              "sourceName": "WorkDay"
+            },
+            "type": "accountAttribute"
+          },
+          {
+            "attributes": {
+              "value": "N"
+            },
+            "type": "static"
+          }
+        ]
+      },
+      "type": "firstValid"
+    },
+    "ctwLeaveStatus": {
+      "attributes": {
+        "values": [
+          {
+            "attributes": {
+              "attributeName": "EMPLOYEE_TYPE",
+              "sourceName": "Workday"
+            },
+            "type": "accountAttribute"
+          },
+          {
+            "attributes": {
+              "value": "N"
+            },
+            "type": "static"
+          }
+        ]
+      },
+      "type": "firstValid"
+    },
+    "value": "#if($workerStatus=='TERMINATED' && $todayIs6MonthsAfterTermDate=='yes')deleteaccount#elseif($workerStatus=='TERMINATED' && $todayIs14DaysAfterTermination=='yes')removeaccess#elseif($workerStatus=='TERMINATED' && $todayIsAfterTermDate=='yes' && $todayIs14DaysAfterTermination=='no')inactive#elseif(((($isWorkerOnLeave == 'Y' && $todayIsGteEstimatedEndDate=='no') || ($isWorkerOnLeave == 'Y' && $todayIsGteEstimatedEndDate == 'yes' && $pendingAfterLastApproved == 'Y')) || $ctwLeaveStatus.toLowerCase() =='inactive') && $workerStatus=='ACTIVE')onleave#elseif($workerStatus=='ACTIVE' && $todayIsAfterHireDate=='yes' && $todayIsBeforeTermDate=='yes' && $isTermDatePopulated=='yes' && $isTermDateWithin15Days=='yes' )preterm#elseif(($workerStatus=='ACTIVE' && $todayIsHireDateMinus20=='yes' && $todayIsAfterHireDate=='no') && ($whatIsFutureAction=='Hire Employee' || $whatIsFutureAction=='Contract Contingent Worker' || $whatIsFutureAction=='Onboarding'))prehire#elseif($workerStatus=='ACTIVE' && $todayIsAfterHireDate=='yes')active#{else}none#end"
+  },
+  "internal": false
+}

@@ -1,0 +1,24 @@
+{
+  "id": "419bfe8b-1701-4dbb-b33d-0849a7cd92b6",
+  "name": "P32 Workday Clone Term Date",
+  "type": "firstValid",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "Workday Clone",
+          "attributeName": "LAST_DAY_OF_WORK"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "sourceName": "Workday Clone",
+          "attributeName": "TERMINATION_DATE"
+        },
+        "type": "accountAttribute"
+      }
+    ]
+  },
+  "internal": false
+}

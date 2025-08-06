@@ -1,0 +1,29 @@
+{
+  "id": "37849045-2b76-4487-a289-dc05c5b4d25b",
+  "name": "P32 SPTest Worker Status",
+  "type": "static",
+  "attributes": {
+    "checkIsActive": {
+      "attributes": {
+        "values": [
+          {
+            "attributes": {
+              "attributeName": "WORKERSTATUS",
+              "sourceName": "WorkDay Flat File"
+            },
+            "type": "accountAttribute"
+          },
+          {
+            "attributes": {
+              "value": "0"
+            },
+            "type": "static"
+          }
+        ]
+      },
+      "type": "firstValid"
+    },
+    "value": "#if($checkIsActive=='0')Inactive#{else}Active#end"
+  },
+  "internal": false
+}

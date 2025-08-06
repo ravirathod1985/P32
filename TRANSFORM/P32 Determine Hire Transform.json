@@ -1,0 +1,32 @@
+{
+  "id": "dea665be-a346-4e5c-88b5-0082b6cd2e46",
+  "name": "P32 Determine Hire Transform",
+  "type": "dateCompare",
+  "attributes": {
+    "firstDate": {
+      "attributes": {
+        "input": {
+          "attributes": {
+            "id": "P32 Convert HireDate in YYYY-mm-dd Transform"
+          },
+          "type": "reference"
+        },
+        "inputFormat": "yyyy-MM-dd",
+        "outputFormat": "ISO8601"
+      },
+      "type": "dateFormat"
+    },
+    "secondDate": {
+      "attributes": {
+        "input": "2023-08-24",
+        "inputFormat": "yyyy-MM-dd",
+        "outputFormat": "ISO8601"
+      },
+      "type": "dateFormat"
+    },
+    "operator": "gt",
+    "positiveCondition": "Yes",
+    "negativeCondition": "No"
+  },
+  "internal": false
+}

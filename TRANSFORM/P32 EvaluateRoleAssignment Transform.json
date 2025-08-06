@@ -1,0 +1,32 @@
+{
+  "id": "a3561dc8-9736-446a-9316-7eb6aeeaeeef",
+  "name": "P32 EvaluateRoleAssignment Transform",
+  "type": "dateCompare",
+  "attributes": {
+    "firstDate": {
+      "attributes": {
+        "input": {
+          "attributes": {
+            "id": "P32 ExtractP32AD AccountCreation Date Transform"
+          },
+          "type": "reference"
+        },
+        "inputFormat": "yyyy-MM-dd",
+        "outputFormat": "ISO8601"
+      },
+      "type": "dateFormat"
+    },
+    "secondDate": {
+      "attributes": {
+        "input": "2023-07-31",
+        "inputFormat": "yyyy-MM-dd",
+        "outputFormat": "ISO8601"
+      },
+      "type": "dateFormat"
+    },
+    "operator": "gt",
+    "positiveCondition": "Yes",
+    "negativeCondition": "No"
+  },
+  "internal": false
+}

@@ -1,0 +1,23 @@
+{
+  "id": "36717ea6-a4cf-43f0-bbaf-550d5f3d20cb",
+  "name": "P32 Workday Clone THP Email",
+  "type": "firstValid",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "THP-ActiveDirectory",
+          "attributeName": "mail"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "value": "NO_EMAIL"
+        },
+        "type": "static"
+      }
+    ]
+  },
+  "internal": false
+}

@@ -1,0 +1,12 @@
+{
+  "id": "5d19c400-c5a1-43da-998e-ea0359f6c222",
+  "name": "P32 Workday Clone Manager Name",
+  "type": "rule",
+  "attributes": {
+    "name": "Cloud Services Deployment Utility",
+    "operation": "getReferenceIdentityAttribute",
+    "uid": "manager",
+    "attributeName": "displayName"
+  },
+  "internal": false
+}

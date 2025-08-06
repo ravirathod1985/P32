@@ -1,0 +1,11 @@
+{
+  "id": "fc049cb7-0303-409a-a9ad-1972c47eb0fa",
+  "name": "P32 eCare DN",
+  "type": "usernameGenerator",
+  "attributes": {
+    "cloudMaxSize": "100",
+    "cloudMaxUniqueChecks": "25",
+    "cloudRequired": "true"
+  },
+  "internal": false
+}

@@ -1,0 +1,36 @@
+{
+  "id": "51c04bd6-d1a2-4750-b84b-6c5364338496",
+  "name": "TC Convert Hiredate",
+  "type": "static",
+  "attributes": {
+    "Hiredate": {
+      "attributes": {
+        "values": [
+          {
+            "attributes": {
+              "input": {
+                "type": "accountAttribute",
+                "attributes": {
+                  "attributeName": "TERMINATION_DATE",
+                  "sourceName": "Workday Flat File"
+                }
+              },
+              "inputFormat": "MM/dd/yyyy",
+              "outputFormat": "yyyy-MM-dd"
+            },
+            "type": "dateFormat"
+          },
+          {
+            "attributes": {
+              "value": "none"
+            },
+            "type": "static"
+          }
+        ]
+      },
+      "type": "firstValid"
+    },
+    "value": "#if($Hiredate=='none')none#{else}$Hiredate#end"
+  },
+  "internal": false
+}

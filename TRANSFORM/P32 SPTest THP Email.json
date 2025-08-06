@@ -1,0 +1,23 @@
+{
+  "id": "5975e9b8-a4e7-4122-a4a4-7b2fb0d0ae0a",
+  "name": "P32 SPTest THP Email",
+  "type": "firstValid",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "THP-ActiveDirectory",
+          "attributeName": "mail"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "value": "NO_EMAIL"
+        },
+        "type": "static"
+      }
+    ]
+  },
+  "internal": false
+}

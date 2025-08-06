@@ -1,0 +1,10 @@
+{
+  "id": "f7cce5cb-8d53-4419-81a9-a2d84e11e7f7",
+  "name": "TC - Get HireDate",
+  "type": "dateFormat",
+  "attributes": {
+    "inputFormat": "MM/dd/yyyy",
+    "outputFormat": "yyyy-MM-dd"
+  },
+  "internal": false
+}

@@ -1,0 +1,23 @@
+{
+  "id": "c9dc210e-3882-44a2-9c6e-3d507a2abfd4",
+  "name": "P32 SPTest UserID",
+  "type": "firstValid",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "Point32Health-ActiveDirectory",
+          "attributeName": "sAMAccountName"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "value": "NONE"
+        },
+        "type": "static"
+      }
+    ]
+  },
+  "internal": false
+}

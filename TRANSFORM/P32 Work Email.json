@@ -1,0 +1,30 @@
+{
+  "id": "77b9cbba-06b6-4470-b276-6079cffc0a6d",
+  "name": "P32 Work Email",
+  "type": "firstValid",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "Point32Health-ActiveDirectory",
+          "attributeName": "mail"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "sourceName": "WorkDay",
+          "attributeName": "EMAIL_ADDRESS_WORK"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "value": "NO_EMAIL"
+        },
+        "type": "static"
+      }
+    ]
+  },
+  "internal": false
+}

@@ -1,0 +1,24 @@
+{
+  "id": "14a0c31d-4b06-421f-a32d-9d3e357d766c",
+  "name": "P32 Term Date",
+  "type": "firstValid",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "WorkDay",
+          "attributeName": "LAST_DAY_OF_WORK"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "sourceName": "WorkDay",
+          "attributeName": "TERMINATION_DATE"
+        },
+        "type": "accountAttribute"
+      }
+    ]
+  },
+  "internal": false
+}

@@ -1,0 +1,25 @@
+{
+  "id": "4931e95a-c4bd-4140-9849-51d4fabc802e",
+  "name": "P32 SPTest AD Display Name",
+  "type": "concat",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "WorkDay Flat File",
+          "attributeName": "LAST_NAME"
+        },
+        "type": "accountAttribute"
+      },
+      ", ",
+      {
+        "attributes": {
+          "sourceName": "WorkDay Flat File",
+          "attributeName": "FIRST_NAME"
+        },
+        "type": "accountAttribute"
+      }
+    ]
+  },
+  "internal": false
+}

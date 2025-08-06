@@ -1,0 +1,23 @@
+{
+  "id": "606a22e7-976b-45d8-a599-dcf06f22071a",
+  "name": "P32 Append .sit to Email",
+  "type": "concat",
+  "attributes": {
+    "values": [
+      {
+        "type": "lower",
+        "attributes": {
+          "input": {
+            "type": "accountAttribute",
+            "attributes": {
+              "attributeName": "EMAIL_ADDRESS_WORK",
+              "sourceName": "WorkDay"
+            }
+          }
+        }
+      },
+      ".sit"
+    ]
+  },
+  "internal": false
+}

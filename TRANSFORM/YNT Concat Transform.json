@@ -1,0 +1,55 @@
+{
+  "id": "52db6ad4-33dd-4df7-a5b8-d2908ab380a8",
+  "name": "YNT Concat Transform",
+  "type": "concat",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "input": {
+            "attributes": {
+              "sourceName": "Point32Health-ActiveDirectory",
+              "attributeName": "whencreated"
+            },
+            "type": "accountAttribute"
+          },
+          "begin": 0,
+          "end": 4
+        },
+        "type": "substring"
+      },
+      "-",
+      {
+        "attributes": {
+          "input": {
+            "attributes": {
+              "sourceName": "Point32Health-ActiveDirectory",
+              "attributeName": "whencreated"
+            },
+            "type": "accountAttribute"
+          },
+          "begin": 4,
+          "end": 6
+        },
+        "type": "substring"
+      },
+      "-",
+      {
+        "attributes": {
+          "input": {
+            "attributes": {
+              "sourceName": "Point32Health-ActiveDirectory",
+              "attributeName": "whencreated"
+            },
+            "type": "accountAttribute"
+          },
+          "begin": 6,
+          "end": 8
+        },
+        "type": "substring"
+      },
+      null
+    ]
+  },
+  "internal": false
+}

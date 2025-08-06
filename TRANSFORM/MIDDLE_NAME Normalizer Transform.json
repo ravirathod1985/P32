@@ -1,0 +1,15 @@
+{
+  "id": "7914c773-8202-46b0-91c6-cba5bca710d9",
+  "name": "MIDDLE_NAME Normalizer Transform",
+  "type": "normalizeNames",
+  "attributes": {
+    "input": {
+      "attributes": {
+        "sourceName": "Workday",
+        "attributeName": "LEGAL_MIDDLE_NAME"
+      },
+      "type": "accountAttribute"
+    }
+  },
+  "internal": false
+}

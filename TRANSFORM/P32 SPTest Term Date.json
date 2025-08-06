@@ -1,0 +1,24 @@
+{
+  "id": "a9300722-d46e-457b-a5bf-78bb087d3f94",
+  "name": "P32 SPTest Term Date",
+  "type": "firstValid",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "WorkDay Flat File",
+          "attributeName": "LAST_DAY_OF_WORK"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "sourceName": "WorkDay Flat File",
+          "attributeName": "TERMINATION_DATE"
+        },
+        "type": "accountAttribute"
+      }
+    ]
+  },
+  "internal": false
+}

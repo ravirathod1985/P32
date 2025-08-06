@@ -1,0 +1,61 @@
+{
+  "id": "9ade0ce2-2ef0-4a87-ba33-125071f436b3",
+  "name": "Static Transform",
+  "type": "static",
+  "attributes": {
+    "Date": {
+      "attributes": {
+        "values": [
+          {
+            "attributes": {
+              "input": {
+                "attributes": {
+                  "sourceName": "Point32Health-ActiveDirectory",
+                  "attributeName": "whencreated"
+                },
+                "type": "accountAttribute"
+              },
+              "begin": 0,
+              "end": 4
+            },
+            "type": "substring"
+          },
+          "-",
+          {
+            "attributes": {
+              "input": {
+                "attributes": {
+                  "sourceName": "Point32Health-ActiveDirectory",
+                  "attributeName": "whencreated"
+                },
+                "type": "accountAttribute"
+              },
+              "begin": 4,
+              "end": 6
+            },
+            "type": " "
+          },
+          "-",
+          {
+            "attributes": {
+              "input": {
+                "attributes": {
+                  "sourceName": "Point32Health-ActiveDirectory",
+                  "attributeName": "whencreated"
+                },
+                "type": "accountAttribute"
+              },
+              "begin": 6,
+              "end": 8
+            },
+            "type": "substring"
+          },
+          null
+        ]
+      },
+      "type": "concat"
+    },
+    "value": "#if($Date=='--')2019-07-20#{else}$Date#end"
+  },
+  "internal": false
+}

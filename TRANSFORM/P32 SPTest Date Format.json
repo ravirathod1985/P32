@@ -1,0 +1,10 @@
+{
+  "id": "22eb93e2-04be-4062-a97b-f639e7187c00",
+  "name": "P32 SPTest Date Format",
+  "type": "dateFormat",
+  "attributes": {
+    "inputFormat": "MM/dd/yy",
+    "outputFormat": "MM/dd/yyyy"
+  },
+  "internal": false
+}

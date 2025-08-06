@@ -1,0 +1,24 @@
+{
+  "id": "f21bc453-f995-4728-8811-997129d2ea55",
+  "name": "P32 Telephone Number",
+  "type": "firstValid",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "Point32Health-ActiveDirectory",
+          "attributeName": "telephoneNumber"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "sourceName": "WorkDay",
+          "attributeName": "WORK_TELEPHONE"
+        },
+        "type": "accountAttribute"
+      }
+    ]
+  },
+  "internal": false
+}

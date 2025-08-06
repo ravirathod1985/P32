@@ -1,0 +1,15 @@
+{
+  "id": "45db7832-8c1a-48b8-9ca2-1b409751b9c4",
+  "name": "FIRST_NAME Normalizer Transform",
+  "type": "normalizeNames",
+  "attributes": {
+    "input": {
+      "attributes": {
+        "sourceName": "Workday",
+        "attributeName": "FIRST_NAME"
+      },
+      "type": "accountAttribute"
+    }
+  },
+  "internal": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "2c8c4282-034c-41ae-b58f-127b16590eb1",
+  "name": "P32 Workday Clone Date Format",
+  "type": "dateFormat",
+  "attributes": {
+    "inputFormat": "MM/dd/yy",
+    "outputFormat": "MM/dd/yyyy"
+  },
+  "internal": false
+}

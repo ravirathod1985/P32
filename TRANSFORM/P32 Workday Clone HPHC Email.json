@@ -1,0 +1,23 @@
+{
+  "id": "9950bd02-4746-42cd-a2c7-0b451ea69543",
+  "name": "P32 Workday Clone HPHC Email",
+  "type": "firstValid",
+  "attributes": {
+    "values": [
+      {
+        "attributes": {
+          "sourceName": "HPHC-ActiveDirectory",
+          "attributeName": "mail"
+        },
+        "type": "accountAttribute"
+      },
+      {
+        "attributes": {
+          "value": "NO_EMAIL"
+        },
+        "type": "static"
+      }
+    ]
+  },
+  "internal": false
+}
