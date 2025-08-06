@@ -1,0 +1,23 @@
+{
+  "description": "This rule print logs in after operation rule",
+  "type": "WebServiceAfterOperationRule",
+  "signature": {
+    "input": [],
+    "output": {
+      "name": "",
+      "description": null,
+      "type": null
+    }
+  },
+  "sourceCode": {
+    "version": "1.0",
+    "script": "import sailpoint.tools.GeneralException;\r\nimport org.json.JSONObject;\r\n        \r\nString ruleName=\"Rule - WebServiceAfterOperationRule - PrintLogs\";\r\nlog.info(\"ExecutingAfterRule rule : \"+ruleName);\r\norg.json.JSONObject jsonResponse = new org.json.JSONObject(rawResponseObject);\r\nif(jsonResponse!=null)\r\n{\r\n  log.info(\"jsonResponse : \"+jsonResponse);\r\n  if(jsonResponse.has(\"result\")==null)\r\n  {        \r\n    if(jsonResponse.get(\"result\").has(\"error_message\")==true)\r\n\t{\r\n\t  String errorMsg=jsonResponse.get(\"result\").get(\"error_message\");\r\n      throw new sailpoint.tools.GeneralException(errorMsg);\r\n\t}\r\n    \r\n  }\r\n}\r\n\r\nlog.info(\"Exiting rule : \"+ruleName);"
+  },
+  "attributes": {
+    "sourceVersion": "1.0"
+  },
+  "id": "816b4ebbc46042d1b09d31932d291f85",
+  "name": "Rule - WebServiceAfterOperationRule - PrintLogs",
+  "created": "2022-04-05T10:52:12.226Z",
+  "modified": "2024-04-17T19:16:04.364Z"
+}

@@ -1,0 +1,54 @@
+{
+  "description": "This JDBC rule can process account creation requests, deletion requests, and modification requests that pertain to the role attribute. It logs debug messages if other account request types are submitted.",
+  "type": "JDBCProvision",
+  "signature": {
+    "input": [
+      {
+        "name": "log",
+        "description": "The log object associated with the SailPointContext.",
+        "type": null
+      },
+      {
+        "name": "context",
+        "description": "A sailpoint.api.SailPointContext object that can be used to query the database if necessary.\n  ",
+        "type": null
+      },
+      {
+        "name": "application",
+        "description": "The application whose data file is being processed.",
+        "type": null
+      },
+      {
+        "name": "schema",
+        "description": "The Schema currently in use.",
+        "type": null
+      },
+      {
+        "name": "connection",
+        "description": "A connection object to connect to database.",
+        "type": null
+      },
+      {
+        "name": "plan",
+        "description": "The ProvisioningPlan created against the JDBC application.",
+        "type": null
+      }
+    ],
+    "output": {
+      "name": "result",
+      "description": "A Provisioning Result object is desirable to return the status.IT can be a new object or part of  Provisioning Plan",
+      "type": null
+    }
+  },
+  "sourceCode": {
+    "version": "1.0",
+    "script": "// source code"
+  },
+  "attributes": {
+    "sourceVersion": "1.0"
+  },
+  "id": "c440ce42a9b146a9a569002626039b04",
+  "name": "Test - Rule",
+  "created": "2022-09-20T12:05:34.341Z",
+  "modified": "2024-04-17T19:16:03.817Z"
+}

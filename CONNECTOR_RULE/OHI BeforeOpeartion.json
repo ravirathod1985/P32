@@ -1,0 +1,44 @@
+{
+  "description": "This rule is used by the  Web Services connector before performing any operation like testconnection, aggregation, etc.",
+  "type": "WebServiceBeforeOperationRule",
+  "signature": {
+    "input": [
+      {
+        "name": "application",
+        "description": "The application whose data file is being processed.",
+        "type": null
+      },
+      {
+        "name": "requestEndPoint",
+        "description": "The current request information contain header, body, context url, method type, response attribute map,\n          successful response code\n        ",
+        "type": null
+      },
+      {
+        "name": "oldResponseMap",
+        "description": "earlier response object ",
+        "type": null
+      },
+      {
+        "name": "restClient",
+        "description": "REST Client Object",
+        "type": null
+      }
+    ],
+    "output": {
+      "name": "EndPoint",
+      "description": "Updated EndPoint Object",
+      "type": null
+    }
+  },
+  "sourceCode": {
+    "version": "1.0",
+    "script": "\timport sailpoint.tools.Util;\r\n\timport java.util.ArrayList;\r\n\timport java.util.HashMap;\r\n\timport java.util.HashSet;\r\n\t\r\n        log.info(\"BEFORE RULE: OHI Create requestEndPoint: \"+requestEndPoint);"
+  },
+  "attributes": {
+    "sourceVersion": "1.0"
+  },
+  "id": "402511eb18ac4d28a231cc19176200d9",
+  "name": "OHI BeforeOpeartion",
+  "created": "2022-10-21T21:11:11.887Z",
+  "modified": "2024-04-17T19:16:03.441Z"
+}

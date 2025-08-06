@@ -1,0 +1,24 @@
+{
+  "description": "Rule to invoke powershell code to create users folder",
+  "type": "ConnectorAfterCreate",
+  "signature": {
+    "input": [],
+    "output": null
+  },
+  "sourceCode": {
+    "version": "1.0",
+    "script": "\r\n$samAccountName=\"test_jd4529\"   \r\n#$fullPath = \"\\\\is-fs1\\Users\\{0}\" -f $samAccountName\r\n$fullPath = \"\\\\is-fs1\\users\\{0}\" -f $samAccountName\r\n$driveLetter = \"F:\"\r\n \r\n$User = Get-ADUser -Identity $samAccountName\r\n \r\nif($User -ne $Null) {\r\n    Set-ADUser $User -HomeDrive $driveLetter -HomeDirectory $fullPath -ea Stop\r\n    $homeShare = New-Item -path $fullPath -ItemType Directory -force -ea Stop\r\n \r\n    $acl = Get-Acl $homeShare\r\n \r\n    $FileSystemRights = [System.Security.AccessControl.FileSystemRights]\"Modify\"\r\n    $AccessControlType = [System.Security.AccessControl.AccessControlType]::Allow\r\n    $InheritanceFlags = [System.Security.AccessControl.InheritanceFlags]\"ContainerInherit, ObjectInherit\"\r\n    $PropagationFlags = [System.Security.AccessControl.PropagationFlags]\"InheritOnly\"\r\n \r\n    $AccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule ($User.SID, $FileSystemRights, $InheritanceFlags, $PropagationFlags, $AccessControlType)\r\n    $acl.AddAccessRule($AccessRule)\r\n \r\n    Set-Acl -Path $homeShare -AclObject $acl -ea Stop\r\n    Write-Output \"HomeDirectory created at {0} -f $fullPath\" >> E:\\Sailpoint\\scripts\\Logs\\createhomedir.txt   \r\n    #Write-Host (\"HomeDirectory created at {0}\" -f $fullPath)\r\n} \r\n"
+  },
+  "attributes": {
+    "ObjectOrientedScript": "true",
+    "extension": ".ps1",
+    "sourceVersion": "1.0",
+    "disabled": "false",
+    "program": "powershell.exe",
+    "timeout": "360"
+  },
+  "id": "07ca6d4c26f141b3a69852602b06dc2f",
+  "name": "Rule - THP ActiveDirectory - Test-AfterCreate",
+  "created": "2023-03-28T14:58:56.533Z",
+  "modified": "2024-04-17T19:16:04.197Z"
+}

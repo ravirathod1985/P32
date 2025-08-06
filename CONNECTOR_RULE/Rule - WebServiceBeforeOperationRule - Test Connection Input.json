@@ -1,0 +1,23 @@
+{
+  "description": "This rule creates a json input for test connection operation.",
+  "type": "WebServiceBeforeOperationRule",
+  "signature": {
+    "input": [],
+    "output": {
+      "name": "",
+      "description": null,
+      "type": null
+    }
+  },
+  "sourceCode": {
+    "version": "1.0",
+    "script": "import sailpoint.object.ProvisioningPlan.AccountRequest;\r\nimport sailpoint.object.ProvisioningPlan.AccountRequest.Operation;\r\nimport sailpoint.object.ProvisioningPlan.AttributeRequest;\r\nimport sailpoint.object.ProvisioningPlan;\r\nimport java.util.List;\r\nimport java.util.Map;\r\nimport org.json.JSONObject;\r\nimport sailpoint.object.ProvisioningPlan.Operation;\r\nimport sailpoint.object.Attributes;\r\nimport java.util.UUID; \r\n\r\nString ruleName=\"Rule - WebServiceBeforeOperationRule - Test Connection Input\";\r\nlog.info(\"Entering : \"+ruleName);\r\nMap bodyMap = new HashMap();\r\nJSONObject jsonBody = new JSONObject();\r\nlog.info(\"Initial RequestBody : \"+requestEndPoint.getBody());    \r\njsonBody.put(\"sourcename\", \"ohidev3\"); \r\nbodyMap.put(\"jsonBody\", jsonBody.toString()); \r\nrequestEndPoint.setBody(bodyMap); \r\nlog.info(\"Final RequestBody : \"+requestEndPoint.getBody());\r\nlog.info(\"Exiting rule : \"+ruleName);\r\nreturn requestEndPoint;"
+  },
+  "attributes": {
+    "sourceVersion": "1.0"
+  },
+  "id": "0a3fcec2d4b04a7287398cf9a0a4759f",
+  "name": "Rule - WebServiceBeforeOperationRule - Test Connection Input",
+  "created": "2022-08-02T08:42:59.011Z",
+  "modified": "2024-04-17T19:16:03.789Z"
+}

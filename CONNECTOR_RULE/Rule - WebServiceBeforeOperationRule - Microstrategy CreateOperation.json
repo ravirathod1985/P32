@@ -1,0 +1,23 @@
+{
+  "description": "This rule creates a user in Microstrategy.",
+  "type": "WebServiceBeforeOperationRule",
+  "signature": {
+    "input": [],
+    "output": {
+      "name": "",
+      "description": null,
+      "type": null
+    }
+  },
+  "sourceCode": {
+    "version": "1.0",
+    "script": "import sailpoint.object.ProvisioningPlan.AccountRequest;\r\nimport sailpoint.object.ProvisioningPlan.AccountRequest.Operation;\r\nimport sailpoint.object.ProvisioningPlan.AttributeRequest;\r\nimport sailpoint.object.ProvisioningPlan;\r\nimport java.util.List;\r\nimport java.util.Map;\r\nimport org.json.JSONObject;\r\nimport sailpoint.object.ProvisioningPlan.Operation;\r\nimport sailpoint.object.Attributes;\r\n\r\nString ruleName=\"Rule - WebServiceBeforeOperationRule - Microstrategy CreateOperation Rule\";\r\nlog.info(\"Entering : \"+ruleName);\r\n\r\nif(provisioningPlan!=null)\r\n{\r\n   AttributeRequest atrq=null;\r\n   String nativeIdentity=\"\";\r\n   String displayName=\"\";\r\n   String active=\"\"; \r\n      \r\n   List accountRequests=provisioningPlan.getAccountRequests();\r\n   Map bodyMap = new HashMap();\r\n   JSONObject jsonBody = new JSONObject();\r\n   Attributes attrs = new Attributes();\r\n   List role=new ArrayList();\r\n   log.info(\"Initial RequestBody : \"+requestEndPoint.getBody());\r\n   for(ProvisioningPlan.AccountRequest accReq:accountRequests)\r\n   {\r\n     log.info(\"total accountRequests : \"+accountRequests.size());\r\n\t nativeIdentity=accReq.getNativeIdentity();\r\n\t atrq=accReq.getAttributeRequest(\"displayName\");\r\n\t displayName=atrq.getValue();\r\n\t atrq=accReq.getAttributeRequest(\"active\");\r\n\t active=atrq.getValue().toString();\r\n\t atrq=accReq.getAttributeRequest(\"role\");\r\n\t if(atrq.getName().equals(\"role\"))\r\n     {\r\n\t   \tlog.info(\"atrq.getValue().getClass() : \"+atrq.getValue().getClass());\r\n\t\tif(atrq.getValue() instanceof String)\r\n\t\t{\r\n\t\t\trole.add(atrq.getValue());\r\n        }\r\n        else if(atrq.getValue() instanceof List)\r\n        {\r\n            role=atrq.getValue();\r\n        }\t\t\t\t  \t\t\r\n     }     \r\n   }\r\n   log.info(\"nativeIdentity : \"+nativeIdentity);\r\n   jsonBody.put(\"loginName\", nativeIdentity);\r\n   jsonBody.put(\"displayName\", displayName);\r\n   jsonBody.put(\"active\", active);\r\n   jsonBody.put(\"userRoleList\", role);\r\n   log.info(\"jsonBody : \"+jsonBody.toString());   \r\n   bodyMap.put(\"jsonBody\", jsonBody.toString());\r\n   requestEndPoint.setBody(bodyMap);\r\n   log.info(\"Final RequestBody : \"+requestEndPoint.getBody());\r\n}\r\nlog.info(\"Exiting rule : \"+ruleName);\r\nreturn requestEndPoint;"
+  },
+  "attributes": {
+    "sourceVersion": "1.0"
+  },
+  "id": "2d6d87f88a3a4954b173f44dca47e9e3",
+  "name": "Rule - WebServiceBeforeOperationRule - Microstrategy CreateOperation",
+  "created": "2022-06-03T08:29:44.222Z",
+  "modified": "2024-04-17T19:16:04.389Z"
+}

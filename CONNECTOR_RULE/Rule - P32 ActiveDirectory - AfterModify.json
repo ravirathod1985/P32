@@ -1,0 +1,24 @@
+{
+  "description": "Executes PowerShell commands on the IQService component after a source account is modified.",
+  "type": "ConnectorAfterModify",
+  "signature": {
+    "input": [],
+    "output": null
+  },
+  "sourceCode": {
+    "version": "1.0",
+    "script": "$logDate = Get-Date -UFormat \"%Y%m%d\"\r\n$logFile = \"E:\\SailPoint\\Scripts\\Logs\\ConnectorAfterModify_$logDate.log\"\r\n$command = \"E:\\SailPoint\\Scripts\\AfterModify.ps1\"\r\n$enableDebug = $true\r\n#====================-------Helper functions-------====================\r\nfunction LogToFile([String] $info) {\r\n  $info | Out-File $logFile -Append\r\n}\r\n#====================-------Get the request object-------====================\r\nTry{\r\n\t  if($enableDebug) {\r\n\t\t  $timestampString = (Get-Date -Format \"yyyy-MM-dd_HH-mm-ss\").ToString()\r\n\t\t  LogToFile(\"[$timestampString] AfterModify: Entering AfterModify rule\")\r\n\t  }\r\n\t  Add-type -path utils.dll;\r\n\t  $sReader = New-Object System.IO.StringReader([System.String]$env:Request);\r\n\t  $xmlReader = [System.xml.XmlTextReader]([sailpoint.utils.xml.XmlUtil]::getReader($sReader));\r\n\t  $requestObject = New-Object Sailpoint.Utils.objects.AccountRequest($xmlReader);\r\n\t  $requestAsString = $env:Request\r\n\t  $op = $requestObject.Operation\r\n\t  \r\n\t  $nativeIdentity = $requestObject.nativeIdentity\r\n\t  foreach ($attribute in $requestObject.AttributeRequests){\r\n\t\t\tif($attribute.Name -eq \"sAMAccountName\") {\r\n\t\t\t\t$sAMAccountName = $attribute.value\r\n\t\t\t}\r\n\t  }\r\n\r\n\t  if($enableDebug) {\r\n\t\t  LogToFile(\"AfterModify: Request as XML object is: $requestAsString\")\r\n\t  }\r\n\t  \r\n\t  if ($op -eq \"Modify\") {\r\n\t\t\t LogToFile(\"AfterModify - Execute Modify Operation Scripts\")\r\n\t\t\t $output = Invoke-Expression $command\r\n\t  }\r\n\t   if ($op -eq \"Disable\") {\r\n\t\t\t LogToFile(\"AfterModify - Execute Modify Operation Scripts\")\r\n\t\t\t $output = Invoke-Expression $command\r\n\t  }\r\n\r\n}Catch{\r\n  $ErrorMessage = $_.Exception.Message\r\n  $ErrorItem = $_.Exception.ItemName\r\n  if($enableDebug) {\r\n\t  LogToFile(\"AfterModify: Error: Item = $ErrorItem -> Message = $ErrorMessage\")\r\n  }\r\n}\r\nif($enableDebug) {\r\n  $timestampString = (Get-Date -Format \"yyyy-MM-dd_HH-mm-ss\").ToString()\r\n  LogToFile(\"[$timestampString] AfterModify: Exiting After Modify rule\")\r\n}"
+  },
+  "attributes": {
+    "ObjectOrientedScript": "true",
+    "extension": ".ps1",
+    "sourceVersion": "1.0",
+    "disabled": "false",
+    "program": "powershell.exe",
+    "timeout": "300"
+  },
+  "id": "aa37ad9f78104f0cb5e3bcea73a517ac",
+  "name": "Rule - P32 ActiveDirectory - AfterModify",
+  "created": "2024-01-24T11:06:55.580Z",
+  "modified": "2024-04-17T19:16:03.384Z"
+}

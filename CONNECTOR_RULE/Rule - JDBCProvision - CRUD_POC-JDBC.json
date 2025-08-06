@@ -1,0 +1,23 @@
+{
+  "description": "This rule performs CRUD operations in POC - JDBC source ",
+  "type": "JDBCProvision",
+  "signature": {
+    "input": [],
+    "output": {
+      "name": "",
+      "description": null,
+      "type": null
+    }
+  },
+  "sourceCode": {
+    "version": "1.0",
+    "script": "import java.util.List;\r\nimport sailpoint.object.ProvisioningPlan;\r\nimport sailpoint.object.ProvisioningPlan.AccountRequest;\r\nimport sailpoint.object.ProvisioningPlan.AttributeRequest;\r\nimport sailpoint.object.Identity;\r\nimport java.sql.PreparedStatement;\r\nimport sailpoint.api.IdentityService;\r\nimport sailpoint.object.Application;\r\n\r\n\r\nString ruleName=\"Rule - JDBCProvision - CRUD_POC-JDBC\";\r\nlog.info(\"Entering rule : \"+ruleName);\r\nif(plan!=null)\r\n{\r\n  String nativeIdentity=plan.getNativeIdentity();\r\n  log.info(\"nativeIdentity : \"+nativeIdentity);\r\n  List accountRequests=plan.getAccountRequests();\r\n  if(accountRequests!=null)\r\n  {\r\n    for(ProvisioningPlan.AccountRequest accReq:accountRequests)\r\n    {\r\n      log.info(\"accReq.getOperation() : \"+accReq.getOperation());\r\n      log.info(\"accReq.getOp() : \"+accReq.getOp());\r\n      List attributeRequests=accReq.getAttributeRequests();\r\n      if(accReq.getOperation().equals(ProvisioningPlan.AccountRequest.Operation.Create)) //Alternate way if(accReq.getOp().equals(ProvisioningPlan.ObjectOperation.Create))\r\n      {\r\n        log.info(\"accReq.getAttributeRequests() : \"+attributeRequests);\r\n        if(attributeRequests!=null)\r\n        {\r\n          // Create Account and provision entitlements\r\n          for(ProvisioningPlan.AttributeRequest attrReq:attributeRequests)\r\n          {\r\n            if(attrReq.getValue() instanceof List)\r\n            {\r\n               List atRs=attrReq.getValue();\r\n               log.info(\"attrReq.getValue() is a list: \"+atRs);\r\n            }\r\n            else if(attrReq.getValue() instanceof String)\r\n            {\r\n               log.info(\"attrReq.getValue() is a string: \"+attrReq.getValue());\r\n            } \r\n          }\r\n        }\r\n      }\r\n    }\r\n  }\r\n}\r\nlog.info(\"Exiting rule : \"+ruleName);"
+  },
+  "attributes": {
+    "sourceVersion": "1.0"
+  },
+  "id": "5cb181d4cf4946179d3ef013660e2f7f",
+  "name": "Rule - JDBCProvision - CRUD_POC-JDBC",
+  "created": "2022-04-18T13:45:57.830Z",
+  "modified": "2024-04-17T19:16:04.139Z"
+}

@@ -1,0 +1,23 @@
+{
+  "description": "This rule checks response for exceptions.",
+  "type": "WebServiceAfterOperationRule",
+  "signature": {
+    "input": [],
+    "output": {
+      "name": "",
+      "description": null,
+      "type": null
+    }
+  },
+  "sourceCode": {
+    "version": "1.0",
+    "script": "import sailpoint.object.ProvisioningPlan.AccountRequest;\r\nimport sailpoint.object.ProvisioningPlan.AccountRequest.Operation;\r\nimport sailpoint.object.ProvisioningPlan.AttributeRequest;\r\nimport sailpoint.object.ProvisioningPlan;\r\nimport java.util.List;\r\nimport java.util.Map;\r\nimport org.json.JSONObject;\r\nimport sailpoint.object.ProvisioningPlan.Operation;\r\nimport sailpoint.object.Attributes;\r\n\r\nString ruleName=\"Rule - WebServiceBeforeOperationRule - OHI CreateOperation Rule\";\r\nlog.info(\"Entering : \"+ruleName);\r\n\r\nif(provisioningPlan!=null)\r\n{\r\n   AttributeRequest atrq=null;\r\n   String nativeIdentity=\"\";\r\n   String displayName=\"\";\r\n   String active=\"\"; \r\n      \r\n   List accountRequests=provisioningPlan.getAccountRequests();\r\n   Map bodyMap = new HashMap();\r\n   JSONObject jsonBody = new JSONObject();\r\n   Attributes attrs = new Attributes();\r\n   List roleList=new ArrayList();\r\n   log.info(\"Initial RequestBody : \"+requestEndPoint.getBody());\r\n   for(ProvisioningPlan.AccountRequest accReq:accountRequests)\r\n   {\r\n     log.info(\"total accountRequests : \"+accountRequests.size());\r\n\t nativeIdentity=accReq.getNativeIdentity();\r\n\t atrq=accReq.getAttributeRequest(\"displayName\");\r\n\t displayName=atrq.getValue();\r\n\t atrq=accReq.getAttributeRequest(\"active\");\r\n\t active=atrq.getValue().toString();\r\n\t atrq=accReq.getAttributeRequest(\"role\");\r\n\t if(atrq.getName().equals(\"role\"))\r\n     {\r\n\t   \tlog.info(\"atrq.getValue().getClass() : \"+atrq.getValue().getClass());\r\n\t\tif(atrq.getValue() instanceof String)\r\n\t\t{\r\n\t\t\troleList.add(atrq.getValue());\r\n        }\r\n        else if(atrq.getValue() instanceof List)\r\n        {\r\n            roleList=atrq.getValue();\r\n        }\t\t\t\t  \t\t\r\n     }     \r\n   }\r\n   log.info(\"nativeIdentity : \"+nativeIdentity);\r\n   jsonBody.put(\"loginName\", nativeIdentity);\r\n   jsonBody.put(\"displayName\", displayName);\r\n   jsonBody.put(\"active\", active);\r\n   jsonBody.put(\"countryCode\", \"US\");\r\n   jsonBody.put(\"languageCode\", \"en\");\r\n   int roleCount=0;\r\n   for(String role:roleList)\r\n   {\r\n      ++roleCount;\r\n      String userRole=userRole+roleCount;\r\n\t  jsonBody.put(userRole\", role);\r\n\t  \r\n   }\r\n   jsonBody.put(\"totalRolesRequested\", roleList.size());\r\n   log.info(\"jsonBody : \"+jsonBody.toString());   \r\n   bodyMap.put(\"jsonBody\", jsonBody.toString());\r\n   requestEndPoint.setBody(bodyMap);\r\n   log.info(\"Final RequestBody : \"+requestEndPoint.getBody());\r\n}\r\nlog.info(\"Exiting rule : \"+ruleName);\r\nreturn requestEndPoint;"
+  },
+  "attributes": {
+    "sourceVersion": "1.0"
+  },
+  "id": "a8bcf0dce30b40f3b18522e031445d39",
+  "name": "Rule - WebServiceBeforeOperationRule - OHI CreateOperation Rule",
+  "created": "2022-07-11T12:26:44.340Z",
+  "modified": "2024-04-17T19:16:03.842Z"
+}

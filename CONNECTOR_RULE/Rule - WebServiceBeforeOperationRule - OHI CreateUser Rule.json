@@ -1,0 +1,23 @@
+{
+  "description": "This rule creates a user in OHI.",
+  "type": "WebServiceBeforeOperationRule",
+  "signature": {
+    "input": [],
+    "output": {
+      "name": "",
+      "description": null,
+      "type": null
+    }
+  },
+  "sourceCode": {
+    "version": "1.0",
+    "script": "import sailpoint.object.ProvisioningPlan.AccountRequest;\r\nimport sailpoint.object.ProvisioningPlan.AccountRequest.Operation;\r\nimport sailpoint.object.ProvisioningPlan.AttributeRequest;\r\nimport sailpoint.object.ProvisioningPlan;\r\nimport java.util.List;\r\nimport java.util.Map;\r\nimport org.json.JSONObject;\r\nimport sailpoint.object.ProvisioningPlan.Operation;\r\nimport sailpoint.object.Attributes;\r\nimport java.util.UUID; \r\nString ruleName=\"Rule - WebServiceBeforeOperationRule - OHI CreateUser Rule\";\r\nlog.info(\"Entering : \"+ruleName);\r\nif(provisioningPlan!=null)\r\n{   \r\n  AttributeRequest atrq=null;   \r\n  String nativeIdentity=\"\"; \r\n  String firstname=\"\"; \r\n  String lastname=\"\";\r\n  String middlename=\"\";\r\n  String active=\"\";   \r\n  UUID uuid = UUID.randomUUID();   //randomly generates a UUID\r\n  String uuidAsString = uuid.toString();  \r\n  log.info(\"Randomly Generated UUID: \"+uuidAsString);\r\n  List accountRequests=provisioningPlan.getAccountRequests();\r\n  Map bodyMap = new HashMap();\r\n  JSONObject jsonBody = new JSONObject();\r\n  Attributes attrs = new Attributes();\r\n  List roleList=new ArrayList();\r\n  log.info(\"Initial RequestBody : \"+requestEndPoint.getBody()); \r\n  for(ProvisioningPlan.AccountRequest accReq:accountRequests) \r\n  {     \r\n    log.info(\"total accountRequests : \"+accountRequests.size());\r\n\tnativeIdentity=accReq.getNativeIdentity();\r\n\tatrq=accReq.getAttributeRequest(\"firstname\");\r\n    if(atrq!=null)\r\n\t{\r\n      firstname=atrq.getValue();\r\n\t}\t\r\n    atrq=accReq.getAttributeRequest(\"lastname\");\r\n    if(atrq!=null)\r\n\t{\r\n      lastname=atrq.getValue();\r\n\t}\r\n    atrq=accReq.getAttributeRequest(\"middlename\");\r\n    if(atrq!=null)\r\n\t{\r\n      middlename=atrq.getValue();\r\n\t}\r\n\tatrq=accReq.getAttributeRequest(\"active\");\r\n\tactive=atrq.getValue().toString();\r\n\tatrq=accReq.getAttributeRequest(\"role\");\r\n\tif(atrq!=null && atrq.getName().equals(\"role\"))\r\n\t{\r\n\t  log.info(\"atrq.getValue().getClass() : \"+atrq.getValue().getClass());\r\n\t  if(atrq.getValue() instanceof String)\r\n\t  {\r\n\t    roleList.add(atrq.getValue());   \r\n      }  \r\n      else if(atrq.getValue() instanceof List) \r\n\t  {      \r\n\t    roleList=atrq.getValue();        \r\n\t  }\r\n\t}        \r\n  }   \r\n  log.info(\"nativeIdentity : \"+nativeIdentity); \r\n  jsonBody.put(\"loginname\", nativeIdentity); \r\n  jsonBody.put(\"firstname\", firstname);\r\n  jsonBody.put(\"lastname\", lastname);\r\n  jsonBody.put(\"middlename\", middlename); \r\n  jsonBody.put(\"active\", active);\r\n  jsonBody.put(\"countrycode\", \"US\"); \r\n  jsonBody.put(\"languagecode\", \"en\");\r\n  jsonBody.put(\"sourcename\", \"ohidev3\");\r\n  jsonBody.put(\"userrolelist\", roleList);   \r\n  jsonBody.put(\"uuidAsString\", uuidAsString); \r\n  log.info(\"jsonBody : \"+jsonBody.toString());  \r\n  bodyMap.put(\"jsonBody\", jsonBody.toString()); \r\n  requestEndPoint.setBody(bodyMap); \r\n  log.info(\"Final RequestBody : \"+requestEndPoint.getBody());\r\n}\r\nlog.info(\"Exiting rule : \"+ruleName);\r\nreturn requestEndPoint;"
+  },
+  "attributes": {
+    "sourceVersion": "1.0"
+  },
+  "id": "0eff57bb5a8f44b2afd270b1b83aafdd",
+  "name": "Rule - WebServiceBeforeOperationRule - OHI CreateUser Rule",
+  "created": "2022-07-12T08:26:48.166Z",
+  "modified": "2024-04-17T19:16:03.290Z"
+}

@@ -1,0 +1,23 @@
+{
+  "description": "This rule checks response for exceptions.",
+  "type": "WebServiceAfterOperationRule",
+  "signature": {
+    "input": [],
+    "output": {
+      "name": "",
+      "description": null,
+      "type": null
+    }
+  },
+  "sourceCode": {
+    "version": "1.0",
+    "script": "import sailpoint.tools.GeneralException;\r\nimport org.json.JSONObject;\r\n\r\nString ruleName=\"Rule - WebServiceAfterOperationRule - CheckResponse\";\r\nlog.info(\"Entering rule : \"+ruleName);\r\norg.json.JSONObject jsonResponse = new org.json.JSONObject(rawResponseObject);\r\nif(jsonResponse!=null)\r\n{  \r\n  if(jsonResponse.has(\"result\")==true)\r\n  {        \r\n    if(jsonResponse.get(\"result\").get(\"status\").equalsIgnoreCase(\"Failure\") )\r\n\t{\r\n\t  String errorMsg=jsonResponse.get(\"result\").get(\"status_message\");\r\n\t  String txnid=jsonResponse.get(\"txnid\");\r\n\t  throw new sailpoint.tools.GeneralException(\"Exception : \"+errorMsg+\"  , the transactionId is : \"+txnid);\r\n\t}  \r\n  }\r\n}  \r\nlog.info(\"Exiting rule : \"+ruleName);"
+  },
+  "attributes": {
+    "sourceVersion": "1.0"
+  },
+  "id": "16d61a85004b434ea85674114e846005",
+  "name": "Rule - WebServiceAfterOperationRule - CheckResponse",
+  "created": "2022-06-02T10:23:31.494Z",
+  "modified": "2024-04-17T19:16:04.066Z"
+}

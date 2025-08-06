@@ -1,0 +1,19 @@
+{
+  "description": "This rule prints logs in beforeOperation",
+  "type": "WebServiceBeforeOperationRule",
+  "signature": {
+    "input": [],
+    "output": null
+  },
+  "sourceCode": {
+    "version": "1.0",
+    "script": "    import java.util.Base64;\r\n    import java.util.ArrayList;\r\n    import java.util.HashMap;\r\n    import java.util.Map;\r\n    import connector.common.JsonUtil;\r\n    import connector.common.Util;\r\n    import sailpoint.connector.webservices.EndPoint;\r\n    import sailpoint.connector.webservices.WebServicesClient;\r\n\r\n\tString ruleName = \"Rule - WebServiceBeforeOperationRule - PrintLogs\";\r\n\tlog.info(\"ExecutingBeforeRule : \" +ruleName);\r\nlog.info(\"13March : \");\r\n\tlog.info(\"getFullUrl : \" +requestEndPoint.getFullUrl() );\r\n\r\n\r\n\tlog.info(\"getHeader : \" +requestEndPoint.getHeader() );\r\n\tlog.info(\"getBody : \" +requestEndPoint.getBody() );\r\n\r\n\tMap requestEndPointBody = requestEndPoint.getBody();\r\n\tString jsonBody = (String) requestEndPointBody.get(\"jsonBody\");\r\n\tlog.info(\"Json Body : \" +jsonBody);\r\n\r\n\tlog.info(\"Exit : \" +ruleName);\r\n\treturn requestEndPoint;"
+  },
+  "attributes": {
+    "sourceVersion": "1.0"
+  },
+  "id": "a96f3554741f4be2bc264644029fdafd",
+  "name": "Rule - WebServiceBeforeOperationRule - PrintLogs",
+  "created": "2022-03-24T08:59:32.671Z",
+  "modified": "2024-04-17T19:16:04.310Z"
+}

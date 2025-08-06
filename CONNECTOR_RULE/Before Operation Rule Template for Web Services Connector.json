@@ -1,0 +1,42 @@
+{
+  "description": "This rule is used by the  Web Services connector before performing any operation\n    like testconnection, aggregation etc .",
+  "type": "WebServiceBeforeOperationRule",
+  "signature": {
+    "input": [
+      {
+        "name": "application",
+        "description": "The application whose data file is being processed.",
+        "type": null
+      },
+      {
+        "name": "requestEndPoint",
+        "description": "The current request information contain header, body, context url, method type, response attribute map,\n          successful response code\n        ",
+        "type": null
+      },
+      {
+        "name": "oldResponseMap",
+        "description": "earlier response object ",
+        "type": null
+      },
+      {
+        "name": "restClient",
+        "description": "REST Client Object",
+        "type": null
+      }
+    ],
+    "output": {
+      "name": "EndPoint",
+      "description": "Updated EndPoint Object",
+      "type": null
+    }
+  },
+  "sourceCode": {
+    "version": "1.0",
+    "script": ""
+  },
+  "attributes": null,
+  "id": "2c9180857dddeb49017e0c81f01b1c1f",
+  "name": "Before Operation Rule Template for Web Services Connector",
+  "created": "2021-12-30T18:02:29.275Z",
+  "modified": "2024-11-19T23:02:26.807Z"
+}

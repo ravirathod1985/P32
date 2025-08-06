@@ -1,0 +1,54 @@
+{
+  "description": "This rule is used by the JDBC connector to build a map representation of the Resultset",
+  "type": "JDBCBuildMap",
+  "signature": {
+    "input": [
+      {
+        "name": "log",
+        "description": "The log object associated with the SailPointContext.",
+        "type": null
+      },
+      {
+        "name": "context",
+        "description": "A sailpoint.api.SailPointContext object that can be used to query the database if necessary.",
+        "type": null
+      },
+      {
+        "name": "application",
+        "description": "The application whose data file is being processed.",
+        "type": null
+      },
+      {
+        "name": "state",
+        "description": "A Map containing state information.",
+        "type": null
+      },
+      {
+        "name": "result",
+        "description": "The ResultSet from database.",
+        "type": null
+      },
+      {
+        "name": "connection",
+        "description": "A connection object to connect to database.",
+        "type": null
+      }
+    ],
+    "output": {
+      "name": "map",
+      "description": "A Map of the resource object assembled from the data.",
+      "type": null
+    }
+  },
+  "sourceCode": {
+    "version": "1.0",
+    "script": "import java.sql.Connection;\r\nimport java.sql.DriverManager;\r\nimport java.sql.PreparedStatement;\r\nimport java.sql.ResultSet;\r\nimport java.sql.SQLException;\r\nimport sailpoint.connector.*;\r\n\r\nString ruleName = \"Rule - TestJDBCBuildMap\";\r\nlog.info(\"Entering rule  : \"+ruleName); \r\n\r\nPreparedStatement pstmt = null;\r\nResultSet rs = null;\r\nString USER_ID = \"\";\r\n\r\nMap map = JDBCConnector.buildMapFromResultSet(result, schema);\r\nUSER_ID = (String) map.get(\"USER_ID\");\r\nlog.info(\"USER_ID : \"+USER_ID);\r\nlog.info(\"Exiting rule  : \"+ruleName);\r\nreturn map;"
+  },
+  "attributes": {
+    "sourceVersion": "1.0"
+  },
+  "id": "c4bae79a2f64415aabdfcf06412eeaa9",
+  "name": "Rule - TestJDBCBuildMap",
+  "created": "2024-03-29T08:58:35.747Z",
+  "modified": "2024-04-17T19:16:03.577Z"
+}

@@ -1,0 +1,19 @@
+{
+  "description": "This rule prints logs in beforeOperation",
+  "type": "WebServiceBeforeOperationRule",
+  "signature": {
+    "input": [],
+    "output": null
+  },
+  "sourceCode": {
+    "version": "1.0",
+    "script": "import sailpoint.object.Identity;\r\nimport sailpoint.object.Application;\r\n\r\nlog.debug(\"-----debug-----\");\r\nlog.info(\"----- info------\");\r\nlog.warn(\"------warn------\");\r\nlog.error(\"-----error-----\");\r\n\r\n\r\n"
+  },
+  "attributes": {
+    "sourceVersion": "1.0"
+  },
+  "id": "807d63c7bc8d4b8f9cba0efafd6ef316",
+  "name": "PrintLogs",
+  "created": "2022-03-10T13:56:52.330Z",
+  "modified": "2024-04-17T19:16:03.807Z"
+}

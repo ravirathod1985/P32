@@ -1,0 +1,24 @@
+{
+  "description": "Executes PowerShell commands on the IQService component after a source account is created.",
+  "type": "ConnectorAfterCreate",
+  "signature": {
+    "input": [],
+    "output": null
+  },
+  "sourceCode": {
+    "version": "1.0",
+    "script": "$logDate = Get-Date -UFormat \"%Y%m%d\"\r\n$logFile = \"E:\\SailPoint\\Scripts\\Logs\\ConnectorAfterCreate_$logDate.log\"\r\n$command = \"E:\\SailPoint\\Scripts\\createHomeDir.ps1\"\r\n$enableDebug = $true\r\n#====================-------Helper functions-------====================\r\nfunction LogToFile([String] $info) {\r\n  $info | Out-File $logFile -Append\r\n}\r\n#====================-------Get the request object-------====================\r\nTry{\r\n\t  if($enableDebug) {\r\n\t\t  $timestampString = (Get-Date -Format \"yyyy-MM-dd_HH-mm-ss\").ToString()\r\n\t\t  LogToFile(\"[$timestampString] AfterCreate: Entering AfterCreate rule\")\r\n\t  }\r\n\t  Add-type -path utils.dll;\r\n\t  $sReader = New-Object System.IO.StringReader([System.String]$env:Request);\r\n\t  $xmlReader = [System.xml.XmlTextReader]([sailpoint.utils.xml.XmlUtil]::getReader($sReader));\r\n\t  $requestObject = New-Object Sailpoint.Utils.objects.AccountRequest($xmlReader);\r\n\t  $requestAsString = $env:Request\r\n\t  $op = $requestObject.Operation\r\n\t  \r\n\t  $nativeIdentity = $requestObject.nativeIdentity\r\n\t  foreach ($attribute in $requestObject.AttributeRequests){\r\n\t\t\tif($attribute.Name -eq \"sAMAccountName\") {\r\n\t\t\t\t$sAMAccountName = $attribute.value\r\n\t\t\t}\r\n\t  }\r\n\r\n\t  if($enableDebug) {\r\n\t\t  LogToFile(\"AfterCreate: Request as XML object is: $requestAsString\")\r\n\t  }\r\n\t  \r\n\t  if($enableDebug) {\r\n\t\t  $timestampString = (Get-Date -Format \"yyyy-MM-dd_HH-mm-ss\").ToString()\r\n\t\t  LogToFile(\"[$timestampString] AfterCreate-Processing $op operation for and sAMAccount: $sAMAccountName \")\r\n\t  }\r\n\r\n\t  if ($op -eq \"Create\") {\r\n\t\t\t LogToFile(\"AfterCreate - Execute Create Operation Scripts\")\r\n\t\t\t $command = -join ($command, \" -name '$sAMAccountName' -dn '$nativeIdentity' -operation '$op'\")\r\n\t\t\t $output = Invoke-Expression $command\r\n\t\t\t $timestampString = (Get-Date -Format \"yyyy-MM-dd_HH-mm-ss\").ToString()\r\n\t\t\t LogToFile(\"[$timestampString] AfterCreate - Customer script Output: $output\")\r\n\t  }\r\n\r\n}Catch{\r\n  $ErrorMessage = $_.Exception.Message\r\n  $ErrorItem = $_.Exception.ItemName\r\n  if($enableDebug) {\r\n\t  LogToFile(\"AfterCreate: Error: Item = $ErrorItem -> Message = $ErrorMessage\")\r\n  }\r\n}\r\nif($enableDebug) {\r\n  $timestampString = (Get-Date -Format \"yyyy-MM-dd_HH-mm-ss\").ToString()\r\n  LogToFile(\"[$timestampString] AfterCreate: Exiting After Create rule\")\r\n}"
+  },
+  "attributes": {
+    "ObjectOrientedScript": "true",
+    "extension": ".ps1",
+    "sourceVersion": "1.0",
+    "disabled": "false",
+    "program": "powershell.exe",
+    "timeout": "300"
+  },
+  "id": "6fd46bc8f1a84f35b41f266ebdbdf1cd",
+  "name": "THP ActiveDirectory - AfterCreate",
+  "created": "2022-08-08T23:07:53.823Z",
+  "modified": "2024-04-17T19:16:03.947Z"
+}

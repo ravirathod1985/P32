@@ -1,0 +1,23 @@
+{
+  "description": "This rule creates a user in Microstrategy Source ",
+  "type": "WebServiceBeforeOperationRule",
+  "signature": {
+    "input": [],
+    "output": {
+      "name": "",
+      "description": null,
+      "type": null
+    }
+  },
+  "sourceCode": {
+    "version": "1.0",
+    "script": "import java.util.List;\r\nimport sailpoint.object.ProvisioningPlan;\r\nimport sailpoint.object.ProvisioningPlan.`AccountRequest`;\r\nimport sailpoint.object.ProvisioningPlan.AttributeRequest;\r\nimport sailpoint.object.Application;\r\n\r\nString ruleName=\"Rule - WebServiceBeforeOperationRule - Microstrategy CreateOperation Rule\";\r\nlog.info(\"Entering rule : \"+ruleName);\r\nif(provisioningPlan!=null)\r\n{\r\n    List accountRequests=provisioningPlan.getAccountRequests();\r\n    if(accountRequests!=null)\r\n    {\r\n      for(ProvisioningPlan.AccountRequest accReq:accountRequests)\r\n      {\r\n        log.info(\"accReq.getOperation() : \"+accReq.getOperation());\r\n        log.info(\"accReq.getOp() : \"+accReq.getOp());\r\n        List attributeRequests=accReq.getAttributeRequests();\r\n\r\n        if(attributeRequests!=null)\r\n        {\r\n          // Create Account and provision entitlements\r\n          for(ProvisioningPlan.AttributeRequest attrReq:attributeRequests)\r\n          {\r\n            if(attrReq.getValue() instanceof List)\r\n            {\r\n              List atRs=attrReq.getValue();\r\n              for(String atR:atRs)\r\n              {\r\n                log.info(\"atr is a part of list: \"+atR);\r\n              }\r\n            }\r\n            else if(attrReq.getValue() instanceof String)\r\n            {\r\n              log.info(\"atr is a string: \"+attrReq.getValue());\r\n            }\r\n          }\r\n        }\r\n\r\n      }\r\n    }\r\n}\r\nlog.info(\"Exiting rule : \"+ruleName);"
+  },
+  "attributes": {
+    "sourceVersion": "1.0"
+  },
+  "id": "6136153800c34daca945299a3aad8335",
+  "name": "Rule - WebServiceBeforeOperationRule - Microstrategy CreateOperation Rule",
+  "created": "2022-05-31T10:51:27.456Z",
+  "modified": "2024-04-17T19:16:04.113Z"
+}

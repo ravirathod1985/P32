@@ -1,0 +1,54 @@
+{
+  "description": "This rule is used by the JDBC connector to build a map representation of the Resultset",
+  "type": "JDBCBuildMap",
+  "signature": {
+    "input": [
+      {
+        "name": "log",
+        "description": "The log object associated with the SailPointContext.",
+        "type": null
+      },
+      {
+        "name": "context",
+        "description": "A sailpoint.api.SailPointContext object that can be used to query the database if necessary.",
+        "type": null
+      },
+      {
+        "name": "application",
+        "description": "The application whose data file is being processed.",
+        "type": null
+      },
+      {
+        "name": "state",
+        "description": "A Map containing state information.",
+        "type": null
+      },
+      {
+        "name": "result",
+        "description": "The ResultSet from database.",
+        "type": null
+      },
+      {
+        "name": "connection",
+        "description": "A connection object to connect to database.",
+        "type": null
+      }
+    ],
+    "output": {
+      "name": "map",
+      "description": "A Map of the resource object assembled from the data.",
+      "type": null
+    }
+  },
+  "sourceCode": {
+    "version": "1.0",
+    "script": "import java.sql.Connection;\r\nimport java.sql.DriverManager;\r\nimport java.sql.PreparedStatement;\r\nimport java.sql.ResultSet;\r\nimport java.sql.SQLException;\r\nimport sailpoint.connector.*;\r\n\r\nString ruleName = \"Rule - Oracle eBiz SIT (FMSSIT1) - JDBCBuildMap\";\r\nlog.info(\"Entering rule  : \"+ruleName); \r\n\r\nPreparedStatement pstmt = null;\r\nResultSet rs = null;\r\nString ATTRIBUTE5 = \"\";\r\n\r\nMap map = JDBCConnector.buildMapFromResultSet(result, schema);\r\nString EMPLOYEE_ID = (String) map.get(\"EMPLOYEE_ID\");\r\nlog.info(\"EMPLOYEE_ID : \"+EMPLOYEE_ID);\r\n\r\ntry {\r\n\t//Query to retreive ATTRIBUTE5\r\n\tString query = \"select attribute5 from per_all_people_f where trunc(sysdate) between effective_start_date and effective_end_date and person_id = ?\"; \r\n    log.info(\"query for \"+EMPLOYEE_ID+\" : \"+query);\r\n\t//Creating the PreparedStatement object\r\n    pstmt = connection.prepareStatement(query);\r\n    pstmt.setString(1, EMPLOYEE_ID);\r\n    rs = pstmt.executeQuery(); \r\n\tlog.info(\"rs for \"+EMPLOYEE_ID+\" : \"+rs);\r\n    if(rs!=null)\r\n\t{\r\n      while(rs.next())\r\n\t  {\r\n\t\tATTRIBUTE5 = rs.getString(1);\r\n\t\tlog.info(\"ATTRIBUTE5 : \"+ATTRIBUTE5);\r\n        map.put(\"ATTRIBUTE5\",ATTRIBUTE5);\t\t\r\n\t  }\r\n\t  \r\n\t}\t\t\r\n}\r\ncatch (SQLException ex){\r\n    // handle any errors\r\n    log.info(\"SQLException: \" + ex.getMessage());\r\n    log.info(\"SQLState: \" + ex.getSQLState());\r\n    log.info(\"VendorError: \" + ex.getErrorCode());\r\n}\r\nfinally \r\n{\r\n    if (rs != null) {\r\n        try {\r\n            rs.close();\r\n        } catch (SQLException sqlEx) { } // ig\r\n        rs = null;\r\n    }\r\n    if (pstmt != null) {\r\n        try {\r\n            pstmt.close();\r\n        } catch (SQLException sqlEx) { } // ignore\r\n\r\n        pstmt = null;\r\n    }\r\n\r\n\t\r\n}\r\nlog.info(\"Exiting rule  : \"+ruleName);\r\nreturn map;"
+  },
+  "attributes": {
+    "sourceVersion": "1.0"
+  },
+  "id": "c8598b3a6d654c7e93eec50e10c615cd",
+  "name": "Rule - Oracle eBiz SIT (FMSSIT1) - JDBCBuildMap",
+  "created": "2024-04-15T13:39:34.820Z",
+  "modified": "2024-04-17T19:16:03.879Z"
+}
