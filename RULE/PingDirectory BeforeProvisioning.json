@@ -1,0 +1,19 @@
+{
+  "description": "Before provisioning rule operations for PingDirectory.",
+  "type": "BeforeProvisioning",
+  "signature": {
+    "input": [],
+    "output": null
+  },
+  "sourceCode": {
+    "version": "2022-09-20 17:35:15",
+    "script": "\n    import sailpoint.object.*;\n    import sailpoint.object.ProvisioningPlan.AccountRequest;\n    import sailpoint.object.ProvisioningPlan.AttributeRequest;\n    import sailpoint.tools.Util;\n    import java.util.Date;\n    import java.text.SimpleDateFormat;\n\n    import java.util.ArrayList;\n    import java.util.List;\n    \n    public AttributeRequest newAttributeRequest(String attributeName, Object attributeValue) \n    {\n      AttributeRequest attributeRequest = new ProvisioningPlan.AttributeRequest();\n      attributeRequest.setName(attributeName);\n      attributeRequest.setOperation(ProvisioningPlan.Operation.Set);\n      attributeRequest.setValue(attributeValue);\n      return attributeRequest;\n    }\n    \n    if(plan != null) {\n        Identity identity = plan.getIdentity();\n        String lifecycleState = null;\n        // Get the identity from the plan and perform operations\n        if(identity != null) {\n            List accountRequests = plan.getAccountRequests();\n            lifecycleState = identity.getAttribute(\"cloudLifecycleState\");\n            if(accountRequests != null && !accountRequests.isEmpty()) {\n                for(AccountRequest accountRequest : accountRequests) {\n                    AccountRequest.Operation op = accountRequest.getOperation();\n                    String nativeIdentity = accountRequest.getNativeIdentity();\n                    if(op == null) continue;\n                    if(op == AccountRequest.Operation.Disable && \"inactive\".equals(lifecycleState) && nativeIdentity != null) {\n                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(\"MM/dd/yyyy\");\n                        Date date = new Date();\n                        String currentDate = simpleDateFormat.format(date);\n                        String inactiveDescription = \"Account Disabled on \"+currentDate;\n                        accountRequest.add(newAttributeRequest(\"description\", inactiveDescription));\n                    }\n                    else if( op == AccountRequest.Operation.Enable && \"removeaccess\".equals(lifecycleState) && nativeIdentity != null){\n                        accountRequest.setOperation(AccountRequest.Operation.Delete);\n                    }\n                }\n            }\n        }\n    }\n"
+  },
+  "attributes": {
+    "sourceVersion": "2022-09-20 17:35:15"
+  },
+  "id": "becfd1c302614e11a0040f8802c2e450",
+  "name": "PingDirectory BeforeProvisioning",
+  "created": "2022-09-20T17:35:15.610Z",
+  "modified": "2024-04-17T19:16:04.042Z"
+}

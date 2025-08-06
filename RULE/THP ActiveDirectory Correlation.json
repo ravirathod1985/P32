@@ -1,0 +1,19 @@
+{
+  "description": "Correlates based on different criteria",
+  "type": "Correlation",
+  "signature": {
+    "input": [],
+    "output": null
+  },
+  "sourceCode": {
+    "version": "2022-09-08 14:20:51",
+    "script": "\n \n\n\timport sailpoint.object.*;\n\timport java.util.*;\n\timport org.apache.commons.lang.StringUtils;\n\n  \n    Map returnMap = new HashMap();\n\t\n    String prefixValue = \"test_\";\n\tint  numCharsTrim = prefixValue.length();\n  \n\tif ( StringUtils.isNotBlank(account.getStringAttribute(\"employeeID\")))\n\t{ \t\n        // Initialize 1st Account Correlation Attribute and Log out this step.\n\t\tif ( idn.countIdentitiesBySearchableIdentityAttribute(\"identificationNumber\", \"Equals\", account.getStringAttribute(\"employeeID\"))>0){\n            log.error(\"employeeID Correlation: \" + employeeID);\n\n\t  \t\treturnMap.put( \"identityAttributeName\", \"identificationNumber\");\n\t   \t    returnMap.put( \"identityAttributeValue\", account.getStringAttribute(\"employeeID\") );\n\t   \t    return returnMap;\n \t\t \n\t\t}\n \t}\n \tif (StringUtils.isNotBlank(account.getStringAttribute(\"sAMAccountName\")))\n\t{ \n\t\t\t\n\t\t// Initialize 2nd Account Correlation Attribute and Log out this step.\n\t\tString sAMAccountName = StringUtils.trimToNull(account.getStringAttribute(\"sAMAccountName\"));\n\t\tlog.error(\"sAMAccountName Before Prefix Removal: \" + sAMAccountName);\n        String sAMAccountName_prefix = sAMAccountName.toLowerCase().substring(0,numCharsTrim);\n\n\t\t// Check if sAMAccountName Account attribute contains the prefix \"TEST_\", if it does, then trim the prefix and attempt correlation.\n\t\tif (sAMAccountName_prefix.equals(prefixValue.toLowerCase())){\n    \t\tsAMAccountName = sAMAccountName.substring(numCharsTrim);\n\t\t}\n\t\tlog.error(\"sAMAccountName AFTER Prefix Removal (if exists): \" + sAMAccountName);\n\t\tif (idn.countIdentitiesBySearchableIdentityAttribute(\"uid\", \"Equals\", sAMAccountName)>0){\n            log.error(\"sAMAccountName Correlation: \" + sAMAccountName);\n\t   \t   \treturnMap.put( \"identityAttributeName\", \"uid\");\n\t    \treturnMap.put( \"identityAttributeValue\", sAMAccountName );\n\t    \t\t\n            return returnMap;\n\t    }\n    }\n\t if ( StringUtils.isNotBlank(account.getStringAttribute(\"mail\")))\n\t {\n\t\t// Initialize 3rd Account Correlation Attribute and Log out this step.\n\t\tString ad_mail = StringUtils.trimToNull(account.getStringAttribute(\"mail\"));\n\t\tlog.error(\"Mail Before Prefix Removal: \" + ad_mail);\n        String ad_mail_prefix = ad_mail.toLowerCase().substring(0,numCharsTrim);\n\n\t\t// Check if mail Account attribute contains the prefix \"TEST_\", if it does, then trim the prefix and attempt correlation.\n\t\tif (ad_mail_prefix.equals(prefixValue.toLowerCase())){\n    \t\tad_mail = ad_mail.substring(numCharsTrim);\n\t\t}\n\t\tlog.error(\"Mail AFTER Prefix Removal (if exists): \" + ad_mail);\n\t\tif (idn.countIdentitiesBySearchableIdentityAttribute(\"email\", \"Equals\", ad_mail)>0){\n            log.error(\"mail Correlation: \" + ad_mail);\n\t  \t\treturnMap.put( \"identityAttributeName\", \"email\");\n\t    \treturnMap.put( \"identityAttributeValue\", ad_mail);\n\n\t        return returnMap;\n\n        }\n  \n     \n     } \n     return returnMap;\n"
+  },
+  "attributes": {
+    "sourceVersion": "2022-09-08 14:20:51"
+  },
+  "id": "ff3da6223b9b4e718988fb6bfe31039f",
+  "name": "THP ActiveDirectory Correlation",
+  "created": "2022-06-03T22:04:30.912Z",
+  "modified": "2024-04-17T19:16:04.236Z"
+}

@@ -1,0 +1,19 @@
+{
+  "description": "Return Manager DN",
+  "type": "IdentityAttribute",
+  "signature": {
+    "input": [],
+    "output": null
+  },
+  "sourceCode": {
+    "version": "2022-11-11 20:52:01",
+    "script": "\n  // Rule - IdentityAttribute - P32 DaysToHire\n  //\n  import sailpoint.object.*;\n\timport java.text.DateFormat;\n\timport java.text.ParseException;\n\timport java.text.SimpleDateFormat;\n\timport java.util.Date;\n\n  public int getDateDiff ( Date startDate )\n    {\n        long currentTime;\n        long startDateTime;\n\n        Date today = new Date();\n        currentTime = today.getTime();\n\n        if ( startDate != null)\n        {\n            startDateTime = startDate.getTime();\n\n            int currentDays = (int) (currentTime / (1000*60*60*24));\n            int startDateDays = (int) (startDateTime / (1000*60*60*24));\n            return ( startDateDays - currentDays) ;\n        }\n        else\n        {\n            return -1;\n        }\n\n    }\n\n  String startDateString = identity.getAttribute(\"startDate\");\n\tDate startDate = null;\n\tString dateFormat=\"MM/dd/yy\";\n\tint daysToHire = 0;\n\tDateFormat dateFormater = new SimpleDateFormat( dateFormat );\n\ttry {\n\t\t startDate = ( startDateString != null ) ? dateFormater.parse( startDateString ) : null;\n\t} catch (ParseException e) {\n    log.error(\"Error faced in LCS rule while parsing dates\");\n    return null;\n\t}\n\t\t\n  if ( startDate != null) {\n      daysToHire = getDateDiff(startDate);\n  }\n  if(daysToHire>0){ \n    return daysToHire;\n  }\n  else return 0;\n\n"
+  },
+  "attributes": {
+    "sourceVersion": "2022-11-11 20:52:01"
+  },
+  "id": "ca49152836ed46aa925924e025153a86",
+  "name": "P32 DaysToHire",
+  "created": "2022-11-11T03:00:55.270Z",
+  "modified": "2024-04-17T19:16:04.288Z"
+}

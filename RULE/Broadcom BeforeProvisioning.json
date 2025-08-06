@@ -1,0 +1,19 @@
+{
+  "description": "Before provisioning rule operations for Broadcom.",
+  "type": "BeforeProvisioning",
+  "signature": {
+    "input": [],
+    "output": null
+  },
+  "sourceCode": {
+    "version": "2022-09-14 19:11:23",
+    "script": "\n    import sailpoint.object.*;\n    import sailpoint.object.ProvisioningPlan.AccountRequest;\n    import sailpoint.object.ProvisioningPlan.AttributeRequest;\n    import sailpoint.tools.Util;\n    import java.util.Date;\n    import java.text.SimpleDateFormat;\n\n    import java.util.ArrayList;\n    import java.util.List;\n    \n    public AttributeRequest newAttributeRequest(String attributeName, Object attributeValue) \n    {\n      AttributeRequest attributeRequest = new ProvisioningPlan.AttributeRequest();\n      attributeRequest.setName(attributeName);\n      attributeRequest.setOperation(ProvisioningPlan.Operation.Set);\n      attributeRequest.setValue(attributeValue);\n      return attributeRequest;\n    }\n    \n    if(plan != null) {\n        Identity identity = plan.getIdentity();\n        String lifecycleState = null;\n\n        // Get the identity from the plan and perform operations\n        if(identity != null) {\n\n            List accountRequests = plan.getAccountRequests();\n            lifecycleState = identity.getAttribute(\"cloudLifecycleState\");\n\n            if(accountRequests != null && !accountRequests.isEmpty()) {\n\n                for(AccountRequest accountRequest : accountRequests) {\n                    AccountRequest.Operation op = accountRequest.getOperation();\n                    String nativeIdentity = accountRequest.getNativeIdentity();\n                    if(op == null) continue;\n                    if( op == AccountRequest.Operation.Enable && \"removeaccess\".equals(lifecycleState) && nativeIdentity != null){\n                        accountRequest.setOperation(AccountRequest.Operation.Delete);\n                    }\n                }\n            }\n        }\n    }\n"
+  },
+  "attributes": {
+    "sourceVersion": "2022-09-14 19:11:23"
+  },
+  "id": "2503d213182a4899b10a0b39de02ac52",
+  "name": "Broadcom BeforeProvisioning",
+  "created": "2022-08-25T18:48:22.840Z",
+  "modified": "2024-04-17T19:16:03.551Z"
+}

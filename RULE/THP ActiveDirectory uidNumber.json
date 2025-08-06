@@ -1,0 +1,19 @@
+{
+  "description": "This will generate a unique uidnumber.",
+  "type": "AttributeGenerator",
+  "signature": {
+    "input": [],
+    "output": null
+  },
+  "sourceCode": {
+    "version": "2024-05-16 19:02:42",
+    "script": "\nimport sailpoint.tools.GeneralException;\nimport java.util.Iterator;\nimport sailpoint.object.*;\nimport java.util.ArrayList;\nimport sailpoint.api.*;\nimport sailpoint.object.*;\nimport java.util.Iterator;\nimport java.util.List;\nimport org.apache.commons.lang.StringUtils;\nimport java.util.Random;\n \nint uidNumber=0;\nboolean isUniqueUidNumber = false;\nint maxIteration = 1;\nString ruleName =  \"THP ActiveDirectory uidNumber\";\nlog.info(\"Entering rule : \"+ruleName);\nwhile((isUniqueUidNumber!=true) && (maxIteration<=100))\n{\n  int rangeMax = 90000000;\n  Random rand = new Random();\n  uidNumber = rand.nextInt(rangeMax)+10000000;\n  String sourceId = application.getId();\n  //idn.attrSearchCountAccounts expects a List as a input\n  List sourceIdList = new ArrayList();\n  sourceIdList.add(sourceId);\n  List uidNumberList = new ArrayList();\n  uidNumberList.add(Integer.toString(uidNumber));\n  if(idn.attrSearchCountAccounts(sourceIdList, \"uidNumber\",\"Equals\",uidNumberList)==0)\n  {\n    isUniqueUidNumber = true;\n  }\n  ++maxIteration;\n}\nlog.info(\"uidNumber : \"+uidNumber);\nlog.info(\"Exiting rule : \"+ruleName);\nreturn uidNumber;\n \n  "
+  },
+  "attributes": {
+    "sourceVersion": "2024-05-16 19:02:42"
+  },
+  "id": "7a2eca9701c74c259b18a1cdef5d8dd4",
+  "name": "THP ActiveDirectory uidNumber",
+  "created": "2024-05-09T17:16:53.656Z",
+  "modified": "2024-05-16T19:02:42.918Z"
+}

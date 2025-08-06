@@ -1,0 +1,19 @@
+{
+  "description": "This will generate a unique DN.",
+  "type": "AttributeGenerator",
+  "signature": {
+    "input": [],
+    "output": null
+  },
+  "sourceCode": {
+    "version": "2023-08-07 17:31:59",
+    "script": "\nimport sailpoint.tools.GeneralException;\nimport sailpoint.api.*;\nimport sailpoint.object.*;\nimport java.util.ArrayList;\nimport java.util.Iterator;\nimport java.util.List;\nimport java.util.logging;\nimport java.util.Random;\nimport java.util.regex.Pattern;\nimport java.lang.*;\nimport java.text.Normalizer;\nimport java.text.Normalizer.Form;\nimport org.apache.commons.lang.StringUtils;\n\nint maxIteration = 1;\nString preferredFirstName = null;\nString preferredLastName = null;\nString firstName = null;\nString lastName = null;\nString middleName = null;\n\npublic String removeBadCharacters(String inputString) {\n\t  return inputString.replaceAll(\"[^A-Za-z0-9-']\", \"\").trim();\n}\npublic String removeDiacriticalMarks(String inputString) {\n\t\tinputString = StringUtils.trimToEmpty(inputString);\n\t\tinputString = Normalizer.normalize(inputString, Normalizer.Form.NFD); \n\t\tinputString = Pattern.compile(\"\\\\p{InCombiningDiacriticalMarks}+\").matcher(inputString).replaceAll(\"\");\n\t\treturn inputString;\n}\npublic String generateDN (String firstName,  String lastName, String middleName, int iteration) {\n\n  // Data protection.\n  firstName  = StringUtils.trimToNull(firstName);\n  lastName   = StringUtils.trimToNull(lastName);\n  middleName = StringUtils.trimToNull(middleName);\n\n  if ((firstName == null) || (lastName == null ))\n    return null;\n\n  firstName = removeBadCharacters(removeDiacriticalMarks(firstName));\n  middleName= removeBadCharacters(removeDiacriticalMarks(middleName));\n  lastName  = removeBadCharacters(removeDiacriticalMarks(lastName));\n\n  // Set Initial Default Values\n  String distinguishedName = \"\";\n  String middleInitial     = \"\";\n  String baseDN            = \",OU=TEST_THPUSERS,DC=thp,DC=tahphq,DC=tahp\";\n  String dnPrefix          = \"CN=TEST_\";\n  \n  // Build Distinguished Name based on Iteration and if middleName is not null\n  if (iteration == 0)\n    distinguishedName = dnPrefix + firstName + \" \" + lastName + baseDN;\n  else if (iteration == 1 && !StringUtils.isBlank(middleName)){\n    middleInitial     = middleName.substring(0,1);\n    distinguishedName = dnPrefix + firstName + \" \" + middleInitial + \" \" + lastName + baseDN;\n  }\n  else{\n    middleInitial     = middleName.substring(0,1);\n    distinguishedName = dnPrefix + firstName + \" \" + middleInitial + \" \" + lastName + baseDN;\n  }\n  log.error(\"AccountGenerator Rule Operation - DN Iteration Value: \" + distinguishedName);\n  // Evaluate Uniqueness and Loop through the method again if not unique.\n  if ( isUnique (distinguishedName))\n    return distinguishedName;\n  else if (iteration <= maxIteration)\n    return generateDN (firstName,  lastName, middleName, (iteration + 1));\n  else\n    return distinguishedName;\n}\n\npublic boolean isUnique (String distinguishedName) throws GeneralException {\n  return !idn.accountExistsByNativeIdentity(application.getName(), distinguishedName);\n}\n\npreferredFirstName = identity.getAttribute(\"preferredFirstName\");\npreferredLastName = identity.getAttribute(\"preferredLastName\");\nif(preferredFirstName!=null && preferredLastName!=null)\n{\n  firstName = preferredFirstName;\n  lastName = preferredLastName;\n  middleName = identity.getAttribute(\"middleName\");\n}\nelse\n{\n  firstName = identity.getFirstname();\n  lastName = identity.getLastname();\n  middleName = identity.getAttribute(\"middleName\");\n}\nreturn generateDN(firstName,lastName,middleName,0);\n\n    "
+  },
+  "attributes": {
+    "sourceVersion": "2023-08-07 17:31:59"
+  },
+  "id": "abb3deb56df0430883dea08e810a2f1b",
+  "name": "THP ActiveDirectory Domain DN",
+  "created": "2022-08-11T22:35:48.409Z",
+  "modified": "2024-04-17T19:16:04.258Z"
+}

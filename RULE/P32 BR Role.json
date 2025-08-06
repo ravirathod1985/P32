@@ -1,0 +1,19 @@
+{
+  "description": "Return Manager DN",
+  "type": "IdentityAttribute",
+  "signature": {
+    "input": [],
+    "output": null
+  },
+  "sourceCode": {
+    "version": "2022-09-14 20:49:44",
+    "script": "\n  // Rule - IdentityAttribute - P32 BR Role\n  //\nimport java.util.ArrayList;\nimport java.util.Iterator;\t\t\nimport java.util.List;\t\t\nimport sailpoint.object.Application;\nimport sailpoint.object.Filter;\nimport sailpoint.object.Identity;\nimport sailpoint.object.Link;\nimport sailpoint.tools.Util;\n\nString firstname = identity.getAttribute(\"firstname\");\nString lastname = identity.getAttribute(\"lastname\");\n\n\nif ((firstname != null && !firstname.isEmpty() && firstname.toLowerCase().contains(\"sptest\")) || (lastname != null && !lastname.isEmpty() && lastname.toLowerCase().contains(\"sptest\")))\n    return \"true\";\nelse return \"false\";\n\n"
+  },
+  "attributes": {
+    "sourceVersion": "2022-09-14 20:49:44"
+  },
+  "id": "d9335bc106414d4a99cc7afcb09ca710",
+  "name": "P32 BR Role",
+  "created": "2022-09-14T19:11:24.251Z",
+  "modified": "2024-04-17T19:16:03.324Z"
+}

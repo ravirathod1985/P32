@@ -1,0 +1,19 @@
+{
+  "description": "Before provisioning rule operations for OUD.",
+  "type": "BeforeProvisioning",
+  "signature": {
+    "input": [],
+    "output": null
+  },
+  "sourceCode": {
+    "version": "2022-09-19 18:41:33",
+    "script": "\nimport sailpoint.object.*;\nimport sailpoint.object.ProvisioningPlan.AccountRequest;\nimport sailpoint.object.ProvisioningPlan.AttributeRequest;\nimport sailpoint.tools.Util;\nimport java.util.Date;\nimport java.util.Calendar;\nimport java.lang.String;\nimport java.util.ArrayList;\nimport java.util.List;\nimport java.text.SimpleDateFormat;\n\npublic AttributeRequest newAttributeRequest(String attributeName, Object attributeValue) \n{\n  AttributeRequest attributeRequest = new ProvisioningPlan.AttributeRequest();\n  attributeRequest.setName(attributeName);\n  attributeRequest.setOperation(ProvisioningPlan.Operation.Set);\n  attributeRequest.setValue(attributeValue);\n  return attributeRequest;\n}\n\nif(plan != null) {\n    Identity identity = plan.getIdentity();\n    String lifecycleState = null;\n\n    // Get the identity from the plan and perform operations\n    if(identity != null) {\n\n        List accountRequests = plan.getAccountRequests();\n        lifecycleState = identity.getAttribute(\"cloudLifecycleState\");\n\n        if(accountRequests != null && !accountRequests.isEmpty()) {\n\n            for(AccountRequest accountRequest : accountRequests) {\n                AccountRequest.Operation op = accountRequest.getOperation();\n                String nativeIdentity = accountRequest.getNativeIdentity();\n                if(op == null) continue;\n                if( op == AccountRequest.Operation.Enable && \"removeaccess\".equalsIgnoreCase(lifecycleState) && nativeIdentity != null){\n                    accountRequest.setOperation(AccountRequest.Operation.Delete);\n                }\n                else if( op == AccountRequest.Operation.Disable && \"Inactive\".equalsIgnoreCase(lifecycleState) && nativeIdentity != null){\n                    SimpleDateFormat SDFormat = new SimpleDateFormat(\"yyyyMMdd\");\n                    Calendar cal = Calendar.getInstance();\n                    String currentDate = SDFormat.format(cal.getTime());\n                    log.info(\"OUD BP Rule - Set TodaysDate to: \"+ currentDate +\" for Identity - \"+ identity.getName() +\" :: [OUD_PROV] Mark Account as Termd.\");\n                    accountRequest.add(new AttributeRequest(\"description\", ProvisioningPlan.Operation.Set, \"Term \" + currentDate));\n                }\n                else if( op == AccountRequest.Operation.Enable && (\"Active\".equalsIgnoreCase(lifecycleState) || \"PreHire\".equalsIgnoreCase(lifecycleState))){\n                    log.info(\"OUD BP Rule: for Identity - \"+ identity.getName() +\" :: [OUD_PROV] Re-Enable Account.\");\n                    accountRequest.add(new AttributeRequest(\"orclIsEnabled\", ProvisioningPlan.Operation.Set, \"ENABLED\"));\n                }\n            }\n        }\n    }\n}\n"
+  },
+  "attributes": {
+    "sourceVersion": "2022-09-19 18:41:33"
+  },
+  "id": "b555edde2ba042968207f32f2fcd319e",
+  "name": "OUD BeforeProvisioning",
+  "created": "2022-09-16T23:00:25.335Z",
+  "modified": "2024-04-17T19:16:04.268Z"
+}
