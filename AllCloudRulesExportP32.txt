@@ -1,0 +1,767 @@
+{
+    "version": 1,
+    "timestamp": "2025-07-22T18:00:11.155498Z",
+    "tenant": "point32health-sb",
+    "description": "Export all available objects",
+    "options": {
+        "excludeTypes": [],
+        "includeTypes": [
+            "RULE"
+        ],
+        "objectOptions": {}
+    },
+    "objects": [
+        {
+            "version": 1,
+            "self": {
+                "id": "2503d213182a4899b10a0b39de02ac52",
+                "type": "RULE",
+                "name": "Broadcom BeforeProvisioning"
+            },
+            "object": {
+                "description": "Before provisioning rule operations for Broadcom.",
+                "type": "BeforeProvisioning",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2022-09-14 19:11:23",
+                    "script": "\n    import sailpoint.object.*;\n    import sailpoint.object.ProvisioningPlan.AccountRequest;\n    import sailpoint.object.ProvisioningPlan.AttributeRequest;\n    import sailpoint.tools.Util;\n    import java.util.Date;\n    import java.text.SimpleDateFormat;\n\n    import java.util.ArrayList;\n    import java.util.List;\n    \n    public AttributeRequest newAttributeRequest(String attributeName, Object attributeValue) \n    {\n      AttributeRequest attributeRequest = new ProvisioningPlan.AttributeRequest();\n      attributeRequest.setName(attributeName);\n      attributeRequest.setOperation(ProvisioningPlan.Operation.Set);\n      attributeRequest.setValue(attributeValue);\n      return attributeRequest;\n    }\n    \n    if(plan != null) {\n        Identity identity = plan.getIdentity();\n        String lifecycleState = null;\n\n        // Get the identity from the plan and perform operations\n        if(identity != null) {\n\n            List accountRequests = plan.getAccountRequests();\n            lifecycleState = identity.getAttribute(\"cloudLifecycleState\");\n\n            if(accountRequests != null && !accountRequests.isEmpty()) {\n\n                for(AccountRequest accountRequest : accountRequests) {\n                    AccountRequest.Operation op = accountRequest.getOperation();\n                    String nativeIdentity = accountRequest.getNativeIdentity();\n                    if(op == null) continue;\n                    if( op == AccountRequest.Operation.Enable && \"removeaccess\".equals(lifecycleState) && nativeIdentity != null){\n                        accountRequest.setOperation(AccountRequest.Operation.Delete);\n                    }\n                }\n            }\n        }\n    }\n"
+                },
+                "attributes": {
+                    "sourceVersion": "2022-09-14 19:11:23"
+                },
+                "id": "2503d213182a4899b10a0b39de02ac52",
+                "name": "Broadcom BeforeProvisioning",
+                "created": "2022-08-25T18:48:22.840Z",
+                "modified": "2024-04-17T19:16:03.551Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "KCdyVC4iLDJ0wz_WuyLb4juh163uEDHDqXjeo5BOXf9Jn9epktTbZ9jsGevQGOuaxDwItANYSr1DOoTjCpVr4A"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "2b479c6fff3f45ea9e5861c5526c1100",
+                "type": "RULE",
+                "name": "THP-ActiveDirectory BeforeProvisioning Rule"
+            },
+            "object": {
+                "description": "",
+                "type": "BeforeProvisioning",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2024-10-01 18:13:05",
+                    "script": "\n\n\t\t\t\t\n\n\timport java.util.ArrayList;\n\timport java.util.Date;\n\timport java.text.SimpleDateFormat;\n\t\n\timport sailpoint.object.Identity;\n\timport sailpoint.object.Application;\n\timport sailpoint.object.Link;\n\timport sailpoint.object.ProvisioningPlan;\n\timport sailpoint.object.ProvisioningPlan.Operation;\n\timport sailpoint.object.ProvisioningPlan.AccountRequest;\n\timport sailpoint.object.ProvisioningPlan.AccountRequest.Operation;\n\timport sailpoint.object.ProvisioningPlan.AttributeRequest;\n\timport sailpoint.api.IdentityService;\n\timport sailpoint.tools.Util;\n\t\n\tString Environment=\"Sandbox\";\n\tString activeOU = null;\n\tString disabledOU = null;\n\t\n\tif(Environment.equals(\"Sandbox\")) {\n     activeOU = \"OU=TEST_THPUSERS,DC=thp,DC=tahphq,DC=tahp\"; //Sandbox users Active OU\n     disabledOU = \"OU=TEST_DISABLED_ACCOUNTS,OU=TEST_THPUSERS,DC=thp,DC=tahphq,DC=tahp\"; //Sandbox users Disable OU\n\t }\n    \n\t\n\tif (Environment.equals(\"Prod\")) {\n    \n      activeOU = \"OU=THPUSERS,DC=thp,DC=tahphq,DC=tahp\"; // Active OU\n     disabledOU = \"OU=DISABLED_ACCOUNTS,OU=THPUSERS,DC=thp,DC=tahphq,DC=tahp\"; // Disable OU\n\t}\n\t\n\tString adDomainUsers = \"CN=TEST_Domain Users,OU=TEST_ACCESS-GROUPS,OU=TEST_THPGROUPS,DC=thp,DC=tahphq,DC=tahp\";\n    Identity identity = null;\n    String nativeIdentity = null;\n    \n\tif( plan != null ) {\n\t\tidentity = plan.getIdentity();\n\t\tnativeIdentity = plan.getNativeIdentity();\n\t}\n\t\n\tif(identity != null) {\n\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] Executing Before Provisioning Rule.... nativeIdentity - \" + nativeIdentity );\n\t\t\n\t\t\n\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] Lifecycle State: \" + identity.getAttribute(\"cloudLifecycleState\") );\n\t\tif (Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"), \"deleteaccount\") && !nativeIdentity.contains(\"LEGAL_HOLD\"))  {\n\t\t\tList emptyAttributes = new ArrayList();\n\t\t\t\n\t\t\tList accountRequests = plan.getAccountRequests();\n\t\t\tfor (AccountRequest accountRequest : accountRequests) {\n\t\t\t\tAccountRequest.Operation op = accountRequest.getOperation();\n\t\t\t\tString accountName = accountRequest.getNativeIdentity();\n      \t\t\t\t//delete account after 180 days of term\n      \t\t\t\tif  ( Util.nullSafeEq(accountRequest.getOperation(), AccountRequest.Operation.Enable)) {\n        \t\t\t  log.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] deleting account after 180 days of term \");\n                      if (!accountName.contains(\"LEGAL_HOLD\")) {\n\t\t\t\t\t    accountRequest.setOperation(AccountRequest.Operation.Delete);\n\t\t\t\t\t  } else {\n\t\t\t\t\t    accountRequest.setOperation(AccountRequest.Operation.Disable);\n\t\t\t\t\t  }\n\t\t\t\t\t    accountRequest.setAttributeRequests(emptyAttributes);\n\t\t\t\t    }\n\t\t\t}\n\t\t\n\t\t} else if (Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"), \"removeaccess\"))  {\n\t\t\tList emptyAttributes = new ArrayList();\n\t\t\t\n\t\t\tList accountRequests = plan.getAccountRequests();\n\t\t\tfor (AccountRequest accountRequest : accountRequests) {\n\t\t\t\tAccountRequest.Operation op = accountRequest.getOperation();\n      \t\t\t\t//Remove all AD Access after 14 days\n      \t\t\t\tif  ( ( Util.nullSafeEq(accountRequest.getOperation(), AccountRequest.Operation.Enable)) || ( Util.nullSafeEq(accountRequest.getOperation(), AccountRequest.Operation.Modify)) ) {\n        \t\t\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] remove account access after initial term \");\n        \t\t\t\t\n\t\t\t\t\t\n                    List groupList = new ArrayList();\n\t\t            accountRequest.add(new AttributeRequest(\"memberOf\", ProvisioningPlan.Operation.Set, groupList));\n\t\t\t\t\taccountRequest.setOperation(AccountRequest.Operation.Disable);\n\t\t\t\t\taccountRequest.add(new AttributeRequest(\"AC_NewParent\",ProvisioningPlan.Operation.Set, disabledOU) );\n\t\t\t\t}\n\t\t\t}\n\t\t\n\t\t} else if (Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"), \"inactive\")) {\n\t\t\tList accountRequests = plan.getAccountRequests();\n\t\t\tfor (AccountRequest accountRequest : accountRequests) {\n\t\t\t\t\n\t\t\t\t//move account to disabled OU on term when LCS is inactive\n\t\t\t\tif (Util.nullSafeEq(accountRequest.getOperation(),AccountRequest.Operation.Disable)) {\n\t\t\t\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] move account to disabled OU on term \");\n\t\t\t\t\t\n\t\t\t\t\taccountRequest.add(new AttributeRequest(\"AC_NewParent\",ProvisioningPlan.Operation.Set, disabledOU) );\n\t\t\t\t\t\n\t\t\t\t}\n\t\t\t}\n\t\t} else if( Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"), \"active\") || Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"), \"prehire\") ){\n\t\t\tList accountRequests = plan.getAccountRequests();\n\t\t\tfor (AccountRequest accountRequest : accountRequests) {\n\t\t\t\n\t\t\t\t//move account to active OU on rehire\n\t\t\t\tif (Util.nullSafeEq(accountRequest.getOperation(),AccountRequest.Operation.Enable)) {\n\t\t\t\t\taccountRequest.add(new AttributeRequest(\"AC_NewParent\",ProvisioningPlan.Operation.Set, activeOU) );\n\t\t\t\t\taccountRequest.add(new AttributeRequest(\"msExchHideFromAddressLists\", ProvisioningPlan.Operation.Set, false));\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] Complete Before Provisioning Rule....\");\n  \n\n\t\t\t"
+                },
+                "attributes": {
+                    "sourceVersion": "2024-10-01 18:13:05"
+                },
+                "id": "2b479c6fff3f45ea9e5861c5526c1100",
+                "name": "THP-ActiveDirectory BeforeProvisioning Rule",
+                "created": "2022-08-25T15:42:40.198Z",
+                "modified": "2024-10-01T18:13:05.777Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "sssvYVw85TgjnBTGR8IEFVmT2hz-APfGXzL2JnZ9D-OhKClwG6U7k-hKRJ_2IzxEIZ8akxZCRNoerhFmYIMfLg"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "2c9180838366129d0183667bd6f9001f",
+                "type": "RULE",
+                "name": "OracleDB BeforeProvisioning"
+            },
+            "object": {
+                "description": "Before provisioning rule operations for OracleDB.",
+                "type": "BeforeProvisioning",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2022-09-22 18:35:35",
+                    "script": "\n    import sailpoint.object.*;\n    import sailpoint.object.ProvisioningPlan.AccountRequest;\n    import sailpoint.object.ProvisioningPlan.AttributeRequest;\n    import sailpoint.tools.Util;\n    import java.util.Date;\n    import java.text.SimpleDateFormat;\n\n    import java.util.ArrayList;\n    import java.util.List;\n    \n    public AttributeRequest newAttributeRequest(String attributeName, Object attributeValue) \n    {\n      AttributeRequest attributeRequest = new ProvisioningPlan.AttributeRequest();\n      attributeRequest.setName(attributeName);\n      attributeRequest.setOperation(ProvisioningPlan.Operation.Set);\n      attributeRequest.setValue(attributeValue);\n      return attributeRequest;\n    }\n    \n    if(plan != null) {\n        Identity identity = plan.getIdentity();\n        String lifecycleState = null;\n\n        // Get the identity from the plan and perform operations\n        if(identity != null) {\n\n            List accountRequests = plan.getAccountRequests();\n            lifecycleState = identity.getAttribute(\"cloudLifecycleState\");\n\n            if(accountRequests != null && !accountRequests.isEmpty()) {\n\n                for(AccountRequest accountRequest : accountRequests) {\n                    AccountRequest.Operation op = accountRequest.getOperation();\n                    String nativeIdentity = accountRequest.getNativeIdentity();\n                    if(op == null) continue;\n                    if( op == AccountRequest.Operation.Enable && \"removeaccess\".equals(lifecycleState) && nativeIdentity != null){\n                        accountRequest.setOperation(AccountRequest.Operation.Delete);\n                    }\n                }\n            }\n        }\n    }\n"
+                },
+                "attributes": {
+                    "sourceVersion": "2022-09-22 18:35:35"
+                },
+                "id": "2c9180838366129d0183667bd6f9001f",
+                "name": "OracleDB BeforeProvisioning",
+                "created": "2022-09-22T18:35:35.545Z",
+                "modified": "2024-04-17T19:16:03.971Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "6QzA7zxPkJwMEeHpkiqmgXgb6gldxcJ0f6Po_69uWK_g3OoiXT0jAVhXEs7x3d3BpRNYGq6Vnb-naTXqIVisFw"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "2d1d53f9eaec444b892f65f8d672fbbb",
+                "type": "RULE",
+                "name": "P32Health ActiveDirectory Domain mail"
+            },
+            "object": {
+                "description": "This will generate the mail attribute and check for uniqueness.",
+                "type": "AttributeGenerator",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2024-05-09 17:16:53",
+                    "script": "\n\n\t\t\t\t\nimport sailpoint.tools.GeneralException;\nimport sailpoint.api.*;\nimport sailpoint.object.*;\nimport java.util.ArrayList;\nimport java.util.Iterator;\nimport java.util.List;\nimport java.util.logging;\nimport java.util.Random;\nimport java.util.regex.Pattern;\nimport java.lang.*;\nimport java.text.Normalizer;\nimport java.text.Normalizer.Form;\nimport org.apache.commons.lang.StringUtils;\n\nint maxIteration = 1;\nString preferredFirstName = null;\nString preferredLastName = null;\nString firstName = null;\nString lastName = null;\nString middleName = null;\n\npublic String replaceConsecutiveSpecialCharacters(String emailGenerated)\n{\n  for (int i=0; i < emailGenerated.length(); i++) \n  {\n      String repchar = \"\";\n      int count = 1;\n      if(((emailGenerated.charAt(i) == '_') || (emailGenerated.charAt(i) == '.')))\n      {\n        int j =i;\n        while (j+1 < emailGenerated.length() && emailGenerated.charAt(j)== emailGenerated.charAt(j+1))\n        {\n          j++;\n          count++;\n        }\n        if((emailGenerated.charAt(i) == '_'))\n        {\n          int k = 0;\n          while(k < count)\n          {\n            repchar = repchar+\"_\";\n            ++k;\n          }\n          emailGenerated = emailGenerated.replaceAll(repchar,\"_\");\n        }\n        if((emailGenerated.charAt(i) == '.'))\n        {\n          int k = 0;\n          while(k <count)\n          {\n            repchar = repchar+\".\";\n            ++k;\n          }\n          emailGenerated = emailGenerated.replace(repchar,\".\");\n        }\n      }\n   }\n  return emailGenerated;\n}\n\npublic String removeBadCharacters(String inputString) {\n\t  \n\t   inputString = inputString.replaceAll(\"[^A-Za-z0-9- ]\", \"\");\n\t   String costCenterCode = identity.getAttribute(\"costCenterCode\");\n\t  if( (costCenterCode!=null) && (costCenterCode.equals(\"355\") || costCenterCode.equals(\"324\") || costCenterCode.equals(\"358\") || costCenterCode.equals(\"998\") || costCenterCode.equals(\"999\")) ) \n\t  {\n\t\t inputString = inputString.replaceAll(\" \",\"_\").replaceAll(\"'\",\"\").trim();\n\t  }else {\n\t\t   inputString = inputString.replaceAll(\" \",\".\").replaceAll(\"'\",\"\").trim();\n\t  }\n\t \n\t   return inputString;\n}\npublic String removeDiacriticalMarks(String inputString) {\n\t\tinputString = StringUtils.trimToEmpty(inputString);\n\t\tinputString = Normalizer.normalize(inputString, Normalizer.Form.NFD); \n\t\tinputString = Pattern.compile(\"\\\\p{InCombiningDiacriticalMarks}+\").matcher(inputString).replaceAll(\"\");\n\t\treturn inputString;\n}\npublic String generateMail (String firstName,  String lastName, String middleName, int iteration) {\n\n  // Data protection.\n  firstName  = StringUtils.trimToNull(firstName);\n  lastName   = StringUtils.trimToNull(lastName);\n  middleName = StringUtils.trimToNull(middleName);\n\n  if ( ( firstName == null ) || ( lastName == null ) )\n  return null;\n\n  firstName = removeBadCharacters(removeDiacriticalMarks(firstName));\n  middleName= removeBadCharacters(removeDiacriticalMarks(middleName));\n  lastName  = removeBadCharacters(removeDiacriticalMarks(lastName));\n\n  // Set Initial Default Values\n  String mail = \"@point32health.org\";\n  String separator=\".\";\n  // Below logic is added to change mail extension for specific cost center codes\n  String costCenterCode = identity.getAttribute(\"costCenterCode\");\n  if( (costCenterCode!=null) && (costCenterCode.equals(\"355\") || costCenterCode.equals(\"324\") || costCenterCode.equals(\"358\")) ) \n  {\n    mail = \"@carepartnersct.com\";  \n\tseparator=\"_\";\n  }\n   if( (costCenterCode!=null) && (costCenterCode.equals(\"998\")  || costCenterCode.equals(\"999\")) )  \n  {\n    mail = \"@hphci.harvard.edu\";\n\tseparator=\"_\";\n  }\n\n  String middleInitial     = \"\";\n  String mailPrefix = \"TEST_\";\n  String sourceName = \"Point32Health-ActiveDirectory [source]\";\n\n  // Build Distinguished Name based on Iteration and if middleName is not null\n  if (iteration == 0)\n    mail = mailPrefix + firstName +separator+ lastName + mail;\n  else if (iteration == 1 && !StringUtils.isBlank(middleName)){\n    middleInitial     = middleName.substring(0,1);\n    mail = mailPrefix + firstName + separator + middleInitial + separator+ lastName + mail;\n    }\n  else{\n    mail = \"NO_EMAIL\";\n  }\n  log.error(\"AccountGenerator Rule Operation - Mail Iteration Value: \" + mail);\n  // Evaluate Uniqueness and Loop through the method again if not unique.\n  if (isUnique (mail, sourceName))\n    return mail;\n  else if (iteration <= maxIteration)\n    return generateMail (firstName,  lastName, middleName, (iteration + 1));\n  else\n    return \"NO_EMAIL\";  //Return static email\n}\n\n\npublic boolean isUnique (String mail, String sourceName) throws GeneralException {\n  return (idn.isUniqueLDAPValue(identity.getName(),sourceName, \"mail\", mail));\n}\n\npreferredFirstName = identity.getAttribute(\"preferredFirstName\");\npreferredLastName = identity.getAttribute(\"preferredLastName\");\nif(preferredFirstName!=null && preferredLastName!=null)\n{\n  firstName = preferredFirstName;\n  lastName = preferredLastName;\n  middleName = identity.getAttribute(\"middleName\");\n}\nelse\n{\n  firstName = identity.getFirstname();\n  lastName = identity.getLastname();\n  middleName = identity.getAttribute(\"middleName\");\n}\n\nString emailGenerated = generateMail(firstName,lastName,middleName,0);\nif(emailGenerated!=null)\n{\n  log.info(\"Intial Email Generated : \"+emailGenerated);\n  emailGenerated = replaceConsecutiveSpecialCharacters(emailGenerated);\n  log.info(\"Email after Removal of consecutive special characters : \"+emailGenerated);\n}\nreturn emailGenerated;\n\n    \n\n\t\t\t"
+                },
+                "attributes": {
+                    "sourceVersion": "2024-05-09 17:16:53"
+                },
+                "id": "2d1d53f9eaec444b892f65f8d672fbbb",
+                "name": "P32Health ActiveDirectory Domain mail",
+                "created": "2022-08-11T18:56:00.610Z",
+                "modified": "2024-05-09T17:16:53.273Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "9TBICmZJWiSmxkNCAWhc-NBzLtOOlrui9sS_Yv5gPFL3qpoQSlyyFM3bID_MecGbBGmjSvJOo_Z314e8Z7EkTg"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "30069b54365f45bda0422d4d561b5731",
+                "type": "RULE",
+                "name": "P32Health ActiveDirectory Domain sAMAccountName"
+            },
+            "object": {
+                "description": "This will generate a unique sAMAccountName after checking all 3 domains.",
+                "type": "AttributeGenerator",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2023-08-01 14:18:41",
+                    "script": "\nimport sailpoint.tools.GeneralException;\nimport sailpoint.api.*;\nimport sailpoint.object.*;\nimport java.util.ArrayList;\nimport java.util.Iterator;\nimport java.util.List;\nimport java.util.logging;\nimport java.util.Random;\nimport java.util.regex.Pattern;\nimport java.util.*;\nimport java.lang.*;\nimport java.text.Normalizer;\nimport java.text.Normalizer.Form;\nimport org.apache.commons.lang.StringUtils;\n\nint maxIteration = 100;\n\npublic String removeBadCharacters(String inputString) {\n    return inputString.replaceAll(\"[^A-Za-z0-9]\", \"\").replaceAll(\" \",\"\").replaceAll(\"'\",\"\").replaceAll(\"-\",\"\").trim();\n}\npublic String removeDiacriticalMarks(String inputString) {\n    inputString = StringUtils.trimToEmpty(inputString);\n    inputString = Normalizer.normalize(inputString, Normalizer.Form.NFD); \n    inputString = Pattern.compile(\"\\\\p{InCombiningDiacriticalMarks}+\").matcher(inputString).replaceAll(\"\");\n    return inputString;\n}\npublic String generateUsername ( String firstName,  String lastName, int iteration ) {\n\n  // Data protection.\n  firstName = StringUtils.trimToNull( firstName );\n  lastName = StringUtils.trimToNull( lastName );\n\n  if ( ( firstName == null ) || ( lastName == null ) )\n    return null;\n\n  firstName = removeBadCharacters(removeDiacriticalMarks(firstName));\n  lastName  = removeBadCharacters(removeDiacriticalMarks(lastName));\n\n  // This will hold the final username, set last initials, set min-max for RandomNumber Generation\n  int rangeMax = 9999;\n  int padAmt = 4;\n  String username = null;\n  String lastInitial = lastName.substring(0,1);\n  String firstInitial = firstName.substring(0,1);\n  Random rand = new Random();\n  int randomNum = rand.nextInt(rangeMax + 1);\n  String PaddedRandomNum = Integer.toString(randomNum);\n  // Active Directory Source Domains To Search, by original sourcename value.\n  String ADSource1 = \"Point32Health-ActiveDirectory [source]\";\n  String ADSource2 = \"THP-ActiveDirectory [source]\";\n  String ADSource3 = \"HPHC-ActiveDirectory [source]\";\n\n  // Build Unique Username with random generated number padded to 5 digits, log out building of values.\n  log.error(\"AccountGenerator Rule Operation - PaddedRandomNum BEFORE padding: \" + PaddedRandomNum);\n  PaddedRandomNum = StringUtils.leftPad(PaddedRandomNum, padAmt, \"0\");\n  log.error(\"AccountGenerator Rule Operation - PaddedRandomNum AFTER padding: \" + PaddedRandomNum);\n  username = \"test_\" + firstInitial + lastInitial + PaddedRandomNum;\n  username = username.toLowerCase();\n  log.error(\"AccountGenerator Rule Operation - username value after concatenation and toLower: \" + username);\n  \n  if ( isUnique ( username, ADSource1, ADSource2, ADSource3 ) )\n    return username;\n  else if ( iteration < maxIteration )\n    return generateUsername ( firstName,  lastName, ( iteration + 1 ) );\n  else\n    return null;\n}\n\n// displayName is the AccountName attribute, in this case it should be sAMAccountName.\npublic boolean isUnique ( String username, String ADSource1, String ADSource2, String ADSource3 ) throws GeneralException {\n  boolean idnCheck = true;\n  boolean nativeADCheck = true;\n// Populate ArrayList with each source to check\n  List sourceList = new ArrayList();\n  sourceList.add(ADSource1);\n  sourceList.add(ADSource2);\n  sourceList.add(ADSource3);\n// for loop, for each source check whether username exists in IDN and then on Native AD system. Iterate through sources ONLY if both tests succeed.  \n  for(int i = 0; i < sourceList.size() && idnCheck && nativeADCheck; i++) {\n    log.error(\"Enter While Loop iteration: \" + i);\n    if (!idn.accountExistsByDisplayName(sourceList.get(i), username)){\n      idnCheck = true;\n      if(idn.isUniqueLDAPValue(identity.getName(),sourceList.get(i),\"sAMAccountName\",username))\n        nativeADCheck = true;\n      else\n        nativeADCheck = false;\n    }\n    else{\n      idnCheck = false;\n    }\n  }\n  if (nativeADCheck && idnCheck){\n    log.error(\"All checks passed, value is unique, return true.\");\n    return true;\n  }\n  else{\n    log.error(\"Some checks failed, value is not unique, return false.\");\n    return false;\n  }\n}\n\nreturn generateUsername( identity.getFirstname(), identity.getLastname(), 0 );\n    "
+                },
+                "attributes": {
+                    "sourceVersion": "2023-08-01 14:18:41"
+                },
+                "id": "30069b54365f45bda0422d4d561b5731",
+                "name": "P32Health ActiveDirectory Domain sAMAccountName",
+                "created": "2022-08-11T18:56:01.739Z",
+                "modified": "2024-04-17T19:16:04.278Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "aENeBU8CVPVaqWl2dNgGqqi7sTytHZzSgvSBo8TMuDYlSAc8dMrQcULeiEcjVImGKIZhcal7KZF7betcsR1ITA"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "34da92f5a29040af8a46c55cbf6b9c7f",
+                "type": "RULE",
+                "name": "Point32Health-ActiveDirectory-Diamond BeforeProvisioning Rule"
+            },
+            "object": {
+                "description": "",
+                "type": "BeforeProvisioning",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2024-09-24 21:53:50",
+                    "script": "\n\n\t\t\t\t\n\n\timport java.util.ArrayList;\n\timport java.util.Date;\n\timport java.text.SimpleDateFormat;\n\t\n\timport sailpoint.object.Identity;\n\timport sailpoint.object.Application;\n\timport sailpoint.object.Link;\n\timport sailpoint.object.ProvisioningPlan;\n\timport sailpoint.object.ProvisioningPlan.Operation;\n\timport sailpoint.object.ProvisioningPlan.AccountRequest;\n\timport sailpoint.object.ProvisioningPlan.AccountRequest.Operation;\n\timport sailpoint.object.ProvisioningPlan.AttributeRequest;\n\timport sailpoint.api.IdentityService;\n\timport sailpoint.tools.Util;\n\n\timport sailpoint.rule.Account;\n\n\tString THP_ACTIVE_DIRECTORY = \"THP-ActiveDirectory [source]\";\n\t\n\tString Environment=\"Sandbox\";\n\tString activeOU = null;\n\tString disabledOU = null;\n\t\n\tif(Environment.equals(\"Sandbox\")) {\n     activeOU = \"OU=TEST_THPUSERS,DC=thp,DC=tahphq,DC=tahp\"; //Sandbox users Active OU\n     disabledOU = \"OU=TEST_DISABLED_ACCOUNTS,OU=TEST_THPUSERS,DC=thp,DC=tahphq,DC=tahp\"; //Sandbox users Disable OU\n\t }\n    \n\t\n\tif (Environment.equals(\"Prod\")) {\n    \n     activeOU = \"OU=THPUSERS,DC=thp,DC=tahphq,DC=tahp\"; // Active OU\n     disabledOU = \"OU=DISABLED_ACCOUNTS,OU=THPUSERS,DC=thp,DC=tahphq,DC=tahp\"; // Disable OU\n\t}\n\t\n\tString adDomainUsers = \"CN=TEST_Domain Users,OU=TEST_ACCESS-GROUPS,OU=TEST_THPGROUPS,DC=thp,DC=tahphq,DC=tahp\";\n    Identity identity = null;\n    String nativeIdentity = null;\n    \n\tif( plan != null ) {\n\t\tidentity = plan.getIdentity();\n\t\tnativeIdentity = plan.getNativeIdentity();\n\t}\n\t\n\tif(identity != null) {\n\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] Executing Before Provisioning Rule.... nativeIdentity - \" + nativeIdentity );\n\t\t\n\t\t\n\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] Lifecycle State: \" + identity.getAttribute(\"cloudLifecycleState\") );\n\t\tif (Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"), \"deleteaccount\"))  {\n\t\t\tList emptyAttributes = new ArrayList();\n\t\t\t\n\t\t\tList accountRequests = plan.getAccountRequests();\n\t\t\tfor (AccountRequest accountRequest : accountRequests) {\n\t\t\t\tAccountRequest.Operation op = accountRequest.getOperation();\n      \t\t\t\t//delete account after 180 days of term\n      \t\t\t\tif  ( Util.nullSafeEq(accountRequest.getOperation(), AccountRequest.Operation.Enable)) {\n        \t\t    log.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] deleting account after 180 days of term \");\n\t\t\t\t\taccountRequest.setOperation(AccountRequest.Operation.Delete);\n\t\t\t\t\taccountRequest.setAttributeRequests(emptyAttributes);\n\t\t\t\t\n\t\t\t\t}\n\t\t\t}\n\t\t\n\t\t} else if (Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"), \"removeaccess\"))  {\n\t\t\tList emptyAttributes = new ArrayList();\n\t\t\t\n\t\t\tList accountRequests = plan.getAccountRequests();\n\t\t\tfor (AccountRequest accountRequest : accountRequests) {\n\t\t\t\tAccountRequest.Operation op = accountRequest.getOperation();\n      \t\t\t\t//Remove all AD Access after 14 days\n      \t\t\t\tif  ( ( Util.nullSafeEq(accountRequest.getOperation(), AccountRequest.Operation.Enable)) || ( Util.nullSafeEq(accountRequest.getOperation(), AccountRequest.Operation.Modify)) ) {\n        \t\t\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] remove account access after initial term \");\n        \t\t\t\t\n\t\t\t\t\t\n                    List groupList = new ArrayList();\n\t\t            accountRequest.add(new AttributeRequest(\"memberOf\", ProvisioningPlan.Operation.Set, groupList));\n\t\t\t\t\taccountRequest.setOperation(AccountRequest.Operation.Disable);\n\t\t\t\t\taccountRequest.add(new AttributeRequest(\"AC_NewParent\",ProvisioningPlan.Operation.Set, disabledOU) );\n\t\t\t\t}\n\t\t\t}\n\t\t\n\t\t} else if (Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"), \"inactive\")) {\n\t\t\tList accountRequests = plan.getAccountRequests();\n\t\t\tfor (AccountRequest accountRequest : accountRequests) {\n\t\t\t\t\n\t\t\t\t//move account to disabled OU on term when LCS is inactive\n\t\t\t\tif (Util.nullSafeEq(accountRequest.getOperation(),AccountRequest.Operation.Disable)) {\n\t\t\t\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] move account to disabled OU on term \");\n\t\t\t\t\t\n\t\t\t\t\taccountRequest.add(new AttributeRequest(\"AC_NewParent\",ProvisioningPlan.Operation.Set, disabledOU) );\n\t\t\t\t\t\n\t\t\t\t}\n\t\t\t}\n\t\t} else if( Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"), \"active\") || Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"), \"prehire\") ){\n\t\t\tList accountRequests = plan.getAccountRequests();\n\t\t\tfor (AccountRequest accountRequest : accountRequests) {\n\t\t\t\n\t\t\t\t//move account to active OU on rehire\n\t\t\t\tif (Util.nullSafeEq(accountRequest.getOperation(),AccountRequest.Operation.Enable)) {\n\t\t\t\t\taccountRequest.add(new AttributeRequest(\"AC_NewParent\",ProvisioningPlan.Operation.Set, activeOU) );\n\t\t\t\t\taccountRequest.add(new AttributeRequest(\"msExchHideFromAddressLists\", ProvisioningPlan.Operation.Set, false));\n\t\t\t\t} else if (Util.nullSafeEq(accountRequest.getOperation(), AccountRequest.Operation.Create)) {\n\t\t\t\t// determine if there is an existing AlphaNumeric 6 account and change to modify and just add group\n\t\t\t\t   String adAccountName = idn.getFirstAccountNativeIdentity(\"THP_ACTIVE_DIRECTORY\", identity.getName());\n\t\t\t\t   Account adAccount = idn.getAccountByNativeIdentity(\"THP_ACTIVE_DIRECTORY\", adAccountName);\n\t\t\t\t   String sAMAccountName = idn.getRawAccountAttribute(adAccount,\"sAMAccountName\");\n\t\t\t\t   if (sAMAccountName.length() <= 6) {\n\t\t\t\t     accountRequest.setNativeIdentity(adAccountName);\n\t\t\t\t     accountRequest.setOperation(AccountRequest.Operation.Modify);\n\t\t\t\t     // remove all attribute requests but the AD group\n\t\t\t\t     List attReqs = accountRequest.getAttributeRequests();\n\t\t\t\t     List reqsToRemove = new ArrayList();\n\t\t\t\t       for (AttributeRequest attReq : attReqs) {\n\t\t\t\t          \tif (!attReq.getName().equals(\"memberOf\")) {\n\t\t\t\t\t       \t\treqsToRemove.add(attReq);\n\t\t\t\t\t\t\t}\n\t\t\t\t    \t}\n\t\t\t\t\t  for (AttributeRequest attReq : reqsToRemove) {\n\t\t\t\t\t\t\taccountRequest.remove(attReq);\n\t\t\t\t\t    }\n\t\t\t\t    }\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] Complete Before Provisioning Rule....\");\n  \n\n\t\t\t"
+                },
+                "attributes": {
+                    "sourceVersion": "2024-09-24 21:53:50"
+                },
+                "id": "34da92f5a29040af8a46c55cbf6b9c7f",
+                "name": "Point32Health-ActiveDirectory-Diamond BeforeProvisioning Rule",
+                "created": "2024-09-24T21:53:50.258Z",
+                "modified": "2024-09-24T21:53:50.258Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "0rYuaiK3iWQCzZdYn9X1-g3TkOSC41YSApAC-UjTJxt6aHbD1gdoTcbAXiB6c9UqvtTWUP8SmP4wn6GN4iZaIg"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "4482c8b53eed4605865763257f6fcd2d",
+                "type": "RULE",
+                "name": "THP ActiveDirectory Domain mail"
+            },
+            "object": {
+                "description": "This will generate the mail attribute and check for uniqueness.",
+                "type": "AttributeGenerator",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2024-05-09 17:16:53",
+                    "script": "\n\n\t\t\t\t\nimport sailpoint.tools.GeneralException;\nimport sailpoint.api.*;\nimport sailpoint.object.*;\nimport java.util.ArrayList;\nimport java.util.Iterator;\nimport java.util.List;\nimport java.util.logging;\nimport java.util.Random;\nimport java.util.regex.Pattern;\nimport java.lang.*;\nimport java.text.Normalizer;\nimport java.text.Normalizer.Form;\nimport org.apache.commons.lang.StringUtils;\n\nint maxIteration = 1;\nString preferredFirstName = null;\nString preferredLastName = null;\nString firstName = null;\nString lastName = null;\nString middleName = null;\n\npublic String replaceConsecutiveSpecialCharacters(String emailGenerated)\n{\n  for (int i=0; i < emailGenerated.length(); i++) \n  {\n      String repchar = \"\";\n      int count = 1;\n      if(((emailGenerated.charAt(i) == '_') || (emailGenerated.charAt(i) == '.')))\n      {\n        int j =i;\n        while (j+1 < emailGenerated.length() && emailGenerated.charAt(j)== emailGenerated.charAt(j+1))\n        {\n          j++;\n          count++;\n        }\n        if((emailGenerated.charAt(i) == '_'))\n        {\n          int k = 0;\n          while(k < count)\n          {\n            repchar = repchar+\"_\";\n            ++k;\n          }\n          emailGenerated = emailGenerated.replaceAll(repchar,\"_\");\n        }\n        if((emailGenerated.charAt(i) == '.'))\n        {\n          int k = 0;\n          while(k <count)\n          {\n            repchar = repchar+\".\";\n            ++k;\n          }\n          emailGenerated = emailGenerated.replace(repchar,\".\");\n        }\n      }\n   }\n  return emailGenerated;\n}\n\npublic String removeBadCharacters(String inputString) {\n\t  return inputString.replaceAll(\"[^A-Za-z0-9- ]\", \"\").replaceAll(\" \",\"_\").replaceAll(\"'\",\"\").trim();\n}\npublic String removeDiacriticalMarks(String inputString) {\n\t\tinputString = StringUtils.trimToEmpty(inputString);\n\t\tinputString = Normalizer.normalize(inputString, Normalizer.Form.NFD); \n\t\tinputString = Pattern.compile(\"\\\\p{InCombiningDiacriticalMarks}+\").matcher(inputString).replaceAll(\"\");\n\t\treturn inputString;\n}\npublic String generateMail (String firstName,  String lastName, String middleName, int iteration) {\n\n  // Data protection.\n  firstName  = StringUtils.trimToNull(firstName);\n  lastName   = StringUtils.trimToNull(lastName);\n  middleName = StringUtils.trimToNull(middleName);\n\n  if ( ( firstName == null ) || ( lastName == null ) )\n  return null;\n\n  firstName = removeBadCharacters(removeDiacriticalMarks(firstName));\n  middleName= removeBadCharacters(removeDiacriticalMarks(middleName));\n  lastName  = removeBadCharacters(removeDiacriticalMarks(lastName));\n\n  // Set Initial Default Values\n   String mail = \"@tufts-health.com\";\n  \n  // Below logic is added to change mail extension for specific cost center codes\n  String costCenterCode = identity.getAttribute(\"costCenterCode\");\n  if( (costCenterCode!=null) && (costCenterCode.equals(\"355\") || costCenterCode.equals(\"324\") || costCenterCode.equals(\"358\")) ) \n  {\n    mail = \"@carepartnersct.com\";  \n  }\n  if( (costCenterCode!=null) && (costCenterCode.equals(\"998\")  || costCenterCode.equals(\"999\")) )  \n  {\n    mail = \"@hphci.harvard.edu\";\n  }\n  String middleInitial     = \"\";\n  String mailPrefix        = \"TEST_\";\n  String sourceName        = \"THP-ActiveDirectory [source]\";\n\n  // Build Distinguished Name based on Iteration and if middleName is not null\n  if (iteration == 0)\n    mail = mailPrefix + firstName +\"_\"+ lastName + mail;\n  else if (iteration == 1 && !StringUtils.isBlank(middleName)){\n    middleInitial     = middleName.substring(0,1);\n    mail = mailPrefix + firstName + \"_\" + middleInitial + \"_\" + lastName + mail;\n    }\n  else{\n    mail = \"NO_EMAIL\";\n  }\n  log.error(\"AccountGenerator Rule Operation - Mail Iteration Value: \" + mail);\n  // Evaluate Uniqueness and Loop through the method again if not unique.\n  if (isUnique (mail, sourceName))\n    return mail;\n  else if (iteration <= maxIteration)\n    return generateMail (firstName,  lastName, middleName, (iteration + 1));\n  else\n    return \"NO_EMAIL\";  //Return static email\n}\n\n\npublic boolean isUnique (String mail, String sourceName) throws GeneralException {\n  return (idn.isUniqueLDAPValue(identity.getName(),sourceName, \"mail\", mail));\n}\n\npreferredFirstName = identity.getAttribute(\"preferredFirstName\");\npreferredLastName = identity.getAttribute(\"preferredLastName\");\nif(preferredFirstName!=null && preferredLastName!=null)\n{\n  firstName = preferredFirstName;\n  lastName = preferredLastName;\n  middleName = identity.getAttribute(\"middleName\");\n}\nelse\n{\n  firstName = identity.getFirstname();\n  lastName = identity.getLastname();\n  middleName = identity.getAttribute(\"middleName\");\n}\n\nString emailGenerated = generateMail(firstName,lastName,middleName,0);\nif(emailGenerated!=null)\n{\n  log.info(\"Intial Email Generated : \"+emailGenerated);\n  emailGenerated = replaceConsecutiveSpecialCharacters(emailGenerated);\n  log.info(\"Email after Removal of consecutive special characters : \"+emailGenerated);\n}\nreturn emailGenerated;\n\n    \n\n\t\t\t"
+                },
+                "attributes": {
+                    "sourceVersion": "2024-05-09 17:16:53"
+                },
+                "id": "4482c8b53eed4605865763257f6fcd2d",
+                "name": "THP ActiveDirectory Domain mail",
+                "created": "2022-08-11T22:35:48.500Z",
+                "modified": "2024-05-09T17:16:53.553Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "l9S1P61NEDwvQQ1WCqQuAxrW-XvAZVBBD_I5d2SQGdK6xF6mtwaC2Of8_VSkn2BXfwu372jg7fU_TLC-Oqd_RA"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "491160c983c6478fbebfc92a4ba4053b",
+                "type": "RULE",
+                "name": "THP-Salesforce BeforeProvisioning"
+            },
+            "object": {
+                "description": "Before provisioning rule operations for THP-Salesforce.",
+                "type": "BeforeProvisioning",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2022-11-15 21:51:12",
+                    "script": "\n\n    import sailpoint.object.ProvisioningPlan;\n    import sailpoint.object.Attributes;\n    import sailpoint.object.Identity;\n    import sailpoint.object.ProvisioningPlan.AccountRequest;\n    import sailpoint.object.ProvisioningPlan.AttributeRequest;\n    import sailpoint.object.ProvisioningPlan.Operation;\n    import sailpoint.object.ManagedAttribute;\n    import sailpoint.object.ManagedAttribute.Type;\t\t\n    import sailpoint.object.Filter;\n    import sailpoint.object.*;\n    import java.util.ArrayList;\n    import sailpoint.rule.ManagedAttributeDetails;\n    import sailpoint.tools.Util;\n    import java.util.Date;\n    import java.text.SimpleDateFormat;\n    import java.util.List;\n    import sailpoint.rule.Account;\n    \n    public AttributeRequest newAttributeRequest(String attributeName, Object attributeValue) \n    {\n      AttributeRequest attributeRequest = new ProvisioningPlan.AttributeRequest();\n      attributeRequest.setName(attributeName);\n      attributeRequest.setOperation(ProvisioningPlan.Operation.Set);\n      attributeRequest.setValue(attributeValue);\n      return attributeRequest;\n    }\n    \n    if(plan != null) {\n        Identity identity = plan.getIdentity();\n        String lifecycleState = null;\n        String accreq_role = null;\n        String accreq_permissionSet = null; \n        String accreq_managedPackage = null;\n        String profile = null;\n        String role = null;\n        String nativeId = null;\n        String ACCESS_REQUEST_MAPPING = \"THP Salesforce Access Request [source]\";\n        if(identity != null) {\n            List accountRequests = plan.getAccountRequests();\n            lifecycleState = identity.getAttribute(\"cloudLifecycleState\");\n            if(accountRequests != null && !accountRequests.isEmpty()) {\n                for(AccountRequest accountRequest : accountRequests) {\n                    AccountRequest.Operation op = accountRequest.getOperation();\n                    String nativeIdentity = accountRequest.getNativeIdentity();\n                    if(op == null) continue;\n                    if(op == AccountRequest.Operation.Create || op == AccountRequest.Operation.Modify) {\n                        List attReqs = accountRequest.getAttributeRequests();\n                        \n                        if(accountRequest.getAttributeRequests() != null && !attReqs.isEmpty()) {\n\n                            //get access request information\n                            for (ProvisioningPlan.AttributeRequest attributeReq: attReqs) {\n\n                                String name = attributeReq.getName();\n                                if ( name.equalsIgnoreCase(\"ProfileId\") ){\n                                    String ProfileAttrValue = (String) attributeReq.getValue();\n                                    ManagedAttributeDetails managedAttributeDetails = idn.getManagedAttributeDetails(application.getId(), \"ProfileId\", ProfileAttrValue, Type.Entitlement);\n                                \n                                    if (managedAttributeDetails == null)\n                                    throw new Exception(\" managed attribute per [\"+ name + \",\" + value +\"]\");\n\n                                    Map madAttributes = managedAttributeDetails.getAttributes();\n\t\t\t\t\t\t\t        profile = (String) madAttributes.get(\"Name\");\n                                }\n                                if ( name.equalsIgnoreCase(\"Role\") ){\n                                    String RoleAttrValue = (String) attributeReq.getValue();\n                                    ManagedAttributeDetails managedAttributeDetails = idn.getManagedAttributeDetails(application.getId(), \"Role\", RoleAttrValue, Type.Entitlement);\n                                \n                                    if (managedAttributeDetails == null)\n                                    throw new Exception(\" managed attribute per [\"+ name + \",\" + value +\"]\");\n\n                                    Map madAttributes = managedAttributeDetails.getAttributes();\n\t\t\t\t\t\t\t        role = (String) madAttributes.get(\"Name\");\n                                }\n                            }\n                        }\n                        if(profile!=null){\n                            nativeId = profile + \"|\" + role;\n                        \n                        Account account = idn.getAccountByNativeIdentity(ACCESS_REQUEST_MAPPING,nativeId);\n                        if(account != null){\n\n                            //get mapping information from delimited source\n                            accreq_managedPackage = idn.getAccountAttribute(account, \"ManagedPackage\");\n                            accreq_permissionSet = idn.getAccountAttribute(account, \"PermissionSet\");\n                            accreq_role = idn.getAccountAttribute(account, \"Role\");\n                            String accreq_userPermissionsSupportUser = idn.getAccountAttribute(account, \"UserPermissionsSupportUser\");\n                            String accreq_userPermissionsMarketingUser = idn.getAccountAttribute(account, \"UserPermissionsMarketingUser\");\n                            String accreq_userPermissionsKnowledgeUser = idn.getAccountAttribute(account, \"UserPermissionsKnowledgeUser\");\n                        \n\n                             //add attribute requests according to mapping\n                            if(accreq_role==null){\n                                accountRequest.add(newAttributeRequest(\"Role\", \"\"));\n                            }\n                            if(accreq_permissionSet==null){\n                                accountRequest.add(newAttributeRequest(\"PermissionSet\", \"\"));\n                            }\n                            if(accreq_managedPackage==null){\n                                accountRequest.add(newAttributeRequest(\"ManagedPackage\", \"\"));\n                            }\n\n                            accountRequest.add(newAttributeRequest(\"UserPermissionsSupportUser\", accreq_userPermissionsSupportUser));\n                            accountRequest.add(newAttributeRequest(\"UserPermissionsMarketingUser\", accreq_userPermissionsMarketingUser));\n                            accountRequest.add(newAttributeRequest(\"UserPermissionsKnowledgeUser\", accreq_userPermissionsKnowledgeUser));\n                        }\n                        }\n                    }\n                    else if( op == AccountRequest.Operation.Disable && \"inactive\".equals(lifecycleState) && nativeIdentity != null){\n                        accountRequest.add(newAttributeRequest(\"ManagedPackage\", \"\"));\n                    }\n                }\n            }\n        }\n    }\n"
+                },
+                "attributes": {
+                    "sourceVersion": "2022-11-15 21:51:12"
+                },
+                "id": "491160c983c6478fbebfc92a4ba4053b",
+                "name": "THP-Salesforce BeforeProvisioning",
+                "created": "2022-11-11T03:00:55.182Z",
+                "modified": "2024-04-17T19:16:03.312Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "E7X6m5kza5rX3RTTjr2rXLB6HCjCDR3D7d5r9QH_xR4L2X36nb_TNoq-D7l1MfI749Xkn0VkwABUvXPcaR0KeA"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "6e55a03d49ef4e5eb34ec001e711f9f7",
+                "type": "RULE",
+                "name": "SDIM Attributes"
+            },
+            "object": {
+                "description": "Before Provisioning Rule which to add mandatory fields to Provisioning Plan for all Modify Operations.",
+                "type": "BeforeProvisioning",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2024-09-17 17:20:32",
+                    "script": "\n    \n\timport java.util.List;\n    import sailpoint.object.ProvisioningPlan;\n    import sailpoint.object.ProvisioningPlan.AccountRequest;\n    import sailpoint.object.ProvisioningPlan.AttributeRequest;\n    import sailpoint.object.Identity;\n\timport sailpoint.rule.Identity;\n\timport sailpoint.rule.Account;\n    import sailpoint.object.*;\n    import java.util.HashMap;\n    import java.util.Map;\n\n    public AttributeRequest newAttributeRequest(String attributeName, Object attributeValue){\n        AttributeRequest attributeRequest = new ProvisioningPlan.AttributeRequest();\n        attributeRequest.setName(attributeName);\n        attributeRequest.setOperation(ProvisioningPlan.Operation.Add);\n        attributeRequest.setValue(attributeValue);\n        return attributeRequest;\n    }\n    \n\t//Key = Identity Attribute    Value = Account Attribute\n    Map attributeTranslationMap = new HashMap();\n    attributeTranslationMap.put(\"displayName\",\"name\");\n\tattributeTranslationMap.put(\"uid\",\"Username\");\n\tattributeTranslationMap.put(\"email\",\"Email\");\n\tattributeTranslationMap.put(\"managerEmail\",\"supervisorEmail\");\n\tattributeTranslationMap.put(\"location\",\"location\");\n\tattributeTranslationMap.put(\"employeeType\",\"EmployeeType\");\n\tattributeTranslationMap.put(\"jobTitle\",\"JobTitle\");\n\tattributeTranslationMap.put(\"department\",\"Department\");\n\tattributeTranslationMap.put(\"startDate\",\"StartDate\");\n\tattributeTranslationMap.put(\"firstname\",\"FirstName\");\n\tattributeTranslationMap.put(\"lastname\",\"LastName\");\n\n\tString sourceName = null, action = null, acctOp = null, attrOp = null;\n\t// needs to be update for each ServiceNow Environment\n\tString DEFAULT_ASSIGNMENT_GROUP = \"a31d8bd96f3e9a40c7fe90264b3ee4b3xxxx\"; \n\t\n    if( plan != null ){\n        if (plan.getIdentity() != null && plan.getAccountRequests() != null){\n            List accountRequests = plan.getAccountRequests();\n            sailpoint.object.Identity identity = plan.getIdentity();\n            \n            if (accountRequests != null){\n                for (AccountRequest accountRequest : accountRequests){\n                \tsourceName = accountRequest.getApplication();\n                \tacctOp = accountRequest.getOperation().toString();\n                \t\n                    if (identity != null ){\n                        if ( ( accountRequest.getAttributeRequests() != null ) && ( !accountRequest.getAttributeRequests().isEmpty() ) ){\n                            for(String attributeKey : attributeTranslationMap.keySet() ) {                                \n                                if(identity.getStringAttribute(attributeKey) != null && accountRequest.getAttributeRequest(attributeTranslationMap.get(attributeKey)) == null ){\n                                    plan.put(attributeTranslationMap.get(attributeKey), identity.getStringAttribute(attributeKey) );\n                                }\n                            }\n                        }\n                    }\n                    \n                    if(\"Modify\".equalsIgnoreCase(acctOp)){\n                    \tList attrReqs = accountRequest.getAttributeRequests();\n                    \t\n                    \tif(attrReqs!=null && !attrReqs.isEmpty()){\n                    \t\tfor (AttributeRequest attrReq : attrReqs){\n                    \t\t\tattrOp = attrReq.getOperation().toString();\n                    \t\t}\n                    \t}\n                    } \n                }\n            }\n\t\t    \n\t\t\tMap arguments = (Map)plan.getArguments();\n\t\t\tsailpoint.rule.Identity requester = null;\n\t\t    \n\t\t\tString requesterName = arguments.get(\"requester\");\n\t\t\tString appName = integration.getName();\n\n\t\t\tString requesterSource = null;\n\t\t\tif (appName != null) {\n\t\t\t\trequesterSource = (String)idn.getSourceAttributeBySourceName(appName, \"requesterSource\");\n\t\t\t}\n\t\t\t\n\t\t\t// Get Account's native Identity (aka unique accountId)\n\t\t\tString openedBy = null;\n\t\t\tString requestedFor = null;\n\t\t\tif (requesterSource != null) {\n\t\t\t\tif (requesterName != null) {\n\t\t\t\t\topenedBy = idn.getFirstAccountNativeIdentity(requesterSource, requesterName);\n\t\t\t\t}\n\t\t\t\tif (identity != null) {\n\t\t\t\t\trequestedFor = idn.getFirstAccountNativeIdentity(requesterSource, identity.getName());\n\t\t\t\t}\n\t\t\t\t\n\t\t\t\targuments.put(\"requesterSource\", requesterSource);\n\t\t\t\t\n\t\t\t} else {\n\t\t\t\tlog.warn(\"Attribute 'requesterSource' is null in the application: \" + appName);\n\t\t\t}\n\n\t\t\tif (requestedFor != null) {\n\t\t\t\targuments.put(\"requested_for\", requestedFor);\n\t\t\t}\n\n\t\t\tif (openedBy != null) {\n\t\t\t\targuments.put(\"opened_by\", openedBy);\n\t\t\t\targuments.put(\"requested_by\", openedBy);\n\t\t\t}\n\n\t\t\tif (identity.getName() != null) {\n\t\t\t\targuments.put(\"identityName\", identity.getName());\n\t\t\t\targuments.put(\"identityDisplayName\", identity.getDisplayName());\n\t\t\t}\n\t\t\t\n\t\t\tif (sourceName != null) {\n\t\t\t\targuments.put(\"source_system_name\", sourceName);\n\t\t\t}\n\n\t\t\tif (null != idn.getSourceAttributeBySourceName(sourceName, \"snowAssignmentGroup\")) {\n\t\t\t    arguments.put(\"snowAssignmentGroup\", idn.getSourceAttributeBySourceName(sourceName, \"snowAssignmentGroup\"));\n\t\t\t} else {\n\t\t\t    arguments.put(\"snowAssignmentGroup\", DEFAULT_ASSIGNMENT_GROUP);\n\t\t    }\n\t\t\t\n\t\t\tif(acctOp != null){\n\t\t\t\tif(\"Create\".equalsIgnoreCase(acctOp)){\n\t\t\t\t\taction = \"Create Account\";\n\t\t\t\t} else if(\"Disable\".equalsIgnoreCase(acctOp)){\n\t\t\t\t\taction = \"Disable Account\";\n\t\t\t\t} else if(\"Enable\".equalsIgnoreCase(acctOp)){\n\t\t\t\t\taction = \"Enable Account\";\n\t\t\t\t} else if(\"Modify\".equalsIgnoreCase(acctOp)){\n\t\t\t\t\tif(\"Add\".equalsIgnoreCase(attrOp)){\n\t\t\t\t\t\taction = \"Add Access\";\n\t\t\t\t\t} else if(\"Remove\".equalsIgnoreCase(attrOp)){\n\t\t\t\t\t\taction = \"Remove Access\";\n\t\t\t\t\t} else {\n\t\t\t\t\t\taction = \"Update Account\";\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\t\n\t\t\t\tif(action != null){\n\t\t\t\t\targuments.put(\"action\", action);\n\t\t\t\t}\n\t\t\t\t\n\t\t\t\t//auto-close configuration\n\t\t\t\tif (null != idn.getSourceAttributeBySourceName(sourceName, \"autoCloseOperations\")) {\n\t\t\t\t   String autoCloseOperations = idn.getSourceAttributeBySourceName(sourceName, \"autoCloseOperations\");\n                   if (autoCloseOperations.contains(acctOp)) {\n\t\t\t\t   arguments.put(\"autoClose\",true);\n\t\t\t\t   } else {\n\t\t\t\t   arguments.put(\"autoClose\",false);\n\t\t\t\t   }\n\t\t\t\t}\n\t\t\t}\n\t\t}\n    }\n  "
+                },
+                "attributes": {
+                    "sourceVersion": "2024-09-17 17:20:32"
+                },
+                "id": "6e55a03d49ef4e5eb34ec001e711f9f7",
+                "name": "SDIM Attributes",
+                "created": "2022-11-11T16:39:36.585Z",
+                "modified": "2024-09-17T17:20:33.655Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "XYwD3JndKaePNv5hvs7-N8NDnwgDHek7WOatbFn2QGOGmnrybuIg8uuH5TBD-RV7EeyJGlUl3VaPd9_t57OSMQ"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "7a2eca9701c74c259b18a1cdef5d8dd4",
+                "type": "RULE",
+                "name": "THP ActiveDirectory uidNumber"
+            },
+            "object": {
+                "description": "This will generate a unique uidnumber.",
+                "type": "AttributeGenerator",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2024-05-16 19:02:42",
+                    "script": "\nimport sailpoint.tools.GeneralException;\nimport java.util.Iterator;\nimport sailpoint.object.*;\nimport java.util.ArrayList;\nimport sailpoint.api.*;\nimport sailpoint.object.*;\nimport java.util.Iterator;\nimport java.util.List;\nimport org.apache.commons.lang.StringUtils;\nimport java.util.Random;\n \nint uidNumber=0;\nboolean isUniqueUidNumber = false;\nint maxIteration = 1;\nString ruleName =  \"THP ActiveDirectory uidNumber\";\nlog.info(\"Entering rule : \"+ruleName);\nwhile((isUniqueUidNumber!=true) && (maxIteration<=100))\n{\n  int rangeMax = 90000000;\n  Random rand = new Random();\n  uidNumber = rand.nextInt(rangeMax)+10000000;\n  String sourceId = application.getId();\n  //idn.attrSearchCountAccounts expects a List as a input\n  List sourceIdList = new ArrayList();\n  sourceIdList.add(sourceId);\n  List uidNumberList = new ArrayList();\n  uidNumberList.add(Integer.toString(uidNumber));\n  if(idn.attrSearchCountAccounts(sourceIdList, \"uidNumber\",\"Equals\",uidNumberList)==0)\n  {\n    isUniqueUidNumber = true;\n  }\n  ++maxIteration;\n}\nlog.info(\"uidNumber : \"+uidNumber);\nlog.info(\"Exiting rule : \"+ruleName);\nreturn uidNumber;\n \n  "
+                },
+                "attributes": {
+                    "sourceVersion": "2024-05-16 19:02:42"
+                },
+                "id": "7a2eca9701c74c259b18a1cdef5d8dd4",
+                "name": "THP ActiveDirectory uidNumber",
+                "created": "2024-05-09T17:16:53.656Z",
+                "modified": "2024-05-16T19:02:42.918Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "WNyIsMXqcchxMQbyNnB3aJPjpBRXR7N9t-6cbZ7na4HTWOacSqqyTNcrK1xjN6Vaqrz4Zna9s9F6Mi4EbKyGTw"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "7c45917f8e3141aa9f9fb7e147353c5f",
+                "type": "RULE",
+                "name": "OHI BeforeProvisioning"
+            },
+            "object": {
+                "description": "Before provisioning rule operations for OHI WebService Source.",
+                "type": "BeforeProvisioning",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2022-12-01 00:19:27",
+                    "script": "\nimport sailpoint.object.*;\nimport sailpoint.object.ProvisioningPlan.AccountRequest;\nimport sailpoint.object.ProvisioningPlan.AttributeRequest;\nimport sailpoint.tools.Util;\nimport java.util.Date;\nimport java.util.Calendar;\nimport java.lang.String;\nimport java.util.Arrays;\nimport java.util.ArrayList;\nimport java.util.List;\nimport java.text.SimpleDateFormat;\nimport sailpoint.rule.Account;\n\npublic AttributeRequest newAttributeRequest(String attributeName, Object attributeValue) \n{\n  AttributeRequest attributeRequest = new ProvisioningPlan.AttributeRequest();\n  attributeRequest.setName(attributeName);\n  attributeRequest.setOperation(ProvisioningPlan.Operation.Set);\n  attributeRequest.setValue(attributeValue);\n  return attributeRequest;\n}\n\nif(plan != null) {\n    Identity identity = plan.getIdentity();\n    String lifecycleState = null;\n\n    // Get the identity from the plan and perform operations\n    if(identity != null) {\n\n        List accountRequests = plan.getAccountRequests();\n        lifecycleState = identity.getAttribute(\"cloudLifecycleState\");\n\n        if(accountRequests != null && !accountRequests.isEmpty()) {\n\n            for(AccountRequest accountRequest : accountRequests) {\n                AccountRequest.Operation op = accountRequest.getOperation();\n                String nativeIdentity = accountRequest.getNativeIdentity();\n \n \n                if( op == AccountRequest.Operation.Modify && nativeIdentity != null) {\n                    if(accountRequest.getAttributeRequest(\"userRoleList\") != null){\n                        AttributeRequest userRoleListRequest = accountRequest.getAttributeRequest(\"userRoleList\");\n                        Object userRoles = userRoleListRequest.getValue();\n                        log.info(\"OHI BP Rule - ProvisioningPlan userRoleListRequests to be added/removed is: \" + userRoles);\n                        \n                        if(userRoleListRequest != null && userRoleListRequest.getOperation().equals(ProvisioningPlan.Operation.Remove)){\n                            Account account = idn.getAccountByNativeIdentity(application.getName(), nativeIdentity);\n                            if (account != null){\n                                List oldUserRoleList = (List) idn.getRawAccountAttribute(account,\"userRoleList\");\n                                log.info(\"OHI BP Rule - ProvisioningPlan userRoleList to be removed is: \" + userRoles + \"[OHI_PROV] Remove Entitlement Operation.\");\n\n                                if(userRoles instanceof String ){\n                                \toldUserRoleList.remove(userRoles);\n                                }else {\n                                \toldUserRoleList.removeAll(userRoles);\n                                }                                \n                                \n                                accountRequest.remove(userRoleListRequest);\n                                accountRequest.add(new AttributeRequest(\"userRoleList\", ProvisioningPlan.Operation.Add, oldUserRoleList));\n                                log.info(\"OHI BP Rule - Revised UserRoleList Value is: \"+ oldUserRoleList +\" for Identity - \"+ identity.getName() +\" :: [OHI_PROV] Remove Entitlement Operation\");\n                            }\n                        }\n                        \n                        if(userRoleListRequest != null && userRoleListRequest.getOperation().equals(ProvisioningPlan.Operation.Add)){\n                            Account account = idn.getAccountByNativeIdentity(application.getName(), nativeIdentity);  \n                            if (account != null){\n                                List oldUserRoleList = (List) idn.getRawAccountAttribute(account,\"userRoleList\");\n                                log.info(\"OHI BP Rule - ProvisioningPlan userRoleList to be Added is: \" + userRoles + \"[OHI_PROV] Add Entitlement Operation.\");\n                                \n                                if(userRoles instanceof String){\n                                \toldUserRoleList.add(userRoles);\n                                }else {\n                                \toldUserRoleList.addAll(userRoles);\n                                }\n                                \n                                accountRequest.remove(userRoleListRequest);\n                                accountRequest.add(new AttributeRequest(\"userRoleList\", ProvisioningPlan.Operation.Add, oldUserRoleList));\n                                log.info(\"OHI BP Rule - Revised UserRoleList Value is: \"+ oldUserRoleList +\" for Identity - \"+ identity.getName() +\" :: [OHI_PROV] Add Entitlement Operation\");\n                            }    \n                        }\n                    }\n                }\n            }\n        }\n    }\n}\n"
+                },
+                "attributes": {
+                    "sourceVersion": "2022-12-01 00:19:27"
+                },
+                "id": "7c45917f8e3141aa9f9fb7e147353c5f",
+                "name": "OHI BeforeProvisioning",
+                "created": "2022-11-01T19:28:01.759Z",
+                "modified": "2024-04-17T19:16:03.350Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "OCKKhBwg2BN9RI2Lfs_t0iD2W4iEZt_Toi6nky4QLOZipJ-mCltsU2avwQcWnIgYXKquXOjs0G_MeCMlxyCcfQ"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "87dc38b57a9744c68cd3c21e54f51d45",
+                "type": "RULE",
+                "name": "HPHC-ActiveDirectory BeforeProvisioning Rule"
+            },
+            "object": {
+                "description": "",
+                "type": "BeforeProvisioning",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2024-05-09 17:16:53",
+                    "script": "\n\n\t\t\t\t\n\n\timport java.util.ArrayList;\n\timport java.util.Date;\n\timport java.text.SimpleDateFormat;\n\t\n\timport sailpoint.object.Identity;\n\timport sailpoint.object.Application;\n\timport sailpoint.object.Link;\n\timport sailpoint.object.ProvisioningPlan;\n\timport sailpoint.object.ProvisioningPlan.Operation;\n\timport sailpoint.object.ProvisioningPlan.AccountRequest;\n\timport sailpoint.object.ProvisioningPlan.AccountRequest.Operation;\n\timport sailpoint.object.ProvisioningPlan.AttributeRequest;\n\timport sailpoint.api.IdentityService;\n\timport sailpoint.tools.Util;\n\t\n\tString Environment=\"Sandbox\";\n\tString activeOU = null;\n\tString disabledOU = null;\n\t\n\tif(Environment.equals(\"Sandbox\")) {\n     activeOU = \"OU=Users,OU=AIM_Uat,DC=EHEALTH,DC=HPHC,DC=ORG\"; \n     disabledOU = \"OU=DisabledAccounts,OU=Users,OU=AIM_Uat,DC=EHEALTH,DC=HPHC,DC=ORG\"; \n\t }\n\tif(Environment.equals(\"Prod\")) {\n      activeOU = \"OU=Domain Users,DC=EHEALTH,DC=HPHC,DC=ORG\";  \n      disabledOU = \"OU=Disabled User Accounts,DC=EHEALTH,DC=HPHC,DC=ORG\"; \n\t}\n\t\n    Identity identity = null;\n    String nativeIdentity = null;\n    \n\tif( plan != null ) {\n\t\tidentity = plan.getIdentity();\n\t\tnativeIdentity = plan.getNativeIdentity();\n\t}\n\t\n\tif(identity != null) {\n\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] Executing Before Provisioning Rule.... nativeIdentity - \" + nativeIdentity );\n\t\t\n\t\t\n\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] Lifecycle State: \" + identity.getAttribute(\"cloudLifecycleState\") );\n\t\tif (Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"), \"deleteaccount\"))  {\n\t\t\tList emptyAttributes = new ArrayList();\n\t\t\t\n\t\t\tList accountRequests = plan.getAccountRequests();\n\t\t\tfor (AccountRequest accountRequest : accountRequests) {\n\t\t\t\tAccountRequest.Operation op = accountRequest.getOperation();\n      \t\t\t\t//delete account after 180 days of term\n      \t\t\t\tif  ( Util.nullSafeEq(accountRequest.getOperation(), AccountRequest.Operation.Enable)) {\n        \t\t\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] deleting account after 180 days of term \");\n\t\t\t\t\taccountRequest.setOperation(AccountRequest.Operation.Delete);\n\t\t\t\t\taccountRequest.setAttributeRequests(emptyAttributes);\n\t\t\t\t\n\t\t\t\t}\n\t\t\t}\n\t\t\n\t\t} else if (Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"), \"removeaccess\"))  {\n\t\t\tList emptyAttributes = new ArrayList();\n\t\t\t\n\t\t\tList accountRequests = plan.getAccountRequests();\n\t\t\tfor (AccountRequest accountRequest : accountRequests) {\n\t\t\t\tAccountRequest.Operation op = accountRequest.getOperation();\n      \t\t\t\t//Remove all AD Access after 14 days\n      \t\t\t\tif  ( ( Util.nullSafeEq(accountRequest.getOperation(), AccountRequest.Operation.Enable)) || ( Util.nullSafeEq(accountRequest.getOperation(), AccountRequest.Operation.Modify)) ) {\n        \t\t\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] remove account access after initial term \");\n        \t\t\t\t\n\t\t\t\t\t\n                    List groupList = new ArrayList();\n\t\t            accountRequest.add(new AttributeRequest(\"memberOf\", ProvisioningPlan.Operation.Set, groupList));\n\t\t\t\t\taccountRequest.setOperation(AccountRequest.Operation.Disable);\n\t\t\t\t\taccountRequest.add(new AttributeRequest(\"AC_NewParent\",ProvisioningPlan.Operation.Set, disabledOU) );\n\n\t\t\t\t}\n\t\t\t}\n\t\t\n\t\t} else if (Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"), \"inactive\")) {\n\t\t\tList accountRequests = plan.getAccountRequests();\n\t\t\tfor (AccountRequest accountRequest : accountRequests) {\n\t\t\t\t\n\t\t\t\t//move account to disabled OU on term when LCS is inactive\n\t\t\t\tif (Util.nullSafeEq(accountRequest.getOperation(),AccountRequest.Operation.Disable)) {\n\t\t\t\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] move account to disabled OU on term \");\n\t\t\t\t\t\n\t\t\t\t\taccountRequest.add(new AttributeRequest(\"AC_NewParent\",ProvisioningPlan.Operation.Set, disabledOU) );\n\t\t\t\t\t\n\t\t\t\t}\n\t\t\t}\n\t\t} else if( Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"), \"active\") || Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"), \"prehire\") ){\n\t\t\tList accountRequests = plan.getAccountRequests();\n\t\t\tfor (AccountRequest accountRequest : accountRequests) {\n\t\t\t\n\t\t\t\t//move account to active OU on rehire\n\t\t\t\tif (Util.nullSafeEq(accountRequest.getOperation(),AccountRequest.Operation.Enable)) {\n\t\t\t\t\taccountRequest.add(new AttributeRequest(\"AC_NewParent\",ProvisioningPlan.Operation.Set, activeOU) );\n\t\t\t\t\taccountRequest.add(new AttributeRequest(\"msExchHideFromAddressLists\", ProvisioningPlan.Operation.Set, false));\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] Complete Before Provisioning Rule....\");\n  \n\n\t\t\t"
+                },
+                "attributes": {
+                    "sourceVersion": "2024-05-09 17:16:53"
+                },
+                "id": "87dc38b57a9744c68cd3c21e54f51d45",
+                "name": "HPHC-ActiveDirectory BeforeProvisioning Rule",
+                "created": "2022-09-21T22:52:04.009Z",
+                "modified": "2024-05-09T17:16:53.747Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "h41SQET-JmcHB_qAC86BoOGBBb-haJoPIL4A8OWouEDh7SdMjA0odpHx3ifxoCGUuqlrfzEiUTd4G8nD935MIw"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "89b4385f1bbd42beb9e10ce0935e2189",
+                "type": "RULE",
+                "name": "Epic SER Multivalued Update"
+            },
+            "object": {
+                "description": "This rule will change \"Add\" and \"Remove\" multivalued attribute requests into \"Set\" requests. Existing\n        account attributes are read from the identity and added to the attribute request \"value\".\n        The operation is then changed to \"Set\". This allows for proper support of multivalued attributes for the Epic\n        SER connector. This is required because the connector does not have a native \"Add\" or \"Remove\" patch operation;\n        it only supports replace. It also does not support a native read for a single account, so this cannot be taken\n        care of within the connector logic.\n    ",
+                "type": "BeforeProvisioning",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "1.0",
+                    "script": "\n        \n            import sailpoint.object.ProvisioningPlan;\n            import sailpoint.object.Schema;\n            import sailpoint.rule.Account;\n            import sailpoint.tools.GeneralException;\n\n            private List objectToList(Object obj) {\n                if (obj instanceof Collection) {\n                    return new ArrayList((Collection) obj);\n                } else {\n                    return new ArrayList(Collections.singletonList(obj));\n                }\n            }\n\n            ////////////////////////////////////////////////////////////////\n            // Main\n            ////////////////////////////////////////////////////////////////\n            String logPrefix = \"MultivaluedUpdate - \";\n            log.trace(logPrefix + \"enter\");\n            if (plan == null || plan.getAccountRequests() == null) return;\n            log.trace(logPrefix + \"Account requests size: \" + plan.getAccountRequests().size());\n            Schema schema = application.getSchema(\"account\");\n            if (schema == null) {\n                log.warn(logPrefix + \"Could not get account schema. Exiting.\");\n                return;\n            }\n            for (ProvisioningPlan.AccountRequest accountRequest : plan.getAccountRequests()) {\n                if (accountRequest.getOp().equals(ProvisioningPlan.ObjectOperation.Create)) {\n                    continue;\n                }\n                if (accountRequest.getOp().equals(ProvisioningPlan.ObjectOperation.Delete)) {\n                    continue;\n                }\n                if (accountRequest.getAttributeRequests() == null) {\n                    continue;\n                }\n                log.trace(logPrefix + \"Attribute requests size: \" + accountRequest.getAttributeRequests().size());\n\n                for (ProvisioningPlan.AttributeRequest attributeRequest : accountRequest.getAttributeRequests()) {\n                    if (attributeRequest.getOp() == null || attributeRequest.getName() == null || attributeRequest.getValue() == null) {\n                        log.warn(logPrefix + \"Attribute request is missing op, name, or value..\");\n                        continue;\n                    }\n\n                    log.trace(logPrefix + \"attribute request name: \" + attributeRequest.getName() +\n                        \", value: \" + attributeRequest.getValue() + \", operation: \" + attributeRequest.getOp());\n\n                    if (!attributeRequest.getOp().equals(ProvisioningPlan.Operation.Add) &&\n                        !attributeRequest.getOp().equals(ProvisioningPlan.Operation.Remove)) {\n                        continue;\n                    }\n\n                    if (!schema.isMultiValued(attributeRequest.getName())) {\n                        log.trace(logPrefix + attributeRequest.getName() + \" is not multivalued. skipping.\");\n                        continue;\n                    }\n\n                    final String applicationName = accountRequest.getApplicationName() == null ?\n                        application.getName() :\n                        accountRequest.getApplicationName();\n                    if (applicationName == null) {\n                        log.error(logPrefix + \"ApplicationName not in accountRequest or application object\");\n                        continue;\n                    }\n                    log.debug(logPrefix + \"Application name: \" + applicationName);\n\n                    final String nativeIdentity = accountRequest.getNativeIdentity() == null ?\n                        plan.getNativeIdentity() :\n                        accountRequest.getNativeIdentity();\n                    if (nativeIdentity == null) {\n                        log.error(logPrefix + \"Native Identity not present in AccountRequest or ProvisioningPlan\");\n                        continue;\n                    }\n                    log.debug(logPrefix + \"nativeIdentity name: \" + nativeIdentity);\n\n                    final Account account = idn.getAccountByNativeIdentity(applicationName, nativeIdentity);\n                    if (account == null) {\n                        log.error(logPrefix + \"Could not find account for app \" + applicationName + \" and identity \" + nativeIdentity);\n                        continue;\n                    }\n                    log.debug(logPrefix + \"Found account with uuid: \" + account.getUuid());\n\n                    final Object rawExistingVals = idn.getRawAccountAttribute(account, attributeRequest.getName());\n                    if (rawExistingVals == null) {\n                        log.debug(logPrefix + \"Existing account attribute value is null for  \" + attributeRequest.getName() + \". Nothing to do.\");\n                        continue;\n                    }\n\n                    log.trace(logPrefix + \"Raw existing values class: \" + rawExistingVals.getClass());\n                    List targetValues = objectToList(rawExistingVals);\n\n                    final Object rawChangeVals = attributeRequest.getValue();\n                    log.trace(logPrefix + \"Attribute Request values class: \" + rawChangeVals.getClass());\n                    List changeVals = objectToList(rawChangeVals);\n\n                    if (attributeRequest.getOp().equals(ProvisioningPlan.Operation.Add)) {\n                        log.debug(logPrefix + \"AttributeRequest with ADD operation found name: \" + attributeRequest.getName());\n                        targetValues.addAll(changeVals);\n                        attributeRequest.setValue(targetValues);\n                        log.debug(logPrefix + \"Changing operation from \\\"Add\\\" to \\\"Set\\\"\");\n                        attributeRequest.setOp(ProvisioningPlan.Operation.Set);\n                        log.debug(logPrefix + \"Resulting target values: \" + targetValues);\n                    } else if (attributeRequest.getOp().equals(ProvisioningPlan.Operation.Remove)) {\n                        log.debug(logPrefix + \"AttributeRequest with REMOVE operation found name: \" + attributeRequest.getName());\n                        targetValues.removeAll(changeVals);\n                        attributeRequest.setValue(targetValues);\n                        log.debug(logPrefix + \"Changing operation from \\\"Remove\\\" to \\\"Set\\\"\");\n                        attributeRequest.setOp(ProvisioningPlan.Operation.Set);\n                        log.debug(logPrefix + \"Resulting target values: \" + targetValues);\n                    }\n                }\n            }\n            log.trace(logPrefix + \"exit\");\n        \n    "
+                },
+                "attributes": null,
+                "id": "89b4385f1bbd42beb9e10ce0935e2189",
+                "name": "Epic SER Multivalued Update",
+                "created": "2023-09-26T16:15:08.831Z",
+                "modified": "2025-07-17T22:22:17.958Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "VsUdbP2da7nqpSZ-QC8I4QCafDjSFAhSsjW_R6s8Ry2fandkQqmCmQ7QoZw6drprw8lYqs9TgBb0q8QWnRX3rw"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "9f1b5ade93a74ebd9ae06291e6792d48",
+                "type": "RULE",
+                "name": "eCare BeforeProvisioning"
+            },
+            "object": {
+                "description": "Before provisioning rule operations for eCare OpenLDAP Source.",
+                "type": "BeforeProvisioning",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2022-10-04 01:05:14",
+                    "script": "\nimport sailpoint.object.*;\nimport sailpoint.object.ProvisioningPlan.AccountRequest;\nimport sailpoint.object.ProvisioningPlan.AttributeRequest;\nimport sailpoint.tools.Util;\nimport java.util.Date;\nimport java.util.Calendar;\nimport java.lang.String;\nimport java.util.ArrayList;\nimport java.util.List;\nimport java.text.SimpleDateFormat;\n\npublic AttributeRequest newAttributeRequest(String attributeName, Object attributeValue) \n{\n  AttributeRequest attributeRequest = new ProvisioningPlan.AttributeRequest();\n  attributeRequest.setName(attributeName);\n  attributeRequest.setOperation(ProvisioningPlan.Operation.Set);\n  attributeRequest.setValue(attributeValue);\n  return attributeRequest;\n}\n\nif(plan != null) {\n    Identity identity = plan.getIdentity();\n    String lifecycleState = null;\n\n    // Get the identity from the plan and perform operations\n    if(identity != null) {\n\n        List accountRequests = plan.getAccountRequests();\n        lifecycleState = identity.getAttribute(\"cloudLifecycleState\");\n\n        if(accountRequests != null && !accountRequests.isEmpty()) {\n\n            for(AccountRequest accountRequest : accountRequests) {\n                AccountRequest.Operation op = accountRequest.getOperation();\n                String nativeIdentity = accountRequest.getNativeIdentity();\n \n \n                if( op == null ) continue;\n                if( op == AccountRequest.Operation.Modify && nativeIdentity != null) {\n                    AttributeRequest hphcroleRequest = acctReq.getAttributeRequest(\"hphcrole\");\n                    if(hphcroleRequest != null && hphcroleRequest.getOperation().equals(ProvisioningPlan.Operation.Add) ){\n                        Account account = idn.getAccountByNativeIdentity(application.getName(), nativeIdentity);\n                        if (account != null){\n                            String oldHphcRole = idn.getAccountAttribute(\"hphcrole\");\n                            AttributeRequest oldHphcRoleReq = new AttributeRequest(\"hphcrole\", ProvisioningPlan.Operation.Remove, oldHphcRole);\n                            accountRequest.add(oldHphcRoleReq);\n\n                        }\n                    }\n                }\n                else if( op == AccountRequest.Operation.Enable && \"removeaccess\".equalsIgnoreCase(lifecycleState) && nativeIdentity != null){\n                    accountRequest.setOperation(AccountRequest.Operation.Delete);\n                }\n                else if( op == AccountRequest.Operation.Disable && \"inactive\".equalsIgnoreCase(lifecycleState) && nativeIdentity != null){\n                    SimpleDateFormat SDFormat = new SimpleDateFormat(\"MM/dd/yyyy\");\n                    Calendar cal = Calendar.getInstance();\n                    String currentDate = SDFormat.format(cal.getTime());\n                    log.info(\"eCare BP Rule - Set TodaysDate to: \"+ currentDate +\" for Identity - \"+ identity.getName() +\" :: [eCare_PROV] Mark Account as Termd.\");\n                    accountRequest.add(new AttributeRequest(\"description\", ProvisioningPlan.Operation.Set, \"Account Disabled on \" + currentDate));\n                    accountRequest.add(new AttributeRequest(\"msDS-UserAccountDisabled\", ProvisioningPlan.Operation.Set, \"True\"));\n                }\n                else if( op == AccountRequest.Operation.Enable && (\"active\".equalsIgnoreCase(lifecycleState) || \"prehire\".equalsIgnoreCase(lifecycleState))){\n                    log.info(\"eCare BP Rule: for Identity - \"+ identity.getName() +\" :: [OUD_PROV] Re-Enable Account.\");\n                    accountRequest.add(new AttributeRequest(\"msDS-UserAccountDisabled\", ProvisioningPlan.Operation.Set, \"\"));\n                }\n            }\n        }\n    }\n}\n"
+                },
+                "attributes": {
+                    "sourceVersion": "2022-10-04 01:05:14"
+                },
+                "id": "9f1b5ade93a74ebd9ae06291e6792d48",
+                "name": "eCare BeforeProvisioning",
+                "created": "2022-10-04T01:05:15.004Z",
+                "modified": "2024-04-17T19:16:03.375Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "GtBzqHb6BFd5WZjuprIdzBt1jcTAr2CA-oizdHfFxfJWwXBQpZFseY2CHmcSr_-5Ijmv-Ydv79Hhrf29XDi0pA"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "abb3deb56df0430883dea08e810a2f1b",
+                "type": "RULE",
+                "name": "THP ActiveDirectory Domain DN"
+            },
+            "object": {
+                "description": "This will generate a unique DN.",
+                "type": "AttributeGenerator",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2023-08-07 17:31:59",
+                    "script": "\nimport sailpoint.tools.GeneralException;\nimport sailpoint.api.*;\nimport sailpoint.object.*;\nimport java.util.ArrayList;\nimport java.util.Iterator;\nimport java.util.List;\nimport java.util.logging;\nimport java.util.Random;\nimport java.util.regex.Pattern;\nimport java.lang.*;\nimport java.text.Normalizer;\nimport java.text.Normalizer.Form;\nimport org.apache.commons.lang.StringUtils;\n\nint maxIteration = 1;\nString preferredFirstName = null;\nString preferredLastName = null;\nString firstName = null;\nString lastName = null;\nString middleName = null;\n\npublic String removeBadCharacters(String inputString) {\n\t  return inputString.replaceAll(\"[^A-Za-z0-9-']\", \"\").trim();\n}\npublic String removeDiacriticalMarks(String inputString) {\n\t\tinputString = StringUtils.trimToEmpty(inputString);\n\t\tinputString = Normalizer.normalize(inputString, Normalizer.Form.NFD); \n\t\tinputString = Pattern.compile(\"\\\\p{InCombiningDiacriticalMarks}+\").matcher(inputString).replaceAll(\"\");\n\t\treturn inputString;\n}\npublic String generateDN (String firstName,  String lastName, String middleName, int iteration) {\n\n  // Data protection.\n  firstName  = StringUtils.trimToNull(firstName);\n  lastName   = StringUtils.trimToNull(lastName);\n  middleName = StringUtils.trimToNull(middleName);\n\n  if ((firstName == null) || (lastName == null ))\n    return null;\n\n  firstName = removeBadCharacters(removeDiacriticalMarks(firstName));\n  middleName= removeBadCharacters(removeDiacriticalMarks(middleName));\n  lastName  = removeBadCharacters(removeDiacriticalMarks(lastName));\n\n  // Set Initial Default Values\n  String distinguishedName = \"\";\n  String middleInitial     = \"\";\n  String baseDN            = \",OU=TEST_THPUSERS,DC=thp,DC=tahphq,DC=tahp\";\n  String dnPrefix          = \"CN=TEST_\";\n  \n  // Build Distinguished Name based on Iteration and if middleName is not null\n  if (iteration == 0)\n    distinguishedName = dnPrefix + firstName + \" \" + lastName + baseDN;\n  else if (iteration == 1 && !StringUtils.isBlank(middleName)){\n    middleInitial     = middleName.substring(0,1);\n    distinguishedName = dnPrefix + firstName + \" \" + middleInitial + \" \" + lastName + baseDN;\n  }\n  else{\n    middleInitial     = middleName.substring(0,1);\n    distinguishedName = dnPrefix + firstName + \" \" + middleInitial + \" \" + lastName + baseDN;\n  }\n  log.error(\"AccountGenerator Rule Operation - DN Iteration Value: \" + distinguishedName);\n  // Evaluate Uniqueness and Loop through the method again if not unique.\n  if ( isUnique (distinguishedName))\n    return distinguishedName;\n  else if (iteration <= maxIteration)\n    return generateDN (firstName,  lastName, middleName, (iteration + 1));\n  else\n    return distinguishedName;\n}\n\npublic boolean isUnique (String distinguishedName) throws GeneralException {\n  return !idn.accountExistsByNativeIdentity(application.getName(), distinguishedName);\n}\n\npreferredFirstName = identity.getAttribute(\"preferredFirstName\");\npreferredLastName = identity.getAttribute(\"preferredLastName\");\nif(preferredFirstName!=null && preferredLastName!=null)\n{\n  firstName = preferredFirstName;\n  lastName = preferredLastName;\n  middleName = identity.getAttribute(\"middleName\");\n}\nelse\n{\n  firstName = identity.getFirstname();\n  lastName = identity.getLastname();\n  middleName = identity.getAttribute(\"middleName\");\n}\nreturn generateDN(firstName,lastName,middleName,0);\n\n    "
+                },
+                "attributes": {
+                    "sourceVersion": "2023-08-07 17:31:59"
+                },
+                "id": "abb3deb56df0430883dea08e810a2f1b",
+                "name": "THP ActiveDirectory Domain DN",
+                "created": "2022-08-11T22:35:48.409Z",
+                "modified": "2024-04-17T19:16:04.258Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "iV56bJojJrB3ncpCUVG-uATfMxSac9w_9nPew7p5ao0aovDd_inYhW5FDfoHxYYMD7T8CkXqZCwYCWZ0-2Mzsw"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "b555edde2ba042968207f32f2fcd319e",
+                "type": "RULE",
+                "name": "OUD BeforeProvisioning"
+            },
+            "object": {
+                "description": "Before provisioning rule operations for OUD.",
+                "type": "BeforeProvisioning",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2022-09-19 18:41:33",
+                    "script": "\nimport sailpoint.object.*;\nimport sailpoint.object.ProvisioningPlan.AccountRequest;\nimport sailpoint.object.ProvisioningPlan.AttributeRequest;\nimport sailpoint.tools.Util;\nimport java.util.Date;\nimport java.util.Calendar;\nimport java.lang.String;\nimport java.util.ArrayList;\nimport java.util.List;\nimport java.text.SimpleDateFormat;\n\npublic AttributeRequest newAttributeRequest(String attributeName, Object attributeValue) \n{\n  AttributeRequest attributeRequest = new ProvisioningPlan.AttributeRequest();\n  attributeRequest.setName(attributeName);\n  attributeRequest.setOperation(ProvisioningPlan.Operation.Set);\n  attributeRequest.setValue(attributeValue);\n  return attributeRequest;\n}\n\nif(plan != null) {\n    Identity identity = plan.getIdentity();\n    String lifecycleState = null;\n\n    // Get the identity from the plan and perform operations\n    if(identity != null) {\n\n        List accountRequests = plan.getAccountRequests();\n        lifecycleState = identity.getAttribute(\"cloudLifecycleState\");\n\n        if(accountRequests != null && !accountRequests.isEmpty()) {\n\n            for(AccountRequest accountRequest : accountRequests) {\n                AccountRequest.Operation op = accountRequest.getOperation();\n                String nativeIdentity = accountRequest.getNativeIdentity();\n                if(op == null) continue;\n                if( op == AccountRequest.Operation.Enable && \"removeaccess\".equalsIgnoreCase(lifecycleState) && nativeIdentity != null){\n                    accountRequest.setOperation(AccountRequest.Operation.Delete);\n                }\n                else if( op == AccountRequest.Operation.Disable && \"Inactive\".equalsIgnoreCase(lifecycleState) && nativeIdentity != null){\n                    SimpleDateFormat SDFormat = new SimpleDateFormat(\"yyyyMMdd\");\n                    Calendar cal = Calendar.getInstance();\n                    String currentDate = SDFormat.format(cal.getTime());\n                    log.info(\"OUD BP Rule - Set TodaysDate to: \"+ currentDate +\" for Identity - \"+ identity.getName() +\" :: [OUD_PROV] Mark Account as Termd.\");\n                    accountRequest.add(new AttributeRequest(\"description\", ProvisioningPlan.Operation.Set, \"Term \" + currentDate));\n                }\n                else if( op == AccountRequest.Operation.Enable && (\"Active\".equalsIgnoreCase(lifecycleState) || \"PreHire\".equalsIgnoreCase(lifecycleState))){\n                    log.info(\"OUD BP Rule: for Identity - \"+ identity.getName() +\" :: [OUD_PROV] Re-Enable Account.\");\n                    accountRequest.add(new AttributeRequest(\"orclIsEnabled\", ProvisioningPlan.Operation.Set, \"ENABLED\"));\n                }\n            }\n        }\n    }\n}\n"
+                },
+                "attributes": {
+                    "sourceVersion": "2022-09-19 18:41:33"
+                },
+                "id": "b555edde2ba042968207f32f2fcd319e",
+                "name": "OUD BeforeProvisioning",
+                "created": "2022-09-16T23:00:25.335Z",
+                "modified": "2024-04-17T19:16:04.268Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "kFiEsJ4jYgpPDbpIUhVmcOQgBMEgRgj5V29bQ0xM4dWIbH6foOZDyuU0QgLsEqUgPFXmgizTeWCCrQwjTpW62g"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "b660e7dbc2cb40458c15d1ce7a2466c9",
+                "type": "RULE",
+                "name": "P32Health ActiveDirectory uidNumber"
+            },
+            "object": {
+                "description": "This will generate a unique uidnumber.",
+                "type": "AttributeGenerator",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2024-05-16 19:02:41",
+                    "script": "\nimport sailpoint.tools.GeneralException;\nimport java.util.Iterator;\nimport sailpoint.object.*;\nimport java.util.ArrayList;\nimport sailpoint.api.*;\nimport sailpoint.object.*;\nimport java.util.Iterator;\nimport java.util.List;\nimport org.apache.commons.lang.StringUtils;\nimport java.util.Random;\n \nint uidNumber=0;\nboolean isUniqueUidNumber = false;\nint maxIteration = 1;\nString ruleName =  \"P32Health ActiveDirectory uidNumber\";\nlog.info(\"Entering rule : \"+ruleName);\nwhile((isUniqueUidNumber!=true) && (maxIteration<=100))\n{\n  int rangeMax = 90000000;\n  Random rand = new Random();\n  uidNumber = rand.nextInt(rangeMax)+10000000;\n  String sourceId = application.getId();\n  //idn.attrSearchCountAccounts expects a List as a input\n  List sourceIdList = new ArrayList();\n  sourceIdList.add(sourceId);\n  List uidNumberList = new ArrayList();\n  uidNumberList.add(Integer.toString(uidNumber));\n  if(idn.attrSearchCountAccounts(sourceIdList, \"uidNumber\",\"Equals\",uidNumberList)==0)\n  {\n    isUniqueUidNumber = true;\n  }\n  ++maxIteration;\n}\nlog.info(\"uidNumber : \"+uidNumber);\nlog.info(\"Exiting rule : \"+ruleName);\nreturn uidNumber;\n \n  "
+                },
+                "attributes": {
+                    "sourceVersion": "2024-05-16 19:02:41"
+                },
+                "id": "b660e7dbc2cb40458c15d1ce7a2466c9",
+                "name": "P32Health ActiveDirectory uidNumber",
+                "created": "2024-05-09T17:16:53.365Z",
+                "modified": "2024-05-16T19:02:42.660Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "HeiQohefLFGJRDJLGu63Ey4gJxRcb6mC_Ok31pbX0kTtQTPrBVGu-HehWs_WNFutLfQbGnFu0pX3379IzfauVg"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "b9a12caa1e574527a7f970d1954be4e1",
+                "type": "RULE",
+                "name": "HPHC-Salesforce BeforeProvisioning"
+            },
+            "object": {
+                "description": "Before provisioning rule operations for HPHC-Salesforce.",
+                "type": "BeforeProvisioning",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2022-12-01 20:40:02",
+                    "script": "\n\n    import sailpoint.object.ProvisioningPlan;\n    import sailpoint.object.Attributes;\n    import sailpoint.object.Identity;\n    import sailpoint.object.ProvisioningPlan.AccountRequest;\n    import sailpoint.object.ProvisioningPlan.AttributeRequest;\n    import sailpoint.object.ProvisioningPlan.Operation;\n    import sailpoint.object.ManagedAttribute;\n    import sailpoint.object.ManagedAttribute.Type;\t\t\n    import sailpoint.object.Filter;\n    import sailpoint.object.*;\n    import java.util.ArrayList;\n    import sailpoint.rule.ManagedAttributeDetails;\n    import sailpoint.tools.Util;\n    import java.util.Date;\n    import java.text.SimpleDateFormat;\n    import java.util.List;\n    import sailpoint.rule.Account;\n    \n    public AttributeRequest newAttributeRequest(String attributeName, Object attributeValue) \n    {\n      AttributeRequest attributeRequest = new ProvisioningPlan.AttributeRequest();\n      attributeRequest.setName(attributeName);\n      attributeRequest.setOperation(ProvisioningPlan.Operation.Set);\n      attributeRequest.setValue(attributeValue);\n      return attributeRequest;\n    }\n\n    public AttributeRequest newAttributeRequestRemove(String attributeName) {\n      AttributeRequest attributeRequest = new ProvisioningPlan.AttributeRequest();\n      attributeRequest.setName(attributeName);\n      attributeRequest.setOperation(ProvisioningPlan.Operation.Remove);\n      return attributeRequest;\n    }\n    \n    if(plan != null) {\n        Identity identity = plan.getIdentity();\n        String lifecycleState = null;\n        String accreq_role = null;\n        String accreq_permissionSet = null; \n        String accreq_managedPackage = null;\n        String profile = null;\n        String role = null;\n        String nativeId = null;\n        String ACCESS_REQUEST_MAPPING = \"HPHC Salesforce Access Request [source]\";\n        if(identity != null) {\n            List accountRequests = plan.getAccountRequests();\n            lifecycleState = identity.getAttribute(\"cloudLifecycleState\");\n            if(accountRequests != null && !accountRequests.isEmpty()) {\n                for(AccountRequest accountRequest : accountRequests) {\n                    AccountRequest.Operation op = accountRequest.getOperation();\n                    String nativeIdentity = accountRequest.getNativeIdentity();\n                    if(op == null) continue;\n                    if(op == AccountRequest.Operation.Create || op == AccountRequest.Operation.Modify) {\n                        List attReqs = accountRequest.getAttributeRequests();\n                        \n                        if(accountRequest.getAttributeRequests() != null && !attReqs.isEmpty()) {\n\n                            //get access request information\n                            for (ProvisioningPlan.AttributeRequest attributeReq: attReqs) {\n\n                                String name = attributeReq.getName();\n                                if ( name.equalsIgnoreCase(\"ProfileId\") ){\n                                    String ProfileAttrValue = (String) attributeReq.getValue();\n                                    ManagedAttributeDetails managedAttributeDetails = idn.getManagedAttributeDetails(application.getId(), \"ProfileId\", ProfileAttrValue, Type.Entitlement);\n                                \n                                    if (managedAttributeDetails == null)\n                                    throw new Exception(\" managed attribute per [\"+ name + \",\" + value +\"]\");\n\n                                    Map madAttributes = managedAttributeDetails.getAttributes();\n\t\t\t\t\t\t\t        profile = (String) madAttributes.get(\"Name\");\n                                }\n                                if ( name.equalsIgnoreCase(\"Role\") ){\n                                    String RoleAttrValue = (String) attributeReq.getValue();\n                                    ManagedAttributeDetails managedAttributeDetails = idn.getManagedAttributeDetails(application.getId(), \"Role\", RoleAttrValue, Type.Entitlement);\n                                \n                                    if (managedAttributeDetails == null)\n                                    throw new Exception(\" managed attribute per [\"+ name + \",\" + value +\"]\");\n\n                                    Map madAttributes = managedAttributeDetails.getAttributes();\n\t\t\t\t\t\t\t        role = (String) madAttributes.get(\"Name\");\n                                }\n                            }\n                        }\n                        if(profile!=null){\n                            nativeId = profile + \"|\" + role;\n                        \n                        Account account = idn.getAccountByNativeIdentity(ACCESS_REQUEST_MAPPING,nativeId);\n                        if(account != null){\n\n                            List managedPackageValues = new ArrayList();\n\n                            //get mapping information from delimited source\n                            accreq_managedPackage = idn.getAccountAttribute(account, \"ManagedPackage\");\n                            accreq_permissionSet = idn.getAccountAttribute(account, \"PermissionSet\");\n                            accreq_role = idn.getAccountAttribute(account, \"Role\");\n                            String CallCenterId = idn.getAccountAttribute(account, \"CallCenterId\");\n                            String accreq_userPermissionsMarketingUser = idn.getAccountAttribute(account, \"UserPermissionsMarketingUser\");\n                        \n\n                             //add attribute requests according to mapping\n                            if(accreq_role==null){\n                                accountRequest.add(newAttributeRequest(\"Role\", \"\"));\n                            }\n                            if(accreq_permissionSet==null){\n                                accountRequest.add(newAttributeRequest(\"PermissionSet\", \"\"));\n                            }\n                            \n                            String[] lines = accreq_managedPackage.split(\"\\\\|\");\n                            \n                            for (int i=0;i<lines.length; i++) {\n                                managedPackageValues.add(lines[i].replaceAll(\"[^a-zA-Z0-9]\", \"\"));\n                            }\n                            \n                            accountRequest.add(newAttributeRequest(\"ManagedPackage\", (managedPackageValues instanceof List ? (List) managedPackageValues : (String) managedPackageValues)));\n\n                            accountRequest.add(newAttributeRequest(\"UserPermissionsMarketingUser\", accreq_userPermissionsMarketingUser));\n                            accountRequest.add(newAttributeRequest(\"CallCenterId\", CallCenterId));\n                            \n                            //if requested role is System Administrator Integrations|Admin remove federation id request\n                            if(nativeId.equalsIgnoreCase(\"System Administrator Integrations|Admin\")){\n                                accountRequest.add(newAttributeRequestRemove(\"FederationIdentifier\"));\n                            }\n                        }\n                        }\n                    }\n                    else if( op == AccountRequest.Operation.Disable && \"inactive\".equals(lifecycleState) && nativeIdentity != null){\n                        accountRequest.add(newAttributeRequest(\"ManagedPackage\", \"\"));\n                    }\n                }\n            }\n        }\n    }\n"
+                },
+                "attributes": {
+                    "sourceVersion": "2022-12-01 20:40:02"
+                },
+                "id": "b9a12caa1e574527a7f970d1954be4e1",
+                "name": "HPHC-Salesforce BeforeProvisioning",
+                "created": "2022-11-15T18:46:04.543Z",
+                "modified": "2024-04-17T19:16:03.994Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "EcL6cJRD073OLiz1nLIiolxcocYlD46tvr3ch_QU0kQZOBr4kKIVviWVTWYvzSO-7lqkxUotBp3y2IrbpN7y4w"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "becfd1c302614e11a0040f8802c2e450",
+                "type": "RULE",
+                "name": "PingDirectory BeforeProvisioning"
+            },
+            "object": {
+                "description": "Before provisioning rule operations for PingDirectory.",
+                "type": "BeforeProvisioning",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2022-09-20 17:35:15",
+                    "script": "\n    import sailpoint.object.*;\n    import sailpoint.object.ProvisioningPlan.AccountRequest;\n    import sailpoint.object.ProvisioningPlan.AttributeRequest;\n    import sailpoint.tools.Util;\n    import java.util.Date;\n    import java.text.SimpleDateFormat;\n\n    import java.util.ArrayList;\n    import java.util.List;\n    \n    public AttributeRequest newAttributeRequest(String attributeName, Object attributeValue) \n    {\n      AttributeRequest attributeRequest = new ProvisioningPlan.AttributeRequest();\n      attributeRequest.setName(attributeName);\n      attributeRequest.setOperation(ProvisioningPlan.Operation.Set);\n      attributeRequest.setValue(attributeValue);\n      return attributeRequest;\n    }\n    \n    if(plan != null) {\n        Identity identity = plan.getIdentity();\n        String lifecycleState = null;\n        // Get the identity from the plan and perform operations\n        if(identity != null) {\n            List accountRequests = plan.getAccountRequests();\n            lifecycleState = identity.getAttribute(\"cloudLifecycleState\");\n            if(accountRequests != null && !accountRequests.isEmpty()) {\n                for(AccountRequest accountRequest : accountRequests) {\n                    AccountRequest.Operation op = accountRequest.getOperation();\n                    String nativeIdentity = accountRequest.getNativeIdentity();\n                    if(op == null) continue;\n                    if(op == AccountRequest.Operation.Disable && \"inactive\".equals(lifecycleState) && nativeIdentity != null) {\n                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(\"MM/dd/yyyy\");\n                        Date date = new Date();\n                        String currentDate = simpleDateFormat.format(date);\n                        String inactiveDescription = \"Account Disabled on \"+currentDate;\n                        accountRequest.add(newAttributeRequest(\"description\", inactiveDescription));\n                    }\n                    else if( op == AccountRequest.Operation.Enable && \"removeaccess\".equals(lifecycleState) && nativeIdentity != null){\n                        accountRequest.setOperation(AccountRequest.Operation.Delete);\n                    }\n                }\n            }\n        }\n    }\n"
+                },
+                "attributes": {
+                    "sourceVersion": "2022-09-20 17:35:15"
+                },
+                "id": "becfd1c302614e11a0040f8802c2e450",
+                "name": "PingDirectory BeforeProvisioning",
+                "created": "2022-09-20T17:35:15.610Z",
+                "modified": "2024-04-17T19:16:04.042Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "uabF51Ud4eDAg4L2s3XxkHzyfnvx21xRp747eKz9qDhvMd-bVWGtVt7B5FQVihszhi6vcZSK44aaWbrHoIHrLw"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "c0809fb39e6a4b67962d8d3eea43433d",
+                "type": "RULE",
+                "name": "HPHC ActiveDirectory Domain mail"
+            },
+            "object": {
+                "description": "This will generate the mail attribute and check for uniqueness.",
+                "type": "AttributeGenerator",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2024-05-09 17:16:51",
+                    "script": "\n\n\t\t\t\t\nimport sailpoint.tools.GeneralException;\nimport sailpoint.api.*;\nimport sailpoint.object.*;\nimport java.util.ArrayList;\nimport java.util.Iterator;\nimport java.util.List;\nimport java.util.logging;\nimport java.util.Random;\nimport java.util.regex.Pattern;\nimport java.lang.*;\nimport java.text.Normalizer;\nimport java.text.Normalizer.Form;\nimport org.apache.commons.lang.StringUtils;\n\nint maxIteration = 1;\nString preferredFirstName = null;\nString preferredLastName = null;\nString firstName = null;\nString lastName = null;\nString middleName = null;\n\npublic String replaceConsecutiveSpecialCharacters(String emailGenerated)\n{\n  for (int i=0; i < emailGenerated.length(); i++) \n  {\n      String repchar = \"\";\n      int count = 1;\n      if(((emailGenerated.charAt(i) == '_') || (emailGenerated.charAt(i) == '.')))\n      {\n        int j =i;\n        while (j+1 < emailGenerated.length() && emailGenerated.charAt(j)== emailGenerated.charAt(j+1))\n        {\n          j++;\n          count++;\n        }\n        if((emailGenerated.charAt(i) == '_'))\n        {\n          int k = 0;\n          while(k < count)\n          {\n            repchar = repchar+\"_\";\n            ++k;\n          }\n          emailGenerated = emailGenerated.replaceAll(repchar,\"_\");\n        }\n        if((emailGenerated.charAt(i) == '.'))\n        {\n          int k = 0;\n          while(k <count)\n          {\n            repchar = repchar+\".\";\n            ++k;\n          }\n          emailGenerated = emailGenerated.replace(repchar,\".\");\n        }\n      }\n   }\n  return emailGenerated;\n}\n\npublic String removeBadCharacters(String inputString) {\n\t  return inputString.replaceAll(\"[^A-Za-z0-9- ]\", \"\").replaceAll(\" \",\"_\").replaceAll(\"'\",\"\").trim();\n}\npublic String removeDiacriticalMarks(String inputString) {\n\t\tinputString = StringUtils.trimToEmpty(inputString);\n\t\tinputString = Normalizer.normalize(inputString, Normalizer.Form.NFD); \n\t\tinputString = Pattern.compile(\"\\\\p{InCombiningDiacriticalMarks}+\").matcher(inputString).replaceAll(\"\");\n\t\treturn inputString;\n}\npublic String generateMail (String firstName,  String lastName, String middleName, int iteration) {\n\n  // Data protection.\n  firstName  = StringUtils.trimToNull(firstName);\n  lastName   = StringUtils.trimToNull(lastName);\n  middleName = StringUtils.trimToNull(middleName);\n\n  if ( ( firstName == null ) || ( lastName == null ) )\n  return null;\n\n  firstName = removeBadCharacters(removeDiacriticalMarks(firstName));\n  middleName= removeBadCharacters(removeDiacriticalMarks(middleName));\n  lastName  = removeBadCharacters(removeDiacriticalMarks(lastName));\n\n  // Set Initial Default Values\n  String mail = \"@harvardpilgrim.org\";\n\n  // Below logic is added to change mail extension for specific cost center codes\n  String costCenterCode = identity.getAttribute(\"costCenterCode\");\n  if( (costCenterCode!=null) && (costCenterCode.equals(\"355\") || costCenterCode.equals(\"324\") || costCenterCode.equals(\"358\")) ) \n  {\n    mail = \"@carepartnersct.com\";  \n\n  }\n  if( (costCenterCode!=null) && (costCenterCode.equals(\"998\")  || costCenterCode.equals(\"999\")) )  \n  {\n    mail = \"@hphci.harvard.edu\";\n\t\n  }\n  String middleInitial     = \"\";\n  String mailPrefix        = \"TEST_\";\n  String sourceName        = \"HPHC-ActiveDirectory [source]\";\n\n  // Build Distinguished Name based on Iteration and if middleName is not null\n  if (iteration == 0)\n    mail = mailPrefix + firstName +\"_\"+ lastName + mail;\n  else if (iteration == 1 && !StringUtils.isBlank(middleName)){\n    middleInitial     = middleName.substring(0,1);\n    mail = mailPrefix + firstName + \"_\" + middleInitial + \"_\" + lastName + mail;\n    }\n  else{\n    mail = \"NO_EMAIL\";\n  }\n  log.error(\"AccountGenerator Rule Operation - Mail Iteration Value: \" + mail);\n  // Evaluate Uniqueness and Loop through the method again if not unique.\n  if (isUnique (mail, sourceName))\n    return mail;\n  else if (iteration <= maxIteration)\n    return generateMail (firstName,  lastName, middleName, (iteration + 1));\n  else\n    return \"NO_EMAIL\";  //Return static email\n}\n\n\npublic boolean isUnique (String mail, String sourceName) throws GeneralException {\n  return (idn.isUniqueLDAPValue(identity.getName(),sourceName, \"mail\", mail));\n}\n\npreferredFirstName = identity.getAttribute(\"preferredFirstName\");\npreferredLastName = identity.getAttribute(\"preferredLastName\");\nif(preferredFirstName!=null && preferredLastName!=null)\n{\n  firstName = preferredFirstName;\n  lastName = preferredLastName;\n  middleName = identity.getAttribute(\"middleName\");\n}\nelse\n{\n  firstName = identity.getFirstname();\n  lastName = identity.getLastname();\n  middleName = identity.getAttribute(\"middleName\");\n}\n\nString emailGenerated = generateMail(firstName,lastName,middleName,0);\nif(emailGenerated!=null)\n{\n  log.info(\"Intial Email Generated : \"+emailGenerated);\n  emailGenerated = replaceConsecutiveSpecialCharacters(emailGenerated);\n  log.info(\"Email after Removal of consecutive special characters : \"+emailGenerated);\n}\nreturn emailGenerated;\n\n    \n\n\t\t\t"
+                },
+                "attributes": {
+                    "sourceVersion": "2024-05-09 17:16:51"
+                },
+                "id": "c0809fb39e6a4b67962d8d3eea43433d",
+                "name": "HPHC ActiveDirectory Domain mail",
+                "created": "2022-09-21T18:49:28.042Z",
+                "modified": "2024-05-09T17:16:53.148Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "EgilaqCRKGEjWSB14reoavAf1rXddCV5tUzEgjfg5nE4JpMJoi-foIDfvT6GVPwgq8Xc72znPlhgEQ1gVR8D9g"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "ca49152836ed46aa925924e025153a86",
+                "type": "RULE",
+                "name": "P32 DaysToHire"
+            },
+            "object": {
+                "description": "Return Manager DN",
+                "type": "IdentityAttribute",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2022-11-11 20:52:01",
+                    "script": "\n  // Rule - IdentityAttribute - P32 DaysToHire\n  //\n  import sailpoint.object.*;\n\timport java.text.DateFormat;\n\timport java.text.ParseException;\n\timport java.text.SimpleDateFormat;\n\timport java.util.Date;\n\n  public int getDateDiff ( Date startDate )\n    {\n        long currentTime;\n        long startDateTime;\n\n        Date today = new Date();\n        currentTime = today.getTime();\n\n        if ( startDate != null)\n        {\n            startDateTime = startDate.getTime();\n\n            int currentDays = (int) (currentTime / (1000*60*60*24));\n            int startDateDays = (int) (startDateTime / (1000*60*60*24));\n            return ( startDateDays - currentDays) ;\n        }\n        else\n        {\n            return -1;\n        }\n\n    }\n\n  String startDateString = identity.getAttribute(\"startDate\");\n\tDate startDate = null;\n\tString dateFormat=\"MM/dd/yy\";\n\tint daysToHire = 0;\n\tDateFormat dateFormater = new SimpleDateFormat( dateFormat );\n\ttry {\n\t\t startDate = ( startDateString != null ) ? dateFormater.parse( startDateString ) : null;\n\t} catch (ParseException e) {\n    log.error(\"Error faced in LCS rule while parsing dates\");\n    return null;\n\t}\n\t\t\n  if ( startDate != null) {\n      daysToHire = getDateDiff(startDate);\n  }\n  if(daysToHire>0){ \n    return daysToHire;\n  }\n  else return 0;\n\n"
+                },
+                "attributes": {
+                    "sourceVersion": "2022-11-11 20:52:01"
+                },
+                "id": "ca49152836ed46aa925924e025153a86",
+                "name": "P32 DaysToHire",
+                "created": "2022-11-11T03:00:55.270Z",
+                "modified": "2024-04-17T19:16:04.288Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "tryf5S5l96s1u7a8QEDcoLWRlq-N4Lq6Oivmd-rN3CZXDUPTqdrc92LULecCaQlyb-JgFBXA27IWaHSKwMOeUQ"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "ca95f434f13944caa57b644c723a6cfa",
+                "type": "RULE",
+                "name": "HPHC ActiveDirectory Domain DN"
+            },
+            "object": {
+                "description": "This will generate a Domain DN.",
+                "type": "AttributeGenerator",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2023-08-07 17:31:58",
+                    "script": "\nimport sailpoint.tools.GeneralException;\nimport sailpoint.api.*;\nimport sailpoint.object.*;\nimport java.util.ArrayList;\nimport java.util.Iterator;\nimport java.util.List;\nimport java.util.logging;\nimport java.util.Random;\nimport java.util.regex.Pattern;\nimport java.lang.*;\nimport java.text.Normalizer;\nimport java.text.Normalizer.Form;\nimport org.apache.commons.lang.StringUtils;\n\nint maxIteration = 1;\nString preferredFirstName = null;\nString preferredLastName = null;\nString firstName = null;\nString lastName = null;\nString middleName = null;\n\npublic String removeBadCharacters(String inputString) {\n\t  return inputString.replaceAll(\"[^A-Za-z0-9-']\", \"\").trim();\n}\npublic String removeDiacriticalMarks(String inputString) {\n\t\tinputString = StringUtils.trimToEmpty(inputString);\n\t\tinputString = Normalizer.normalize(inputString, Normalizer.Form.NFD); \n\t\tinputString = Pattern.compile(\"\\\\p{InCombiningDiacriticalMarks}+\").matcher(inputString).replaceAll(\"\");\n\t\treturn inputString;\n}\npublic String generateDN (String firstName,  String lastName, String middleName, int iteration) {\n\n  // Data protection.\n  firstName  = StringUtils.trimToNull(firstName);\n  lastName   = StringUtils.trimToNull(lastName);\n  middleName = StringUtils.trimToNull(middleName);\n\n  if ((firstName == null) || (lastName == null ))\n    return null;\n\n  firstName = removeBadCharacters(removeDiacriticalMarks(firstName));\n  middleName= removeBadCharacters(removeDiacriticalMarks(middleName));\n  lastName  = removeBadCharacters(removeDiacriticalMarks(lastName));\n\n  // Set Initial Default Values\n  String distinguishedName = \"\";\n  String middleInitial     = \"\";\n  String baseDN = \",OU=Users,OU=AIM_Uat,DC=EHEALTH,DC=HPHC,DC=ORG\";  \n  String dnPrefix = \"CN=TEST_\";\n  \n  // Build Distinguished Name based on Iteration and if middleName is not null\n  if (iteration == 0)\n    distinguishedName = dnPrefix + lastName + \"\\\\, \" + firstName + baseDN;\n  else if (iteration == 1 && !StringUtils.isBlank(middleName)){\n    middleInitial     = middleName.substring(0,1);\n    distinguishedName = dnPrefix + lastName + \"\\\\, \" + firstName + \" \"+ middleInitial + baseDN;\n  }\n  else{\n    middleInitial     = middleName.substring(0,1);\n    distinguishedName = dnPrefix + lastName + \"\\\\, \" + firstName + \" \"+ middleInitial + baseDN;\n  }\n  log.error(\"AccountGenerator Rule Operation - DN Iteration Value: \" + distinguishedName);\n  // Evaluate Uniqueness and Loop through the method again if not unique.\n  if ( isUnique (distinguishedName))\n    return distinguishedName;\n  else if (iteration <= maxIteration)\n    return generateDN (firstName,  lastName, middleName, (iteration + 1));\n  else\n    return distinguishedName;\n}\n\npublic boolean isUnique (String distinguishedName) throws GeneralException {\n  return !idn.accountExistsByNativeIdentity(application.getName(), distinguishedName);\n}\n\npreferredFirstName = identity.getAttribute(\"preferredFirstName\");\npreferredLastName = identity.getAttribute(\"preferredLastName\");\nif(preferredFirstName!=null && preferredLastName!=null)\n{\n  firstName = preferredFirstName;\n  lastName = preferredLastName;\n  middleName = identity.getAttribute(\"middleName\");\n}\nelse\n{\n  firstName = identity.getFirstname();\n  lastName = identity.getLastname();\n  middleName = identity.getAttribute(\"middleName\");\n}\nreturn generateDN(firstName,lastName,middleName,0);\n\n    "
+                },
+                "attributes": {
+                    "sourceVersion": "2023-08-07 17:31:58"
+                },
+                "id": "ca95f434f13944caa57b644c723a6cfa",
+                "name": "HPHC ActiveDirectory Domain DN",
+                "created": "2022-09-21T18:49:27.948Z",
+                "modified": "2024-04-17T19:16:03.869Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "KyJMhXS-_JAeBcDl2yYfThgp03o3UX1ncYayfIDYVcN9vKQS4mvhtpI-3CfwujTwrSTiZ2EZrDYIIxAT0sL5tQ"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "d7a2ec20b79241f9bbe8cfb9ac10e05e",
+                "type": "RULE",
+                "name": "Point32Health-ActiveDirectory BeforeProvisioning Rule"
+            },
+            "object": {
+                "description": "",
+                "type": "BeforeProvisioning",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2024-10-01 15:11:36",
+                    "script": "\n\n\timport java.util.ArrayList;\n\timport java.util.Date;\n\timport java.text.SimpleDateFormat;\n\t\n\timport sailpoint.object.Identity;\n\timport sailpoint.object.Application;\n\timport sailpoint.object.Link;\n\timport sailpoint.object.ProvisioningPlan;\n\timport sailpoint.object.ProvisioningPlan.Operation;\n\timport sailpoint.object.ProvisioningPlan.AccountRequest;\n\timport sailpoint.object.ProvisioningPlan.AccountRequest.Operation;\n\timport sailpoint.object.ProvisioningPlan.AttributeRequest;\n\timport sailpoint.api.IdentityService;\n\timport sailpoint.tools.Util;\n\t\n\tString Environment=\"Sandbox\";\n\tString activeOU = null;\n\tString disabledOU = null;\n\t\n\tif(Environment.equals(\"Sandbox\")) {\n     activeOU = \"OU=TEST_P32HUsers,DC=p32health,DC=org\"; //Sandbox users Active OU\n     disabledOU = \"OU=Disabled_Accounts,OU=TEST_P32HUsers,DC=p32health,DC=org\"; //Sandbox users Disable OU\n    \n    }\n\t\n\tif(Environment.equals(\"Prod\")) {\n          activeOU = \"OU=P32HUsers,DC=p32health,DC=org\"; // Active OU\n         disabledOU = \"OU=DISABLED_ACCOUNTS,OU=P32HUsers,DC=p32health,DC=org\"; // Disable OU\n\t}\n\t\n   String adDomainUsers = \"CN=Domain Users,CN=Users,DC=p32health,DC=org\";\n\tIdentity identity = null;\n    String nativeIdentity = null;\n\tString accountNativeIdentity = null;\n\tList usersMembership = new ArrayList();\n    \n\tif( plan != null ) {\n\t\tidentity = plan.getIdentity();\n\t\tnativeIdentity = plan.getNativeIdentity();\n\t}\n\t\n\tif(identity != null) {\n\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] Executing Before Provisioning Rule.... nativeIdentity - \" + nativeIdentity );\n\t\t\n\t\t\n\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] Lifecycle State: \" + identity.getAttribute(\"cloudLifecycleState\") );\n\t\tif (Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"), \"deleteaccount\"))  {\n\t\t\tList emptyAttributes = new ArrayList();\n\t\t\t\n\t\t\tList accountRequests = plan.getAccountRequests();\n\t\t\tfor (AccountRequest accountRequest : accountRequests) {\n\t\t\t\tAccountRequest.Operation op = accountRequest.getOperation();\n                String accountName = accountRequest.getNativeIdentity();\n      \t\t\t\t//delete account after 180 days of term\n      \t\t\t\tif  ( Util.nullSafeEq(accountRequest.getOperation(), AccountRequest.Operation.Enable)) {\n        \t\t\t  log.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] deleting account after 180 days of term \");\n\t\t\t\t\t      if (!accountName.contains(\"LEGAL_HOLD\")) {\n\t\t\t\t          accountRequest.setOperation(AccountRequest.Operation.Delete);\n\t\t\t\t\t       } else {\n\t\t\t\t\t    accountRequest.setOperation(AccountRequest.Operation.Disable);\n\t\t\t\t\t      }\n\t\t\t\t\t    accountRequest.setAttributeRequests(emptyAttributes);\t\t\t\t\n\t\t\t\t    }\n\t\t\t   }\n\t\t} \n\t\telse if (Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"), \"removeaccess\"))  {\n\t\t\tList emptyAttributes = new ArrayList();\n\t\t\t//List of LicensingGroups that needs to be retained during Termination\n\t\t\tList licensingGroups = new ArrayList();\n\t\t\tlicensingGroups.add(\"CN=TEST_P32_AZ_OFFICE_E3_LIC_PROVISION,OU=TEST_P32HGroups,DC=p32health,DC=org\");\n\t\t\tlicensingGroups.add(\"CN=TEST_AzZscaler-WebExcepWeTransfer,OU=TEST_P32HGroups,DC=p32health,DC=org\");\n\t\t\tList accountRequests = plan.getAccountRequests();\n\t\t\tfor (AccountRequest accountRequest : accountRequests) {\n\t\t\t\tAccountRequest.Operation op = accountRequest.getOperation();\n      \t\t\t\t//Remove all AD Access after 14 days\n      \t\t\t\tif  ( ( Util.nullSafeEq(accountRequest.getOperation(), AccountRequest.Operation.Enable)) || ( Util.nullSafeEq(accountRequest.getOperation(), AccountRequest.Operation.Modify)) ) {\n        \t\t\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] remove account access after initial term \");\n        \t\t\t\t\n\t\t\t\t\t\t\n                        \t\t\t\t\t\t\n\t\t\t\t\t    //Below code retains access on LicensingGroups during termination\n\t\t\t\t\t\tString accountNativeIdentity = accountRequest.getNativeIdentity();\n\t\t\t\t\t\tusersMembership = (List) idn.getRawAccountAttribute(application.getName(), accountNativeIdentity,\"memberOf\");\n\t\t\t\t\t\tlog.info(\"Users AD Groups before removing access : \"+usersMembership);\n\t\t\t\t\t\tif(usersMembership!=null && usersMembership.size()>0)\n\t\t\t\t\t\t{\n\t\t\t\t\t      //Below code checks if user is a member of Licensing Groups, if yes , the groups are retained and not sent for removal\t\n\t\t\t\t\t\t  for(String licGroup:licensingGroups)\n\t\t\t\t\t\t  {\n\t\t\t\t\t\t\tif(usersMembership.contains(licGroup))\n\t\t\t\t\t\t\t{  \n\t\t\t\t\t\t\t  usersMembership.remove(licGroup);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t  }\n\t\t\t\t\t\t}\n\t\t\t\t\t\t\n\t\t\t\t\t\taccountRequest.add(new AttributeRequest(\"memberOf\", ProvisioningPlan.Operation.Remove, usersMembership));\n\t\t\t\t\t\taccountRequest.setOperation(AccountRequest.Operation.Disable);\t\n\t\t\t\t\t\taccountRequest.add(new AttributeRequest(\"AC_NewParent\",ProvisioningPlan.Operation.Set, disabledOU) );   \n\t\t\t\t\t\tlog.info(\"Users AD groups removed  : \"+usersMembership);\n                    }\n                }\n            } \n\t\telse if (Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"),\"inactive\")) {\n\t\t\tList accountRequests = plan.getAccountRequests();\n\t\t\tfor (AccountRequest accountRequest : accountRequests) {\n\t\t\t\t\n\t\t\t\t//move account to disabled OU on term when LCS is inactive\n\t\t\t\tif (Util.nullSafeEq(accountRequest.getOperation(),AccountRequest.Operation.Disable)) {\n\t\t\t\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] move account to disabled OU on term \");\n\t\t\t\t\t\n\t\t\t\t\taccountRequest.add(new AttributeRequest(\"AC_NewParent\",ProvisioningPlan.Operation.Set, disabledOU) );\n                    }\n                }\n            } \n\t    else if( Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"),\"active\") || Util.nullSafeEq(identity.getAttribute(\"cloudLifecycleState\"),\"prehire\") ){\n\t\t\tList accountRequests = plan.getAccountRequests();\n\t\t\tfor (AccountRequest accountRequest : accountRequests) {\n\t\t\t\n\t\t\t\t//move account to active OU on rehire\n\t\t\t\tif (Util.nullSafeEq(accountRequest.getOperation(),AccountRequest.Operation.Enable)) {\n\t\t\t\t\taccountRequest.add(new AttributeRequest(\"AC_NewParent\",ProvisioningPlan.Operation.Set, activeOU) );\n\t\t\t\t\taccountRequest.add(new AttributeRequest(\"msExchHideFromAddressLists\", ProvisioningPlan.Operation.Set, false));\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\t\tlog.info(\"identity: \"+ identity.getName() +\" :: [AD_PROV] Complete Before Provisioning Rule....\");\n  \n\n\t\t\t"
+                },
+                "attributes": {
+                    "sourceVersion": "2024-10-01 15:11:36"
+                },
+                "id": "d7a2ec20b79241f9bbe8cfb9ac10e05e",
+                "name": "Point32Health-ActiveDirectory BeforeProvisioning Rule",
+                "created": "2022-08-25T15:42:40.034Z",
+                "modified": "2024-10-01T15:11:37.560Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "EqPgbJNZjYNqh7vcc5r4AD1bG9Xa87dKxJ_LTo_4X4-UHGiIptGlErV3eTU6WI-Uxg_uvZzP3jhh0AAJIZvMPw"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "d9335bc106414d4a99cc7afcb09ca710",
+                "type": "RULE",
+                "name": "P32 BR Role"
+            },
+            "object": {
+                "description": "Return Manager DN",
+                "type": "IdentityAttribute",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2022-09-14 20:49:44",
+                    "script": "\n  // Rule - IdentityAttribute - P32 BR Role\n  //\nimport java.util.ArrayList;\nimport java.util.Iterator;\t\t\nimport java.util.List;\t\t\nimport sailpoint.object.Application;\nimport sailpoint.object.Filter;\nimport sailpoint.object.Identity;\nimport sailpoint.object.Link;\nimport sailpoint.tools.Util;\n\nString firstname = identity.getAttribute(\"firstname\");\nString lastname = identity.getAttribute(\"lastname\");\n\n\nif ((firstname != null && !firstname.isEmpty() && firstname.toLowerCase().contains(\"sptest\")) || (lastname != null && !lastname.isEmpty() && lastname.toLowerCase().contains(\"sptest\")))\n    return \"true\";\nelse return \"false\";\n\n"
+                },
+                "attributes": {
+                    "sourceVersion": "2022-09-14 20:49:44"
+                },
+                "id": "d9335bc106414d4a99cc7afcb09ca710",
+                "name": "P32 BR Role",
+                "created": "2022-09-14T19:11:24.251Z",
+                "modified": "2024-04-17T19:16:03.324Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "IueWagMlh57vSngW4JN615orDSumiCYkFVIlxL5QVjNP0VpacTTO6dVOZ-na7WBEBd1kZ--aWrReWIX9AWsyuQ"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "dc7451b6d18e4310b40ee0479c17f6b1",
+                "type": "RULE",
+                "name": "P32Health ActiveDirectory Domain DN"
+            },
+            "object": {
+                "description": "This will generate a username.",
+                "type": "AttributeGenerator",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2023-08-07 17:31:59",
+                    "script": "\nimport sailpoint.tools.GeneralException;\nimport sailpoint.api.*;\nimport sailpoint.object.*;\nimport java.util.ArrayList;\nimport java.util.Iterator;\nimport java.util.List;\nimport java.util.logging;\nimport java.util.Random;\nimport java.util.regex.Pattern;\nimport java.lang.*;\nimport java.text.Normalizer;\nimport java.text.Normalizer.Form;\nimport org.apache.commons.lang.StringUtils;\n\nint maxIteration = 1;\nString preferredFirstName = null;\nString preferredLastName = null;\nString firstName = null;\nString lastName = null;\nString middleName = null;\n\npublic String removeBadCharacters(String inputString) {\n\t  return inputString.replaceAll(\"[^A-Za-z0-9-']\", \"\").trim();\n}\npublic String removeDiacriticalMarks(String inputString) {\n\t\tinputString = StringUtils.trimToEmpty(inputString);\n\t\tinputString = Normalizer.normalize(inputString, Normalizer.Form.NFD); \n\t\tinputString = Pattern.compile(\"\\\\p{InCombiningDiacriticalMarks}+\").matcher(inputString).replaceAll(\"\");\n\t\treturn inputString;\n}\npublic String generateDN (String firstName,  String lastName, String middleName, int iteration) {\n\n  // Data protection.\n  firstName  = StringUtils.trimToNull(firstName);\n  lastName   = StringUtils.trimToNull(lastName);\n  middleName = StringUtils.trimToNull(middleName);\n\n  if ((firstName == null) || (lastName == null ))\n    return null;\n\n  firstName = removeBadCharacters(removeDiacriticalMarks(firstName));\n  middleName= removeBadCharacters(removeDiacriticalMarks(middleName));\n  lastName  = removeBadCharacters(removeDiacriticalMarks(lastName));\n\n  // Set Initial Default Values\n  String distinguishedName = \"\";\n  String middleInitial     = \"\";\n  String baseDN = \",OU=TEST_P32HUsers,DC=p32health,DC=org\";\n  String dnPrefix = \"CN=TEST_\";\n  \n  // Build Distinguished Name based on Iteration and if middleName is not null\n  if (iteration == 0)\n    distinguishedName = dnPrefix + lastName + \"\\\\, \" + firstName + baseDN;\n  else if (iteration == 1 && !StringUtils.isBlank(middleName)){\n    middleInitial     = middleName.substring(0,1);\n    distinguishedName = dnPrefix + lastName + \"\\\\, \" + firstName + \" \"+ middleInitial + baseDN;\n  }\n  else{\n    middleInitial     = middleName.substring(0,1);\n    distinguishedName = dnPrefix + lastName + \"\\\\, \" + firstName + \" \"+ middleInitial + baseDN;\n  }\n  log.error(\"AccountGenerator Rule Operation - DN Iteration Value: \" + distinguishedName);\n  // Evaluate Uniqueness and Loop through the method again if not unique.\n  if ( isUnique (distinguishedName))\n    return distinguishedName;\n  else if (iteration <= maxIteration)\n    return generateDN (firstName,  lastName, middleName, (iteration + 1));\n  else\n    return distinguishedName;\n}\n\npublic boolean isUnique (String distinguishedName) throws GeneralException {\n  return !idn.accountExistsByNativeIdentity(application.getName(), distinguishedName);\n}\n\npreferredFirstName = identity.getAttribute(\"preferredFirstName\");\npreferredLastName = identity.getAttribute(\"preferredLastName\");\nif(preferredFirstName!=null && preferredLastName!=null)\n{\n  firstName = preferredFirstName;\n  lastName = preferredLastName;\n  middleName = identity.getAttribute(\"middleName\");\n}\nelse\n{\n  firstName = identity.getFirstname();\n  lastName = identity.getLastname();\n  middleName = identity.getAttribute(\"middleName\");\n}\nreturn generateDN(firstName,lastName,middleName,0);\n\n    "
+                },
+                "attributes": {
+                    "sourceVersion": "2023-08-07 17:31:59"
+                },
+                "id": "dc7451b6d18e4310b40ee0479c17f6b1",
+                "name": "P32Health ActiveDirectory Domain DN",
+                "created": "2022-08-11T18:56:00.404Z",
+                "modified": "2024-04-17T19:16:03.852Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "CyWpf2dT9qQQqzB3gdSpO6BjsDHojjLbL1XF2ihqWRsN9BbnRJ-EeqIpBIC_EtsbRAr_CD72s-53tperFqc4eQ"
+        },
+        {
+            "version": 1,
+            "self": {
+                "id": "ff3da6223b9b4e718988fb6bfe31039f",
+                "type": "RULE",
+                "name": "THP ActiveDirectory Correlation"
+            },
+            "object": {
+                "description": "Correlates based on different criteria",
+                "type": "Correlation",
+                "signature": {
+                    "input": [],
+                    "output": null
+                },
+                "sourceCode": {
+                    "version": "2022-09-08 14:20:51",
+                    "script": "\n \n\n\timport sailpoint.object.*;\n\timport java.util.*;\n\timport org.apache.commons.lang.StringUtils;\n\n  \n    Map returnMap = new HashMap();\n\t\n    String prefixValue = \"test_\";\n\tint  numCharsTrim = prefixValue.length();\n  \n\tif ( StringUtils.isNotBlank(account.getStringAttribute(\"employeeID\")))\n\t{ \t\n        // Initialize 1st Account Correlation Attribute and Log out this step.\n\t\tif ( idn.countIdentitiesBySearchableIdentityAttribute(\"identificationNumber\", \"Equals\", account.getStringAttribute(\"employeeID\"))>0){\n            log.error(\"employeeID Correlation: \" + employeeID);\n\n\t  \t\treturnMap.put( \"identityAttributeName\", \"identificationNumber\");\n\t   \t    returnMap.put( \"identityAttributeValue\", account.getStringAttribute(\"employeeID\") );\n\t   \t    return returnMap;\n \t\t \n\t\t}\n \t}\n \tif (StringUtils.isNotBlank(account.getStringAttribute(\"sAMAccountName\")))\n\t{ \n\t\t\t\n\t\t// Initialize 2nd Account Correlation Attribute and Log out this step.\n\t\tString sAMAccountName = StringUtils.trimToNull(account.getStringAttribute(\"sAMAccountName\"));\n\t\tlog.error(\"sAMAccountName Before Prefix Removal: \" + sAMAccountName);\n        String sAMAccountName_prefix = sAMAccountName.toLowerCase().substring(0,numCharsTrim);\n\n\t\t// Check if sAMAccountName Account attribute contains the prefix \"TEST_\", if it does, then trim the prefix and attempt correlation.\n\t\tif (sAMAccountName_prefix.equals(prefixValue.toLowerCase())){\n    \t\tsAMAccountName = sAMAccountName.substring(numCharsTrim);\n\t\t}\n\t\tlog.error(\"sAMAccountName AFTER Prefix Removal (if exists): \" + sAMAccountName);\n\t\tif (idn.countIdentitiesBySearchableIdentityAttribute(\"uid\", \"Equals\", sAMAccountName)>0){\n            log.error(\"sAMAccountName Correlation: \" + sAMAccountName);\n\t   \t   \treturnMap.put( \"identityAttributeName\", \"uid\");\n\t    \treturnMap.put( \"identityAttributeValue\", sAMAccountName );\n\t    \t\t\n            return returnMap;\n\t    }\n    }\n\t if ( StringUtils.isNotBlank(account.getStringAttribute(\"mail\")))\n\t {\n\t\t// Initialize 3rd Account Correlation Attribute and Log out this step.\n\t\tString ad_mail = StringUtils.trimToNull(account.getStringAttribute(\"mail\"));\n\t\tlog.error(\"Mail Before Prefix Removal: \" + ad_mail);\n        String ad_mail_prefix = ad_mail.toLowerCase().substring(0,numCharsTrim);\n\n\t\t// Check if mail Account attribute contains the prefix \"TEST_\", if it does, then trim the prefix and attempt correlation.\n\t\tif (ad_mail_prefix.equals(prefixValue.toLowerCase())){\n    \t\tad_mail = ad_mail.substring(numCharsTrim);\n\t\t}\n\t\tlog.error(\"Mail AFTER Prefix Removal (if exists): \" + ad_mail);\n\t\tif (idn.countIdentitiesBySearchableIdentityAttribute(\"email\", \"Equals\", ad_mail)>0){\n            log.error(\"mail Correlation: \" + ad_mail);\n\t  \t\treturnMap.put( \"identityAttributeName\", \"email\");\n\t    \treturnMap.put( \"identityAttributeValue\", ad_mail);\n\n\t        return returnMap;\n\n        }\n  \n     \n     } \n     return returnMap;\n"
+                },
+                "attributes": {
+                    "sourceVersion": "2022-09-08 14:20:51"
+                },
+                "id": "ff3da6223b9b4e718988fb6bfe31039f",
+                "name": "THP ActiveDirectory Correlation",
+                "created": "2022-06-03T22:04:30.912Z",
+                "modified": "2024-04-17T19:16:04.236Z"
+            },
+            "jwsHeader": "eyJhbGciOiJFUzI1NiJ9",
+            "jwsSignature": "x6vy9x95_CxQmY5LpWwU9uNq-gqXPoH1ku2YorQVPVG0zhg13x0Pe_nTxF1Ml0on2lm6DfAedpnm4hS8-7YOQQ"
+        }
+    ]
+}
