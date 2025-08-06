@@ -1,0 +1,74 @@
+{
+  "id": "9a8cf851-2245-4608-9e54-79cc72564bce",
+  "name": "Account Aggregation Failed Notification",
+  "description": "Account Aggregation Failed Notification",
+  "created": "2024-10-08T14:40:06.121579945Z",
+  "modified": "2025-06-06T10:08:22.760746162Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180877f4b7fd4017f51d8a8b060c2",
+    "name": "28163"
+  },
+  "definition": {
+    "start": "Compare Strings",
+    "steps": {
+      "Compare Strings": {
+        "choiceList": [
+          {
+            "comparator": "StringEquals",
+            "nextStep": "Send Email",
+            "variableA.$": "$.trigger.status",
+            "variableB": "Error"
+          }
+        ],
+        "defaultStep": "End Step — Success 1",
+        "description": "Check if aggregation status is failed",
+        "type": "choice"
+      },
+      "End Step — Success": {
+        "type": "success"
+      },
+      "End Step — Success 1": {
+        "description": "Aggregation Completed without Failure",
+        "type": "success"
+      },
+      "Send Email": {
+        "actionId": "sp:send-email",
+        "attributes": {
+          "body": "<p>Aggregation failure alert for $source</p>",
+          "context": {
+            "source.$": "$.trigger.source.name"
+          },
+          "from": "no-reply@sailpoint.com",
+          "recipientEmailList": [
+            "joseph.dera@point32health.org",
+            "iam_support@point32health.org"
+          ],
+          "replyTo": "joseph.dera@point32health.org",
+          "subject": "Aggregation failure alert"
+        },
+        "description": "Notify Source Admin of aggregation failure",
+        "nextStep": "End Step — Success",
+        "type": "action",
+        "versionNumber": 2
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "id": "idn:account-aggregation-completed"
+    }
+  }
+}

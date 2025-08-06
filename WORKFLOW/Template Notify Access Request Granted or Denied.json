@@ -1,0 +1,93 @@
+{
+  "id": "e2495e5d-2efe-4090-a9f4-f2a664ba2b16",
+  "name": "Template: Notify Access Request Granted or Denied",
+  "description": "A five-step workflow that emails two identities when an access request is approved or denied.",
+  "created": "2023-06-08T14:14:49.83310439Z",
+  "modified": "2023-06-08T14:14:49.83310439Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "definition": {
+    "start": "Get Identity",
+    "steps": {
+      "Get Identity": {
+        "actionId": "sp:get-identity",
+        "attributes": {
+          "id.$": "$.trigger.requestedFor.id"
+        },
+        "description": "Get the identity data for the identity that the access was requested for.  This will be used to lookup the identity's manager.",
+        "nextStep": "Get Identity 1",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Get Identity 1": {
+        "actionId": "sp:get-identity",
+        "attributes": {
+          "id.$": "$.getIdentity.managerRef.id"
+        },
+        "description": "This node is used to gather information about the user's manager to populate their email.",
+        "nextStep": "Send Email 2",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Send Email": {
+        "actionId": "sp:send-email",
+        "attributes": {
+          "body": "Dear ${manager},<br><p>This email is to inform you that your direct report <b style=\"\">${directReport}</b>, has requested access with <b style=\"\">ID${requestID}</b>. This request has a status of:<br><b style=\"\"> ${status}</b>. </p><br><p>Thank you, <br> Your Access Team</p>",
+          "context": {
+            "directReport.$": "$.getIdentity.attributes.displayName",
+            "manager.$": "$.getIdentity1.attributes.firstname",
+            "requestID.$": "$.trigger.accessRequestId",
+            "status.$": "$.trigger.requestedItemsStatus"
+          },
+          "recipientEmailList.$": "$.getIdentity1.attributes.email",
+          "subject": "Your employee has an update to their access"
+        },
+        "description": "Send an email to the identity's manager to notify them of the access change.",
+        "nextStep": "success",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Send Email 2": {
+        "actionId": "sp:send-email",
+        "attributes": {
+          "body": "Dear ${IdName},<br><p>This email is to inform you that your access request with ID <b style=\"\">${accessR} </b>has been determined with the following status <br> <b style=\"\">${requestStatus}. </p><br><p>Thank you,<br>Your Access Team</p>",
+          "context": {
+            "IdName.$": "$.getIdentity.attributes.displayName",
+            "accessR.$": "$.trigger.accessRequestId",
+            "requestStatus.$": "$.trigger.requestedItemsStatus"
+          },
+          "recipientEmailList.$": "$.getIdentity.attributes.email",
+          "replyTo": null,
+          "subject": "Your access has been decided"
+        },
+        "description": "Send an email to the identity that is the target of the access request with the details of the decision.",
+        "nextStep": "Send Email",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "success": {
+        "type": "success"
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "id": "idn:access-request-post-approval"
+    }
+  }
+}

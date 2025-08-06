@@ -1,0 +1,80 @@
+{
+  "id": "915bd307-8767-4394-b4e4-cdbc5b6484db",
+  "name": "Kamran Remove Requested Roles on Inactive LCS",
+  "description": "Kamran Remove Requested Roles on Inactive LCS",
+  "created": "2024-09-09T01:06:52.247015008Z",
+  "modified": "2024-09-09T01:26:01.535318823Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "8da2890b9aa34f62881adc68048bf7f6",
+    "name": "47142"
+  },
+  "definition": {
+    "start": "Compare Strings 1",
+    "steps": {
+      "Compare Strings 1": {
+        "choiceList": [
+          {
+            "comparator": "StringEquals",
+            "nextStep": "Get Access",
+            "variableA.$": "$.trigger.changes[?(@.attribute==\"cloudLifecycleState\")].newValue",
+            "variableB": "inactive"
+          }
+        ],
+        "defaultStep": "End Step - Success 1",
+        "displayName": "",
+        "type": "choice"
+      },
+      "End Step - Success 1": {
+        "displayName": "",
+        "type": "success"
+      },
+      "Get Access": {
+        "actionId": "sp:access:get",
+        "attributes": {
+          "accessprofiles": false,
+          "entitlements": false,
+          "getAccessBy": "specificIdentity",
+          "identityToReturn.$": "$.trigger.identity.id",
+          "roles": true
+        },
+        "displayName": "",
+        "nextStep": "Manage Access",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "Manage Access": {
+        "actionId": "sp:access:manage",
+        "attributes": {
+          "comments": "Remove Access",
+          "removeIdentity.$": "$.trigger.identity.id",
+          "requestType": "REVOKE_ACCESS",
+          "requestedItems.$": "$.getAccess.accessItems"
+        },
+        "displayName": "",
+        "nextStep": "End Step - Success 1",
+        "type": "action",
+        "versionNumber": 1
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "8da2890b9aa34f62881adc68048bf7f6",
+    "name": "47142"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "8da2890b9aa34f62881adc68048bf7f6",
+    "name": "47142"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "attributeToFilter": "cloudLifecycleState",
+      "filter.$": "$.changes[?(@.attribute == \"cloudLifecycleState\")]",
+      "id": "idn:identity-attributes-changed"
+    }
+  }
+}

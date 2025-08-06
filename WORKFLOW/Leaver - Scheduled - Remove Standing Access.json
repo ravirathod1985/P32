@@ -1,0 +1,121 @@
+{
+  "id": "17bdaf4b-63d3-4489-bbe2-c188ad98027b",
+  "name": "Leaver - Scheduled - Remove Standing Access",
+  "description": "This workflow is scheduled to search for any leavers with standing access. It will pass the identity ids to the \"Leaver - Child - Remove Standing Access\" workflow to remove all non-birthright access",
+  "created": "2025-06-10T17:48:24.312517835Z",
+  "modified": "2025-06-10T18:20:45.820318467Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "bd09ebba96384fb9a78a661ef7871a35",
+    "name": "48565"
+  },
+  "definition": {
+    "start": "Find Leavers with Access",
+    "steps": {
+      "Find Leavers with Access": {
+        "actionId": "sp:http",
+        "attributes": {
+          "authenticationType": "OAuth",
+          "method": "post",
+          "oAuthClientId": "4db3d07a5d8341178ff0d2a4fc00eed0",
+          "oAuthClientSecret": "$.secrets.0ad7a785-d34f-4010-ab43-5c7320ecc6e3",
+          "oAuthCredentialLocation": "oAuthInHeader",
+          "oAuthTokenUrl": "https://point32health-sb.api.identitynow.com/oauth/token",
+          "requestContentType": "text",
+          "requestHeaders": "Content-Type:application/json",
+          "textRequestBody": "{\n    \"indices\": [\n        \"identities\"\n    ],\n    \"query\": {\n        \"query\": \"@access(revocable:true OR standalone:true) AND attributes.cloudLifecycleState:inactive\"\n    },\n    \"queryResultFilter\": {\n        \"includes\": [\n            \"id\"\n        ]\n    }\n}",
+          "url": "https://point32health-sb.api.identitynow.com/v2024/search",
+          "urlParams": {
+            "limit": "250"
+          }
+        },
+        "nextStep": "Found Leavers with Access?",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Found Leavers with Access?": {
+        "actionId": "sp:compare-unary",
+        "choiceList": [
+          {
+            "comparator": "IsPresent",
+            "nextStep": "Loop Leavers with Access",
+            "variableA.$": "$.findLeaversWithAccess.body[0].id"
+          }
+        ],
+        "defaultStep": "No Leavers with Standing Access",
+        "type": "choice"
+      },
+      "Leavers Access Removed": {
+        "actionId": "sp:operator-success",
+        "description": "Leavers standing access removed",
+        "type": "success"
+      },
+      "Loop Leavers with Access": {
+        "actionId": "sp:loop:iterator",
+        "attributes": {
+          "context.$": "",
+          "input.$": "$.findLeaversWithAccess.body",
+          "start": "Remove Leaver Access",
+          "steps": {
+            "Leaver Access Removed": {
+              "actionId": "sp:operator-success",
+              "description": "Leaver standing access removed",
+              "type": "success"
+            },
+            "Remove Leaver Access": {
+              "actionId": "sp:http",
+              "attributes": {
+                "authenticationType": "OAuth",
+                "jsonRequestBody": {
+                  "id": "{{$.loop.loopInput.id}}"
+                },
+                "method": "post",
+                "oAuthClientId": "childWorkflow-clientId",
+                "oAuthClientSecret": "$.secrets.90ed505b-3320-49f1-ba9d-423c0d447ab6",
+                "oAuthCredentialLocation": "oAuthInHeader",
+                "oAuthTokenUrl": "https://tenant.api.identitynow.com/oauth/token",
+                "requestContentType": "json",
+                "url": "https://tenant.api.identitynow.com/beta/workflows/execute/external/75150210-243f-4213-a952-34ffe7d3bc8d"
+              },
+              "nextStep": "Leaver Access Removed",
+              "type": "action",
+              "versionNumber": 2
+            }
+          }
+        },
+        "nextStep": "Leavers Access Removed",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "No Leavers with Standing Access": {
+        "actionId": "sp:operator-success",
+        "description": "No Leavers with Standing Access",
+        "type": "success"
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "bd09ebba96384fb9a78a661ef7871a35",
+    "name": "48565"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "bd09ebba96384fb9a78a661ef7871a35",
+    "name": "48565"
+  },
+  "trigger": {
+    "type": "SCHEDULED",
+    "attributes": {
+      "cronString": "0 19,7 * * *",
+      "dailyTimes": [
+        "19:00",
+        "07:00"
+      ],
+      "frequency": "daily",
+      "id": "idn:cron-schedule",
+      "timeZone": "America/New_York"
+    }
+  }
+}

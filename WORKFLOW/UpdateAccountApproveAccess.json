@@ -1,0 +1,44 @@
+{
+  "id": "5b8dceb5-9100-4fb6-80e0-91efa040c893",
+  "name": "UpdateAccountApproveAccess",
+  "description": "",
+  "created": "2023-06-08T13:26:11.923883318Z",
+  "modified": "2023-06-08T13:56:04.156054754Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "definition": {
+    "start": "Approve Access Request",
+    "steps": {
+      "Approve Access Request": {
+        "actionId": "sp:approve-request",
+        "attributes": {
+          "approvalId.$": "$.trigger.requestedFor.id",
+          "comment": "getting the requested for ID"
+        },
+        "description": null,
+        "type": "action",
+        "versionNumber": 1
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "id": "idn:access-request-post-approval"
+    }
+  }
+}

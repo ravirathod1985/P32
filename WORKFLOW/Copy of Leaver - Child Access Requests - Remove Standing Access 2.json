@@ -1,0 +1,86 @@
+{
+  "id": "356e0321-6adc-470b-a1ea-18363286d275",
+  "name": "Copy of Leaver - Child Access Requests - Remove Standing Access 2",
+  "description": "This workflow takes the id of the identity as an input and removes all non-birthright standing access from that identity via Access Requests",
+  "created": "2025-06-13T17:50:22.234166102Z",
+  "modified": "2025-07-10T12:19:35.313946941Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "bd09ebba96384fb9a78a661ef7871a35",
+    "name": "48565"
+  },
+  "definition": {
+    "start": "Get Access",
+    "steps": {
+      "End Step - Success": {
+        "actionId": "sp:operator-success",
+        "displayName": "",
+        "type": "success"
+      },
+      "Get Access": {
+        "actionId": "sp:access:get",
+        "attributes": {
+          "accessprofiles": true,
+          "entitlements": true,
+          "getAccessBy": "specificIdentity",
+          "identityToReturn.$": "$.trigger.identity.id",
+          "roles": true
+        },
+        "displayName": "",
+        "nextStep": "Loop",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "Loop": {
+        "actionId": "sp:loop:iterator",
+        "attributes": {
+          "context.$": "$.trigger.identity",
+          "input.$": "$.getAccess.accessItems",
+          "start": "Manage Access",
+          "steps": {
+            "End Step - Success 1": {
+              "actionId": "sp:operator-success",
+              "displayName": "",
+              "type": "success"
+            },
+            "Manage Access": {
+              "actionId": "sp:access:manage",
+              "attributes": {
+                "comments": "Revoking the access",
+                "removeIdentity.$": "$.trigger.identity.id",
+                "requestType": "REVOKE_ACCESS",
+                "requestedItems.$": "$.loop.loopInput"
+              },
+              "displayName": "",
+              "nextStep": "End Step - Success 1",
+              "type": "action",
+              "versionNumber": 1
+            }
+          }
+        },
+        "displayName": "",
+        "nextStep": "End Step - Success",
+        "type": "action",
+        "versionNumber": 1
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "bd09ebba96384fb9a78a661ef7871a35",
+    "name": "48565"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "bd09ebba96384fb9a78a661ef7871a35",
+    "name": "48565"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "filter.$": "$.changes[?(@.attribute == \"cloudLifecycleState\" && @.newValue == \"removeaccess\")]",
+      "id": "idn:identity-attributes-changed"
+    }
+  }
+}

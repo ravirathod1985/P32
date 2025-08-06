@@ -1,0 +1,103 @@
+{
+  "id": "9f5edc74-fcde-4a6e-9e60-80d4562e752f",
+  "name": "Create Cert campaign on attribute change",
+  "description": "Create and activate a certification campaign for every identity that has changed department or employeeType",
+  "created": "2022-11-02T11:21:20.728125973Z",
+  "modified": "2023-02-15T15:42:44.613093646Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "definition": {
+    "start": "Get Identity",
+    "steps": {
+      "Activate Certification Campaign": {
+        "actionId": "sp:activate-campaign",
+        "attributes": {
+          "id.$": "$.createCertificationCampaign.id"
+        },
+        "description": "Activate newly created Cert campaign",
+        "nextStep": "Send Email 1",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "Create Certification Campaign": {
+        "actionId": "sp:create-campaign",
+        "attributes": {
+          "description": "User Transfer Review - Change in Department or EmployeeType",
+          "duration": "2w",
+          "emailNotificationEnabled": false,
+          "identityId.$": "$.trigger.identity.id",
+          "name": "User Transfer Review - {{$.getIdentity.attributes.displayName}}",
+          "reviewerId.$": "$.getIdentity.managerRef.id"
+        },
+        "description": "Create identity cert campaign",
+        "nextStep": "Activate Certification Campaign",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "Get Identity": {
+        "actionId": "sp:get-identity",
+        "attributes": {
+          "id.$": "$.trigger.identity.id"
+        },
+        "description": "Get identity attributes to look up users manager",
+        "nextStep": "Get Identity 2",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Get Identity 2": {
+        "actionId": "sp:get-identity",
+        "attributes": {
+          "id.$": "$.getIdentity.managerRef.id"
+        },
+        "description": "Gather information about the user's manager to populate email.",
+        "nextStep": "Create Certification Campaign",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Send Email 1": {
+        "actionId": "sp:send-email",
+        "attributes": {
+          "body": "Dear ${recipName}, <br><p>This notification is to inform you that <b style=\"\">${displayName}</b> has recently changed departments. </p> <br><p>A Certification campaign named <b style=\"\">${campaignName} </b>has been generated for your review. </p> <br><p> Thank you <br>Security & Compliance</p>",
+          "context": {
+            "campaignName.$": "$.createCertificationCampaign.attributes.name",
+            "displayName.$": "$.getIdentity.attributes.displayName",
+            "recipName.$": "$.getIdentity2.attributes.displayName"
+          },
+          "from": null,
+          "recipientEmailList.$": "$.getIdentity2.attributes.email",
+          "replyTo": null,
+          "subject": "Direct Report department or employeeType change"
+        },
+        "description": "Notify user's manager on Cert campaign",
+        "nextStep": "success 1",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "success 1": {
+        "type": "success"
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180857dddeb49017e0c8200321c8e",
+    "name": "slpt.services"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180857dddeb49017e0c8200321c8e",
+    "name": "slpt.services"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "description": "Change in Identity attributes after authoritative source aggregation",
+      "filter.$": "$.changes[?(@.attribute == \"department\" || @.attribute == \"employeeType\")]",
+      "id": "idn:identity-attributes-changed"
+    }
+  }
+}

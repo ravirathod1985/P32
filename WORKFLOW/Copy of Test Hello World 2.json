@@ -1,0 +1,72 @@
+{
+  "id": "2399030b-d421-4c64-ae48-4a5d3d8c3a9d",
+  "name": "Copy of Test Hello World 2",
+  "description": "This is a basic example workflow.",
+  "created": "2023-12-11T10:49:20.178382401Z",
+  "modified": "2023-12-11T13:23:35.86370323Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "definition": {
+    "start": "Get Identity",
+    "steps": {
+      "Compare Strings": {
+        "choiceList": [
+          {
+            "comparator": "StringEquals",
+            "nextStep": "End Step — Success",
+            "variableA.$": "$.trigger.action",
+            "variableB": "Identity Refresh"
+          }
+        ],
+        "defaultStep": "End Step — Failure",
+        "type": "choice"
+      },
+      "End Step — Failure": {
+        "failureName": "Non OHI",
+        "type": "failure"
+      },
+      "End Step — Success": {
+        "type": "success"
+      },
+      "Get Identity": {
+        "actionId": "sp:get-identity",
+        "attributes": {
+          "id.$": "$.trigger.recipient.id"
+        },
+        "nextStep": "Send Email",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Send Email": {
+        "actionId": "sp:send-email",
+        "attributes": {
+          "body.$": "",
+          "context": {},
+          "recipientEmailList.$": "$.getIdentity.attributes.supervisorEmail"
+        },
+        "type": "action",
+        "versionNumber": 2
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "id": "idn:post-provisioning"
+    }
+  }
+}

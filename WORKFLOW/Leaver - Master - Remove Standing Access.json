@@ -1,0 +1,70 @@
+{
+  "id": "8a14d19b-4889-4c8f-bf8a-3830ee9b2323",
+  "name": "Leaver - Master - Remove Standing Access",
+  "description": "This workflow is triggered from the changes to the cloudLifecycleState. If the newValue is inactive, it will pass the identity id to the \"Leaver - Child - Remove Standing Access\" workflow to remove all non-birthright access",
+  "created": "2025-06-10T17:48:02.995830232Z",
+  "modified": "2025-06-12T17:08:33.035171582Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "bd09ebba96384fb9a78a661ef7871a35",
+    "name": "48565"
+  },
+  "definition": {
+    "start": "Wait",
+    "steps": {
+      "Leaver Access Removed": {
+        "actionId": "sp:operator-success",
+        "description": "Leaver standing access removed",
+        "type": "success"
+      },
+      "Remove Standing Access": {
+        "actionId": "sp:http",
+        "attributes": {
+          "authenticationType": "OAuth",
+          "jsonRequestBody": {
+            "id": "{{$.trigger.identity.id}}"
+          },
+          "method": "post",
+          "oAuthClientId": "98846043-a388-4f53-9e8f-24bed0dfb15e",
+          "oAuthClientSecret": "$.secrets.6a96f3b7-18df-44fb-9bcb-9deb7775f262",
+          "oAuthCredentialLocation": "oAuthInHeader",
+          "oAuthTokenUrl": "https://point32health-sb.api.identitynow.com/oauth/token",
+          "requestContentType": "json",
+          "url": "https://point32health-sb.api.identitynow.com/beta/workflows/execute/external/3d55dbd0-3002-4541-b227-f806f3a88a72"
+        },
+        "nextStep": "Leaver Access Removed",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Wait": {
+        "actionId": "sp:sleep",
+        "attributes": {
+          "duration": "1m",
+          "type": "waitFor"
+        },
+        "displayName": "Wait for Birthright",
+        "nextStep": "Remove Standing Access",
+        "type": "action",
+        "versionNumber": 1
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "bd09ebba96384fb9a78a661ef7871a35",
+    "name": "48565"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "bd09ebba96384fb9a78a661ef7871a35",
+    "name": "48565"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "filter.$": "$.changes[?(@.attribute == \"cloudLifecycleState\" && @.newValue == \"removeaccess\")]",
+      "id": "idn:identity-attributes-changed"
+    }
+  }
+}

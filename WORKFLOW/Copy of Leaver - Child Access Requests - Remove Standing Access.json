@@ -1,0 +1,172 @@
+{
+  "id": "86dd1f40-06bb-4f53-a31f-a17317f86db0",
+  "name": "Copy of Leaver - Child Access Requests - Remove Standing Access",
+  "description": "This workflow takes the id of the identity as an input and removes all non-birthright standing access from that identity via Access Requests",
+  "created": "2025-06-12T17:15:44.391711958Z",
+  "modified": "2025-06-13T17:24:11.95088737Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "bd09ebba96384fb9a78a661ef7871a35",
+    "name": "48565"
+  },
+  "definition": {
+    "start": "Get Identity",
+    "steps": {
+      "Get Identity": {
+        "actionId": "sp:get-identity",
+        "attributes": {
+          "id.$": "$.trigger.identity.id"
+        },
+        "displayName": "",
+        "nextStep": "Get Standalone Entitlements",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Get Revocable Access": {
+        "actionId": "sp:http",
+        "attributes": {
+          "authenticationType": "OAuth",
+          "jsonRequestBody": {
+            "indices": [
+              "identities"
+            ],
+            "query": {
+              "innerHit": {
+                "query": "revocable:true",
+                "type": "access"
+              },
+              "query": "id:\"{{$.trigger.identity.id}}\""
+            }
+          },
+          "method": "post",
+          "oAuthClientId": "4db3d07a5d8341178ff0d2a4fc00eed0",
+          "oAuthClientSecret": "$.secrets.f9efd6f2-403a-4fa4-8884-6d7590afd9c6",
+          "oAuthCredentialLocation": "oAuthInHeader",
+          "oAuthScope": null,
+          "oAuthTokenUrl": "https://point32health-sb.api.identitynow.com/oauth/token",
+          "requestContentType": "json",
+          "requestHeaders": "Content-Type:application/json",
+          "textRequestBody": "",
+          "url": "https://point32health-sb.api.identitynow.com/v3/search"
+        },
+        "description": "Get all Revocable Access",
+        "nextStep": "Has Revocable Access?",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Get Standalone Entitlements": {
+        "actionId": "sp:http",
+        "attributes": {
+          "authenticationType": "OAuth",
+          "jsonRequestBody": {
+            "indices": [
+              "identities"
+            ],
+            "query": {
+              "innerHit": {
+                "query": "standalone:true",
+                "type": "access"
+              },
+              "query": "id:\"{{$.trigger.identity.id}}\""
+            }
+          },
+          "method": "post",
+          "oAuthClientId": "4db3d07a5d8341178ff0d2a4fc00eed0",
+          "oAuthClientSecret": "$.secrets.bf1644e5-8b5b-4019-8323-471a30e838dc",
+          "oAuthCredentialLocation": "oAuthInHeader",
+          "oAuthScope": null,
+          "oAuthTokenUrl": "https://point32health-sb.api.identitynow.com/oauth/token",
+          "requestContentType": "json",
+          "requestHeaders": "Content-Type:application/json",
+          "textRequestBody": "",
+          "url": "https://point32health-sb.api.identitynow.com/v3/search"
+        },
+        "description": "Get all Standalone Entitlements",
+        "nextStep": "Loop Standalone Entitlements",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Has Revocable Access?": {
+        "actionId": "sp:compare-unary",
+        "choiceList": [
+          {
+            "comparator": "IsPresent",
+            "nextStep": "Revoke Revocable Access",
+            "variableA.$": "$.getRevocableAccess.body[0].id"
+          }
+        ],
+        "defaultStep": "No Revocable Access",
+        "type": "choice"
+      },
+      "Loop Standalone Entitlements": {
+        "actionId": "sp:loop:iterator",
+        "attributes": {
+          "context.$": "$.getIdentity",
+          "input.$": "$.getStandaloneEntitlements.body[0:250]",
+          "start": "Revoke Standalone Entitlement",
+          "steps": {
+            "Revoke Standalone Entitlement": {
+              "actionId": "sp:access:manage",
+              "attributes": {
+                "comments": "Automated Leaver Workflow - Removing Standalone Entitlement",
+                "removeIdentity.$": "$.loopStandaloneEntitlements.context.id",
+                "requestType": "REVOKE_ACCESS",
+                "requestedItems.$": "$.getStandaloneEntitlements.body[0]"
+              },
+              "nextStep": "Standalone Entitlement Revoked",
+              "type": "action",
+              "versionNumber": 1
+            },
+            "Standalone Entitlement Revoked": {
+              "actionId": "sp:operator-success",
+              "type": "success"
+            }
+          }
+        },
+        "nextStep": "Get Revocable Access",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "No Revocable Access": {
+        "actionId": "sp:operator-success",
+        "description": "No standing entitlements to revoke",
+        "type": "success"
+      },
+      "Revoke Revocable Access": {
+        "actionId": "sp:access:manage",
+        "attributes": {
+          "comments": "Automated Leaver Workflow - Removing standing access",
+          "removeIdentity.$": "$.trigger.identity.id",
+          "requestType": "REVOKE_ACCESS",
+          "requestedItems.$": "$.getRevocableAccess.body"
+        },
+        "nextStep": "Standing Access Revoked",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "Standing Access Revoked": {
+        "actionId": "sp:operator-success",
+        "description": "Leaver standing access removed",
+        "type": "success"
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "bd09ebba96384fb9a78a661ef7871a35",
+    "name": "48565"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "bd09ebba96384fb9a78a661ef7871a35",
+    "name": "48565"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "filter.$": "$.changes[?(@.attribute == \"cloudLifecycleState\" && @.newValue == \"removeaccess\")]",
+      "id": "idn:identity-attributes-changed"
+    }
+  }
+}

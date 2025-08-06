@@ -1,0 +1,114 @@
+{
+  "id": "17c6f48a-a644-4516-822c-4306ba416df3",
+  "name": "YNT - IdentityAttributeChanged",
+  "description": "",
+  "created": "2023-08-03T13:57:36.966143001Z",
+  "modified": "2023-08-07T09:54:38.385193144Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "definition": {
+    "start": "Compare Strings",
+    "steps": {
+      "Activate Certification Campaign": {
+        "actionId": "sp:activate-campaign",
+        "attributes": {
+          "id.$": "$.createCertificationCampaign.id"
+        },
+        "description": "Test",
+        "nextStep": "Send Email",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "Compare Strings": {
+        "choiceList": [
+          {
+            "comparator": "StringMatches",
+            "nextStep": "Get Identity",
+            "variableA.$": "$.trigger.changes",
+            "variableB": "department"
+          }
+        ],
+        "defaultStep": "End Step — Success",
+        "description": "This attribute checks whether the department value in the workflow has changed.",
+        "type": "choice"
+      },
+      "Create Certification Campaign": {
+        "actionId": "sp:create-campaign",
+        "attributes": {
+          "activateUponCreation": true,
+          "description": "Department Changed",
+          "duration": "2w",
+          "emailNotificationEnabled": true,
+          "name": "$trigger.identity.name",
+          "recommendationsEnabled": true,
+          "type": "MANAGER",
+          "undecidedAccess": false
+        },
+        "description": null,
+        "nextStep": "Activate Certification Campaign",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "End Step — Success": {
+        "description": "Done",
+        "type": "success"
+      },
+      "Get Identity": {
+        "actionId": "sp:get-identity",
+        "attributes": {
+          "id.$": "$.trigger.identity.id"
+        },
+        "description": "Get details of Identity under certification",
+        "nextStep": "Get Identity 1",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Get Identity 1": {
+        "actionId": "sp:get-identity",
+        "attributes": {
+          "id.$": "$.getIdentity.managerRef.id"
+        },
+        "description": "Get Managers Email",
+        "nextStep": "Create Certification Campaign",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Send Email": {
+        "actionId": "sp:send-email",
+        "attributes": {
+          "body": "Certification Triggered on Mover",
+          "context": {},
+          "from": "no-reply@sailpoint.com",
+          "recipientEmailList.$": "$.getIdentity1.attributes.email",
+          "replyTo": "no-reply@sailpoint.com",
+          "subject": "User Department Changed"
+        },
+        "nextStep": "End Step — Success",
+        "type": "action",
+        "versionNumber": 2
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "attributeToFilter": "department",
+      "filter.$": "$.changes[?(@.attribute == \"department\")]",
+      "id": "idn:identity-attributes-changed"
+    }
+  }
+}

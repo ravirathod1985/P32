@@ -1,0 +1,58 @@
+{
+  "id": "2561901d-3b6c-426c-b665-d45fb76a55b2",
+  "name": "Access Request Dynamic Approver WF",
+  "description": "Access Request Dynamic Approver WF",
+  "created": "2024-05-14T09:14:17.611460405Z",
+  "modified": "2024-05-16T12:17:37.648462165Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "definition": {
+    "start": "HTTP Request",
+    "steps": {
+      "End Step - Success": {
+        "displayName": "",
+        "type": "success"
+      },
+      "HTTP Request": {
+        "actionId": "sp:http",
+        "attributes": {
+          "jsonRequestBody": {
+            "id": "2c91808b6ef1d43e016efba0ce470906",
+            "name": "Adam Adams",
+            "type": "IDENTITY"
+          },
+          "method": "put",
+          "requestContentType": "json-patch+json",
+          "url": null
+        },
+        "displayName": "",
+        "nextStep": "End Step - Success",
+        "type": "action",
+        "versionNumber": 2
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "trigger": {
+    "type": "EXTERNAL",
+    "attributes": {
+      "clientId": "d070ef96-1b6a-41bf-9174-754eea4a28d1",
+      "description": "Access Request",
+      "id": "idn:external-http",
+      "url": "/beta/workflows/execute/external/2561901d-3b6c-426c-b665-d45fb76a55b2"
+    }
+  }
+}

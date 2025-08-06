@@ -1,0 +1,247 @@
+{
+  "id": "862df976-c077-4523-aa98-9a5862e82a06",
+  "name": "SEND EMAIL",
+  "description": "",
+  "created": "2023-05-09T14:14:44.822008388Z",
+  "modified": "2023-05-09T14:14:44.822008388Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "definition": {
+    "start": "Verify Data Type",
+    "steps": {
+      "HTTP Request": {
+        "actionId": "sp:http",
+        "attributes": {
+          "authenticationType": "OAuth",
+          "jsonRequestBody": {
+            "aggregationsDsl": {},
+            "indices": [
+              "identities"
+            ],
+            "query": {
+              "query": "{{$.trigger.requester.id}} & {{$.trigger.recipient.id}}"
+            },
+            "sort": [
+              "-status"
+            ]
+          },
+          "method": "post",
+          "oAuthClientId": "",
+          "oAuthClientSecret": "",
+          "oAuthCredentialLocation": "oAuthInBody",
+          "oAuthTokenUrl": "https://.api.identitynow.com/oauth/token",
+          "requestContentType": "json",
+          "url": "https://.api.identitynow.com/v3/search"
+        },
+        "description": "API call to requester and recipient email address",
+        "nextStep": "Send Email",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "HTTP Request 1": {
+        "actionId": "sp:http",
+        "attributes": {
+          "authenticationType": "OAuth",
+          "jsonRequestBody": {
+            "aggregationsDsl": {},
+            "indices": [
+              "identities"
+            ],
+            "query": {
+              "query": "{{$.trigger.requester.id}} & {{$.trigger.recipient.id}}"
+            },
+            "sort": [
+              "-status"
+            ]
+          },
+          "method": "post",
+          "oAuthClientId": "",
+          "oAuthClientSecret": "",
+          "oAuthCredentialLocation": "oAuthInBody",
+          "oAuthTokenUrl": "https://.api.identitynow.com/oauth/token",
+          "requestContentType": "json",
+          "url": "https://.api.identitynow.com/v3/search"
+        },
+        "description": "API call to requester and recipient email address",
+        "nextStep": "Send Email 2",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "HTTP Request 2": {
+        "actionId": "sp:http",
+        "attributes": {
+          "authenticationType": "OAuth",
+          "jsonRequestBody": {
+            "aggregationsDsl": {},
+            "indices": [
+              "identities"
+            ],
+            "query": {
+              "query": "{{$.trigger.requester.id}} & {{$.trigger.recipient.id}}"
+            },
+            "sort": [
+              "-status"
+            ]
+          },
+          "method": "post",
+          "oAuthClientId": "",
+          "oAuthClientSecret": "",
+          "oAuthCredentialLocation": "oAuthInBody",
+          "oAuthTokenUrl": "https://.api.identitynow.com/oauth/token",
+          "requestContentType": "json",
+          "url": "https://.api.identitynow.com/v3/search"
+        },
+        "description": "API call to requester and recipient email address",
+        "nextStep": "Send Email 1",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Send Email": {
+        "actionId": "sp:send-email",
+        "attributes": {
+          "body": "",
+          "context": {
+            "recipient.$": "$.trigger.recipient.name",
+            "reqNumber.$": "$.trigger.accountRequests[*].ticketId",
+            "requestername.$": "$.trigger.requester.name",
+            "test.$": "$.trigger.accountRequests[*].attributeRequests[*].attributeValue"
+          },
+          "from": "no-reply@sailpoint.com",
+          "recipientEmailList.$": "$.hTTPRequest.body[*].email",
+          "subject": "Access Request ${reqNumber} Closed for ${recipient}"
+        },
+        "nextStep": "success",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Send Email 1": {
+        "actionId": "sp:send-email",
+        "attributes": {
+          "body": "access request #${reqNumber} for ${recipient} was recently closed",
+          "context": {
+            "error.$": "$.trigger.errors",
+            "recipient.$": "$.trigger.recipient.name",
+            "reqNumber.$": "$.trigger.accountRequests[*].ticketId",
+            "requestername.$": "$.trigger.requester.name"
+          },
+          "recipientEmailList.$": "$.hTTPRequest2.body[*].email",
+          "subject": "Access Request Failed"
+        },
+        "nextStep": "success",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Send Email 2": {
+        "actionId": "sp:send-email",
+        "attributes": {
+          "body": "access request #${reqNumber} for ${recipient} was recently closed",
+          "context": {
+            "recipient.$": "$.trigger.recipient.name",
+            "reqNumber.$": "$.trigger.accountRequests[*].ticketId",
+            "requestername.$": "$.trigger.requester.name"
+          },
+          "from": "no-reply@sailpoint.com",
+          "recipientEmailList.$": "$.hTTPRequest1.body[*].email",
+          "subject": "Imp Access Request ${reqNumber} Closed "
+        },
+        "description": null,
+        "nextStep": "success",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Verify Data Type": {
+        "choiceList": [
+          {
+            "comparator": "IsPresent",
+            "nextStep": "Verify Data Type 2",
+            "variableA.$": "$.trigger.sources"
+          }
+        ],
+        "defaultStep": "success 1",
+        "description": null,
+        "type": "choice"
+      },
+      "Verify Data Type 1": {
+        "choiceList": [
+          {
+            "comparator": "IsPresent",
+            "nextStep": "Verify Data Type 3",
+            "variableA.$": "$.trigger.accountRequests[?(@.provisioningTarget == \"Sourcename\" && @.provisioningResult == \"committed\")]"
+          }
+        ],
+        "defaultStep": "Verify Data Type 4",
+        "type": "choice"
+      },
+      "Verify Data Type 2": {
+        "choiceList": [
+          {
+            "comparator": "IsPresent",
+            "nextStep": "Verify Data Type 1",
+            "variableA.$": "$.trigger.accountRequests[?(@.provisioningTarget==\"Sourcename\")]"
+          }
+        ],
+        "defaultStep": "success 1",
+        "type": "choice"
+      },
+      "Verify Data Type 3": {
+        "choiceList": [
+          {
+            "comparator": "IsPresent",
+            "nextStep": "Verify Data Type 5",
+            "variableA.$": "$.trigger.accountRequests[*].attributeRequests"
+          }
+        ],
+        "defaultStep": "success",
+        "type": "choice"
+      },
+      "Verify Data Type 4": {
+        "choiceList": [
+          {
+            "comparator": "IsPresent",
+            "nextStep": "HTTP Request 2",
+            "variableA.$": "$.trigger.accountRequests[?(@.provisioningTarget == \"Sourcename\" && @.provisioningResult == \"failed\")]"
+          }
+        ],
+        "defaultStep": "success",
+        "type": "choice"
+      },
+      "Verify Data Type 5": {
+        "choiceList": [
+          {
+            "comparator": "IsPresent",
+            "nextStep": "HTTP Request 1",
+            "variableA.$": "$.trigger.accountRequests[0].attributeRequests[?(@.attributeValue =~ /TEST.*/)].attributeValue"
+          }
+        ],
+        "defaultStep": "HTTP Request",
+        "type": "choice"
+      },
+      "success": {
+        "type": "success"
+      },
+      "success 1": {
+        "type": "success"
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "id": "idn:post-provisioning"
+    }
+  }
+}

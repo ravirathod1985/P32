@@ -1,0 +1,83 @@
+{
+  "id": "39c88073-99cf-4d63-bc4b-ce34eae01ceb",
+  "name": "Copy of Test Hello World",
+  "description": "This is a basic example workflow.",
+  "created": "2023-09-20T09:17:26.728280678Z",
+  "modified": "2023-09-20T13:28:47.980738522Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "definition": {
+    "start": "Get Access",
+    "steps": {
+      "Compare Strings": {
+        "choiceList": [
+          {
+            "comparator": "StringEquals",
+            "nextStep": "End Step — Success",
+            "variableA.$": "$.trigger.sources",
+            "variableB": "OHI"
+          }
+        ],
+        "defaultStep": "End Step — Failure",
+        "type": "choice"
+      },
+      "End Step — Failure": {
+        "failureName": "Non OHI",
+        "type": "failure"
+      },
+      "End Step — Success": {
+        "type": "success"
+      },
+      "Get Access": {
+        "actionId": "sp:access:get",
+        "attributes": {
+          "accessprofiles": false,
+          "entitlements": false,
+          "getAccessBy": "searchQuery",
+          "identityToReturn.$": "$.trigger.recipient.id",
+          "query": "Test",
+          "roles": true
+        },
+        "description": "Get List of Access Profile that needs to be submitted.",
+        "nextStep": "Manage Access",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "Manage Access": {
+        "actionId": "sp:access:manage",
+        "attributes": {
+          "addIdentities": [
+            "2c918083834176ae018341d9358231de"
+          ],
+          "comments": "Thanks",
+          "requestType": "GRANT_ACCESS",
+          "requestedItems.$": "$.getAccess.accessItems[?(@.name == \"Test Role for FQA\")]"
+        },
+        "nextStep": "Compare Strings",
+        "type": "action",
+        "versionNumber": 1
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "filter.$": "$.accountRequests[?(@.accountOperation == \"HelldDon\")]",
+      "id": "idn:post-provisioning"
+    }
+  }
+}

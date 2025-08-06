@@ -1,0 +1,30 @@
+{
+  "id": "1504c273-5a2a-4cd0-be82-8617346190d8",
+  "name": "Assign SSO Groups",
+  "description": "Assign SSO Groups",
+  "created": "2025-06-09T18:42:07.319095183Z",
+  "modified": "2025-06-09T18:42:07.319095183Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "bd09ebba96384fb9a78a661ef7871a35",
+    "name": "48565"
+  },
+  "definition": {
+    "steps": {}
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "bd09ebba96384fb9a78a661ef7871a35",
+    "name": "48565"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "bd09ebba96384fb9a78a661ef7871a35",
+    "name": "48565"
+  },
+  "trigger": {
+    "type": "",
+    "attributes": {}
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "id": "c1b008e3-be9e-4ec7-b2d5-a7359b160e6b",
+  "name": "Add Attribute When Certain Access Request Decided",
+  "description": "A five-step workflow that emails two identities when an access request is approved or denied.",
+  "created": "2023-05-08T21:23:36.825089016Z",
+  "modified": "2023-05-09T21:20:38.40080921Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "definition": {
+    "start": "Get Identity",
+    "steps": {
+      "Get Access": {
+        "actionId": "sp:access:get",
+        "attributes": {
+          "accessprofiles": false,
+          "entitlements": true,
+          "getAccessBy": "specificIdentity",
+          "identityToReturn.$": "$.trigger.requestedFor.id",
+          "query": null,
+          "roles": false
+        },
+        "description": "Getting the access for user access",
+        "nextStep": "success",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "Get Identity": {
+        "actionId": "sp:get-identity",
+        "attributes": {
+          "id.$": "$.trigger.requestedFor.id"
+        },
+        "description": "Get the identity data for the identity that the access was requested for.  This will be used to lookup the identity's manager.",
+        "nextStep": "Get Access",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "success": {
+        "type": "success"
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "filter.$": "$.requestItemStatus[?(@.name=='DIAMOND' && @.operation =='Add' &&@.type=='ACCESS_PROFILE')]",
+      "id": "idn:access-request-post-approval"
+    }
+  }
+}

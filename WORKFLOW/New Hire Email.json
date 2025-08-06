@@ -1,0 +1,64 @@
+{
+  "id": "6b272b9c-bfbc-483d-8883-dbe0fdfc5fdf",
+  "name": "New Hire Email",
+  "description": "New Hire Email - to send email 3 days before joining",
+  "created": "2022-11-02T16:10:49.544297915Z",
+  "modified": "2023-07-04T06:17:56.988521208Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "definition": {
+    "start": "Get List of Identities",
+    "steps": {
+      "Get List of Identities": {
+        "actionId": "sp:get-identities",
+        "attributes": {
+          "inputQuery": "attributes.cloudLifecycleState:\"prehire\" AND attributes.daysToHire:\"1\"",
+          "searchBy": "searchQuery"
+        },
+        "nextStep": "Send Email 1",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Send Email 1": {
+        "actionId": "sp:send-email",
+        "attributes": {
+          "body": "<p>Dear  ${name} </p>\n\n<p>Please use the below link to retrieve your temporary password to login to Point32Health’s system.  <br>https://point32health-sb.identitynow.com/r/default/reset-password</br> </p>\n\n<p>Your Point32Health username: \n<br>${uid}</br> </p>\n\n<p>If you have any questions, please contact IAM_Support@point32health.org</p>",
+          "context": "{\"name.$\":\"$.getListOfIdentities.identities[*].attributes.displayName\",\"uid.$\":\"$.getListOfIdentities.identities[*].attributes.uid\"}",
+          "from": null,
+          "recipientEmailList.$": "$.getListOfIdentities.identities[*].attributes.email",
+          "replyTo": "iam_support@point32health.org",
+          "subject": "Welcome to Point32!"
+        },
+        "nextStep": "success",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "success": {
+        "type": "success"
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180857dddeb49017e0c8200321c8e",
+    "name": "slpt.services"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180857dddeb49017e0c8200321c8e",
+    "name": "slpt.services"
+  },
+  "trigger": {
+    "type": "SCHEDULED",
+    "attributes": {
+      "cronString": "55 17 * * *",
+      "frequency": "cronSchedule",
+      "id": "idn:cron-schedule",
+      "timeZone": "America/New_York"
+    }
+  }
+}

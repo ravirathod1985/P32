@@ -1,0 +1,116 @@
+{
+  "id": "031cb34a-560f-4170-a97f-8f42d486d0da",
+  "name": "Remove Requested Roles on Inactive LCS",
+  "description": "Removes requested roles on Inactive LCS",
+  "created": "2024-08-14T18:45:43.137523311Z",
+  "modified": "2024-08-14T18:46:22.969609132Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180857dddeb49017e0c8200321c8e",
+    "name": "slpt.services"
+  },
+  "definition": {
+    "start": "Compare Strings 1",
+    "steps": {
+      "Compare Strings 1": {
+        "choiceList": [
+          {
+            "comparator": "StringEquals",
+            "nextStep": "Get Access",
+            "variableA.$": "$.trigger.changes[?(@.attribute==\"cloudLifecycleState\")].newValue",
+            "variableB": "inactive"
+          }
+        ],
+        "defaultStep": "End Step - Success 1",
+        "displayName": "",
+        "type": "choice"
+      },
+      "End Step - Success 1": {
+        "displayName": "",
+        "type": "success"
+      },
+      "Get Access": {
+        "actionId": "sp:access:get",
+        "attributes": {
+          "accessprofiles": false,
+          "entitlements": false,
+          "getAccessBy": "specificIdentity",
+          "identityToReturn.$": "$.trigger.identity.id",
+          "roles": true
+        },
+        "displayName": "",
+        "nextStep": "Loop",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "Loop": {
+        "actionId": "sp:loop:iterator",
+        "attributes": {
+          "context.$": "$.trigger.identity.id",
+          "input.$": "$.getAccess.accessItems",
+          "start": "HTTP Request",
+          "steps": {
+            "End Step - Success": {
+              "displayName": "",
+              "type": "success"
+            },
+            "HTTP Request": {
+              "actionId": "sp:http",
+              "attributes": {
+                "authenticationType": "OAuth",
+                "jsonRequestBody": {
+                  "requestType": "REVOKE_ACCESS",
+                  "requestedFor": [
+                    "{{$.loop.context}}"
+                  ],
+                  "requestedItems": [
+                    {
+                      "comment": "Removed automatically due to LCS change",
+                      "id": "{{$.loop.loopInput.id}}",
+                      "type": "ROLE"
+                    }
+                  ]
+                },
+                "method": "post",
+                "oAuthClientId": "xxxxxxxxxxxxxxxx",
+                "oAuthCredentialLocation": "oAuthInHeader",
+                "oAuthScope": null,
+                "oAuthTokenUrl": "https://point32health-sb.api.identitynow.com/oauth/token",
+                "requestContentType": "json",
+                "url": "https://point32health-sb.api.identitynow.com/v3/access-requests"
+              },
+              "description": "Calls remove access",
+              "displayName": "",
+              "nextStep": "End Step - Success",
+              "type": "action",
+              "versionNumber": 2
+            }
+          }
+        },
+        "displayName": "",
+        "nextStep": "End Step - Success 1",
+        "type": "action",
+        "versionNumber": 1
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180877f4b7fd4017f51d8a8b060c2",
+    "name": "28163"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180877f4b7fd4017f51d8a8b060c2",
+    "name": "28163"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "attributeToFilter": "cloudLifecycleState",
+      "filter.$": "$.changes[?(@.attribute == \"cloudLifecycleState\")]",
+      "id": "idn:identity-attributes-changed"
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "id": "e25ca3a2-0b56-43b6-ac5f-effe1bcdcf40",
+  "name": "DL-Developer Days",
+  "description": "Testing workflow",
+  "created": "2023-03-09T15:49:41.138883362Z",
+  "modified": "2024-08-15T19:53:41.02985702Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180867f4b803a017f51d7adb516e4",
+    "name": "17306"
+  },
+  "definition": {
+    "start": "Get Identity",
+    "steps": {
+      "Get Identity": {
+        "actionId": "sp:get-identity",
+        "attributes": {
+          "id.$": "$.trigger.identity.id"
+        },
+        "nextStep": "Send Email",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Send Email": {
+        "actionId": "sp:send-email",
+        "attributes": {
+          "context": {},
+          "recipientEmailList.$": "$.getIdentity.id"
+        },
+        "nextStep": "success",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "success": {
+        "type": "success"
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180867f4b803a017f51d7adb516e4",
+    "name": "17306"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180867f4b803a017f51d7adb516e4",
+    "name": "17306"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "attributeToFilter": "onLeave",
+      "filter.$": "$.changes[?(@.attribute == \"onLeave\")]",
+      "id": "idn:identity-attributes-changed"
+    }
+  }
+}

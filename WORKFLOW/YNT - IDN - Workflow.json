@@ -1,0 +1,30 @@
+{
+  "id": "f88c3bc2-d612-4e63-82ef-c6deae9e2e74",
+  "name": "YNT - IDN - Workflow",
+  "description": "",
+  "created": "2023-07-04T05:15:35.785129267Z",
+  "modified": "2023-07-04T05:15:35.785129267Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "definition": {
+    "steps": {}
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "trigger": {
+    "type": "",
+    "attributes": {}
+  }
+}

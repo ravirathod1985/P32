@@ -1,0 +1,65 @@
+{
+  "id": "40f4ca11-4035-4240-b49c-ccad5eee9bab",
+  "name": "Deprovision Inactive Users Detected in Saas Management",
+  "description": "This workflow is triggered by a SaaS Management report generated for accounts with zero days of activity over 90 days from initial activation. This workflow will deprovision those accounts to reduce risk and license costs.",
+  "created": "2024-02-22T14:12:08.31376125Z",
+  "modified": "2024-02-22T14:13:09.646271543Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "definition": {
+    "start": "Get Accounts",
+    "steps": {
+      "Get Accounts": {
+        "actionId": "sp:get-accounts",
+        "attributes": {
+          "filterCriteria": "name",
+          "getAccountsBy": "filters",
+          "operator": "eq",
+          "value": "$.trigger.results.resultItemList[*].title"
+        },
+        "description": "This action identifies the appropriate account data for the listed accounts provided by the SaaS Management report.",
+        "nextStep": "Manage Accounts",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "Manage Accounts": {
+        "actionId": "sp:manage-account",
+        "attributes": {
+          "accountIds.$": "$.getAccounts.accounts[*].id",
+          "operation": "disable"
+        },
+        "description": "This action deprovisions all accounts returned by the Get Accounts step to help eliminate risk and license costs for inactive accounts.",
+        "nextStep": "success",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "success": {
+        "description": "This workflow has completed successfully.",
+        "type": "success"
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "trigger": {
+    "type": "EXTERNAL",
+    "attributes": {
+      "clientId": "dae91f18-6168-4e5c-965d-0c5b5534e2bb",
+      "description": "This workflow is triggered by a report generated from SaaS Management. Accounts with no activity over the last 90 days will be deprovisioned.",
+      "id": "idn:external-http",
+      "url": "/beta/workflows/execute/external/40f4ca11-4035-4240-b49c-ccad5eee9bab"
+    }
+  }
+}

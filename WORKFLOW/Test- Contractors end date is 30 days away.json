@@ -1,0 +1,101 @@
+{
+  "id": "ed6c9688-9377-43ba-a769-2bbd4461bfb6",
+  "name": "Test- Contractors end date is 30 days away",
+  "description": "Workflow to send an email notification to the application or source owner indicating that a contractor's end date is 30 days away",
+  "created": "2023-05-09T14:03:55.823613053Z",
+  "modified": "2023-05-09T14:03:55.823613053Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "definition": {
+    "start": "Compare Strings",
+    "steps": {
+      "Compare Strings": {
+        "choiceList": [
+          {
+            "comparator": "StringEquals",
+            "nextStep": "Get Identity",
+            "variableA.$": "$.trigger.changes[?(@.attribute==\"contractEndsInLessThan30Days\")].newValue",
+            "variableB": "TRUE"
+          }
+        ],
+        "defaultStep": "success 1",
+        "description": "Verifies if the \"Contract Ends In Less Than 30 Days\" is TRUE",
+        "type": "choice"
+      },
+      "Get Identity": {
+        "actionId": "sp:get-identity",
+        "attributes": {
+          "id.$": "$.trigger.identity.id"
+        },
+        "description": "Retrieves available details about the Identity",
+        "nextStep": "Get Identity 1",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Get Identity 1": {
+        "actionId": "sp:get-identity",
+        "attributes": {
+          "id.$": "$.getIdentity.managerRef.id"
+        },
+        "description": "This step is used to gather information about the user's manager to populate their details",
+        "nextStep": "Send Email",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Send Email": {
+        "actionId": "sp:send-email",
+        "attributes": {
+          "body": "HR Team - <br>\n<p>\nThis is to notify you that employee <b style=\"\">${displayName}</b> end date is approaching according to Workday.<br>\n<ul>\n<li>Employee Name: ${displayName}</li>\n<li>Email: ${email}</li>\n<li>Manager:${manager}</li>\n<li>Department:${department}</li>\n<li>Job Title: ${jobTitle}</li>\n<li>Termination Date: ${endDate}</li>\n</ul>\n</p>\nPlease perform any  updates should their contract need to be extended.<br>\n<br>\nThank you,<br>\nOur Team",
+          "context": {
+            "department.$": "$.getIdentity.attributes.department",
+            "displayName.$": "$.getIdentity.attributes.displayName",
+            "email.$": "$.getIdentity.attributes.email",
+            "endDate.$": "$.getIdentity.attributes.endDate",
+            "jobTitle.$": "$.getIdentity.attributes.jobTitle",
+            "manager.$": "$.getIdentity1.attributes.displayName"
+          },
+          "recipientEmailList": [
+            "me@aceme.com"
+          ],
+          "replyTo": "me@acme.com",
+          "subject": "Approaching Contractor EndDate"
+        },
+        "description": "Notifies the HR that the contract users EndDate is approaching",
+        "nextStep": "success",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "success": {
+        "description": "Finishes the workflow in a Success state",
+        "type": "success"
+      },
+      "success 1": {
+        "description": "Finishes the workflow in a failure state.",
+        "type": "success"
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "attributeToFilter": "contractEndsInLessThan30Days",
+      "description": "Get the Identity when the \"Contract Ends In Less Than 30 Days\" is changed from FALSE to TRUE and Notify the HR",
+      "filter.$": "$.changes[?(@.attribute == \"contractEndsInLessThan30Days\")]",
+      "id": "idn:identity-attributes-changed"
+    }
+  }
+}

@@ -1,0 +1,178 @@
+{
+  "id": "3062812a-f82e-4008-9137-0f55da0ef23c",
+  "name": "When LCS changes to RemoveAccess Prod",
+  "description": "Workflow to  remove access for identities that move into a \"RemoveAccess\" lifecycle state.",
+  "created": "2023-08-24T22:57:35.940522038Z",
+  "modified": "2023-08-24T22:58:13.076605872Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "definition": {
+    "start": "Compare Strings",
+    "steps": {
+      "Compare Strings": {
+        "choiceList": [
+          {
+            "comparator": "StringEquals",
+            "nextStep": "Get Identity",
+            "variableA.$": "$.trigger.changes[?(@.attribute == \"cloudLifecycleState\")].newValue",
+            "variableB": "removeaccess"
+          }
+        ],
+        "defaultStep": "success",
+        "description": "Verifies that the change in cloudLifecycleState is to \"removeaccess\".",
+        "type": "choice"
+      },
+      "Compare Strings 1": {
+        "choiceList": [
+          {
+            "comparator": "StringMatches",
+            "nextStep": "Get Identity 1",
+            "variableA.$": "$.getIdentity.attributes.lastname",
+            "variableB": "sptest"
+          }
+        ],
+        "defaultStep": "success 2",
+        "description": "Check if Identity is a \"test\" identity.",
+        "type": "choice"
+      },
+      "Get Access": {
+        "actionId": "sp:access:get",
+        "attributes": {
+          "accessprofiles": false,
+          "entitlements": false,
+          "getAccessBy": "specificIdentity",
+          "identityToReturn.$": "$.trigger.identity.id",
+          "roles": true
+        },
+        "description": "Retrieve user's assigned Roles",
+        "nextStep": "Manage Access",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "Get Access 1": {
+        "actionId": "sp:access:get",
+        "attributes": {
+          "accessprofiles": true,
+          "entitlements": false,
+          "getAccessBy": "specificIdentity",
+          "identityToReturn.$": "$.trigger.identity.id",
+          "roles": false
+        },
+        "description": "Get Access Profiles that are still assigned.",
+        "nextStep": "Manage Access 1",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "Get Identity": {
+        "actionId": "sp:get-identity",
+        "attributes": {
+          "id.$": "$.trigger.identity.id"
+        },
+        "description": "Retrieves available details about the identity.",
+        "nextStep": "Compare Strings 1",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "Get Identity 1": {
+        "actionId": "sp:get-identity",
+        "attributes": {
+          "id.$": "$.getIdentity.manager.id"
+        },
+        "description": "This node is used to gather information about the user's manager to populate their email.",
+        "nextStep": "Send Email 1",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "Manage Access": {
+        "actionId": "sp:access:manage",
+        "attributes": {
+          "comments": "User has been terminated 14+ days, removing access.",
+          "removeDuration": null,
+          "removeIdentity.$": "$.trigger.identity.id",
+          "requestType": "REVOKE_ACCESS",
+          "requestedItems.$": "$.getAccess.accessItems"
+        },
+        "description": "Remove Roles",
+        "nextStep": "Wait",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "Manage Access 1": {
+        "actionId": "sp:access:manage",
+        "attributes": {
+          "comments": "User has been terminated 14+ days, removing access.",
+          "removeDuration": null,
+          "removeIdentity.$": "$.trigger.identity.id",
+          "requestType": "REVOKE_ACCESS",
+          "requestedItems.$": "$.getAccess1.accessItems"
+        },
+        "description": "Remove Access Profiles Only",
+        "nextStep": "success 1",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "Send Email 1": {
+        "actionId": "sp:send-email",
+        "attributes": {
+          "body": "Dear manager\n\nThis email is to notify you that employee ${displayName} is no longer active.\n\nsAMAccountName: TEST_Es13236",
+          "context": {
+            "displayName.$": "$.getIdentity.attributes.displayName"
+          },
+          "from": "no-reply@sailpoint.com",
+          "recipientEmailList": [
+            "idn-services-pwd-reset@sailpoint.com"
+          ],
+          "replyTo": null,
+          "subject": "Employee Leaving"
+        },
+        "description": "Notifies the users manager that the user's access is removed. This step can also be configured to notify security admins using a distribution list.",
+        "nextStep": "Get Access",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Wait": {
+        "actionId": "sp:sleep",
+        "attributes": {
+          "duration": "2m",
+          "type": "waitFor"
+        },
+        "description": "Wait for Previous Manage Access Step to complete",
+        "nextStep": "Get Access 1",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "success": {
+        "description": "Terminates the workflow when the comparison operator indicates the user was changed to any lifecycle state other than \"removeaccess.\"",
+        "type": "success"
+      },
+      "success 1": {
+        "description": "Finishes the workflow in a Success state. Some organizations may want to add a step to create a certification campaign prior to ending the workflow.",
+        "type": "success"
+      },
+      "success 2": {
+        "type": "success"
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "filter.$": "$.changes[?(@.attribute == \"cloudLifecycleState\")]",
+      "id": "idn:identity-attributes-changed"
+    }
+  }
+}

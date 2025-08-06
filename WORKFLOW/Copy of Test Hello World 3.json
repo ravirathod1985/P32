@@ -1,0 +1,82 @@
+{
+  "id": "cabe49fd-5897-4bc7-a66c-62d27376fd35",
+  "name": "Copy of Test Hello World 3",
+  "description": "This is a basic example workflow.",
+  "created": "2024-01-04T12:54:05.825747915Z",
+  "modified": "2024-01-04T12:54:05.825747915Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "definition": {
+    "start": "Get Access",
+    "steps": {
+      "Compare Strings": {
+        "choiceList": [
+          {
+            "comparator": "StringEquals",
+            "nextStep": "End Step — Success",
+            "variableA.$": "$.trigger.sources",
+            "variableB": "OHI"
+          }
+        ],
+        "defaultStep": "End Step — Failure",
+        "type": "choice"
+      },
+      "End Step — Failure": {
+        "failureName": "Non OHI",
+        "type": "failure"
+      },
+      "End Step — Success": {
+        "type": "success"
+      },
+      "Get Access": {
+        "actionId": "sp:access:get",
+        "attributes": {
+          "accessprofiles": false,
+          "entitlements": false,
+          "getAccessBy": "searchQuery",
+          "identityToReturn.$": "$.trigger.recipient.id",
+          "query": "Test",
+          "roles": true
+        },
+        "description": "Get List of Access Profile that needs to be submitted.",
+        "nextStep": "Manage Access",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "Manage Access": {
+        "actionId": "sp:access:manage",
+        "attributes": {
+          "addIdentities": [
+            "2c918083834176ae018341d9358231de"
+          ],
+          "comments": "Thanks",
+          "requestType": "GRANT_ACCESS",
+          "requestedItems.$": "$.getAccess.accessItems[?(@.name == \"Test Role for FQA\")]"
+        },
+        "nextStep": "Compare Strings",
+        "type": "action",
+        "versionNumber": 1
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "id": "idn:post-provisioning"
+    }
+  }
+}

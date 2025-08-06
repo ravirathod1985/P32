@@ -1,0 +1,30 @@
+{
+  "id": "0963a0a1-f702-4b3d-a153-5c328be1f80b",
+  "name": "TEST-Access-StatusApproved",
+  "description": "Learning workflow process",
+  "created": "2023-06-12T17:38:31.904237866Z",
+  "modified": "2023-06-12T17:38:31.904237866Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180867f4b803a017f51d7adb516e4",
+    "name": "17306"
+  },
+  "definition": {
+    "steps": {}
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180867f4b803a017f51d7adb516e4",
+    "name": "17306"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180867f4b803a017f51d7adb516e4",
+    "name": "17306"
+  },
+  "trigger": {
+    "type": "",
+    "attributes": {}
+  }
+}

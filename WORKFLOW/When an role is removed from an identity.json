@@ -1,0 +1,30 @@
+{
+  "id": "033935e8-d7b2-4735-9c9a-37187c114ce6",
+  "name": "When an role is removed from an identity",
+  "description": "Creating a workflow for when a role is removed from an identity all the accounts attached through that role to that identity are deleted in the source.",
+  "created": "2023-11-03T18:03:23.611547435Z",
+  "modified": "2023-11-03T18:06:04.305907704Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180867f4b803a017f51d7adb516e4",
+    "name": "17306"
+  },
+  "definition": {
+    "steps": {}
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180867f4b803a017f51d7adb516e4",
+    "name": "17306"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180867f4b803a017f51d7adb516e4",
+    "name": "17306"
+  },
+  "trigger": {
+    "type": "",
+    "attributes": {}
+  }
+}

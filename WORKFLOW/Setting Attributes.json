@@ -1,0 +1,30 @@
+{
+  "id": "e6550006-50dd-49f0-8465-645ff5fb2564",
+  "name": "Setting Attributes",
+  "description": "Setting Attributes",
+  "created": "2023-05-09T12:56:14.529774371Z",
+  "modified": "2023-05-09T12:56:14.529774371Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "definition": {
+    "steps": {}
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "trigger": {
+    "type": "",
+    "attributes": {}
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "id": "01fb678d-7e94-4ad8-9311-f174e83c53c0",
+  "name": "YNT1",
+  "description": "",
+  "created": "2023-07-01T11:24:27.115156431Z",
+  "modified": "2023-10-16T07:58:17.32558231Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "definition": {
+    "start": "Send Slack Message",
+    "steps": {
+      "End Step — Success": {
+        "type": "success"
+      },
+      "Send Slack Message": {
+        "actionId": "sp:send-slack-message",
+        "attributes": {
+          "body": "Hello",
+          "id": "2c9180887f4b7fdb017f51d88bd02b35"
+        },
+        "description": null,
+        "nextStep": "End Step — Success",
+        "type": "action",
+        "versionNumber": 1
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "id": "idn:source-updated"
+    }
+  }
+}

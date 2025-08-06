@@ -1,0 +1,156 @@
+{
+  "id": "3d55dbd0-3002-4541-b227-f806f3a88a72",
+  "name": "Leaver - Child Access Requests - Remove Standing Access",
+  "description": "This workflow takes the id of the identity as an input and removes all non-birthright standing access from that identity via Access Requests",
+  "created": "2025-06-10T18:07:35.815462617Z",
+  "modified": "2025-06-12T16:50:16.401244096Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "bd09ebba96384fb9a78a661ef7871a35",
+    "name": "48565"
+  },
+  "definition": {
+    "start": "Get Standalone Entitlements",
+    "steps": {
+      "Get Revocable Access": {
+        "actionId": "sp:http",
+        "attributes": {
+          "authenticationType": "OAuth",
+          "method": "post",
+          "oAuthClientId": "4db3d07a5d8341178ff0d2a4fc00eed0",
+          "oAuthClientSecret": "$.secrets.672ee11f-729c-4f44-9190-9956874942db",
+          "oAuthCredentialLocation": "oAuthInHeader",
+          "oAuthScope": null,
+          "oAuthTokenUrl": "https://point32health-sb.api.identitynow.com/oauth/token",
+          "requestContentType": "text",
+          "requestHeaders": "Content-Type:application/json",
+          "textRequestBody": "{\"indices\":[\"identities\"],\"query\":{\"innerHit\":{\"query\":\"revocable:true\",\"type\":\"access\"},\"query\":\"id:\\\"{{$.trigger.id}}\\\"\"}}",
+          "url": "https://point32health-sb.api.identitynow.com/v2024/search"
+        },
+        "description": "Get all Revocable Access",
+        "nextStep": "Has Revocable Access?",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Get Standalone Entitlements": {
+        "actionId": "sp:http",
+        "attributes": {
+          "authenticationType": "OAuth",
+          "method": "post",
+          "oAuthClientId": "4db3d07a5d8341178ff0d2a4fc00eed0",
+          "oAuthClientSecret": "$.secrets.f2fdfc55-52d0-4e5e-978e-c61e5e731af6",
+          "oAuthCredentialLocation": "oAuthInHeader",
+          "oAuthScope": null,
+          "oAuthTokenUrl": "https://point32health-sb.api.identitynow.com/oauth/token",
+          "requestContentType": "text",
+          "requestHeaders": "Content-Type:application/json",
+          "textRequestBody": "{\"indices\":[\"identities\"],\"query\":{\"innerHit\":{\"query\":\"standalone:true\",\"type\":\"access\"},\"query\":\"id:\\\"{{$.trigger.id}}\\\"\"}}",
+          "url": "https://point32health-sb.api.identitynow.com/v3/search"
+        },
+        "description": "Get all Standalone Entitlements",
+        "nextStep": "Loop Standalone Entitlements",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Has Revocable Access?": {
+        "actionId": "sp:compare-unary",
+        "choiceList": [
+          {
+            "comparator": "IsPresent",
+            "nextStep": "Revoke Revocable Access",
+            "variableA.$": "$.getRevocableAccess.body[0].id"
+          }
+        ],
+        "defaultStep": "No Revocable Access",
+        "type": "choice"
+      },
+      "Loop Standalone Entitlements": {
+        "actionId": "sp:loop:iterator",
+        "attributes": {
+          "context.$": "$.trigger",
+          "input.$": "$.getStandaloneEntitlements.body[0:250]",
+          "start": "Has Entitlement Id?",
+          "steps": {
+            "Has Entitlement Id?": {
+              "actionId": "sp:compare-unary",
+              "choiceList": [
+                {
+                  "comparator": "IsPresent",
+                  "nextStep": "Revoke Standalone Entitlement",
+                  "variableA.$": "$.loop.loopInput.id"
+                }
+              ],
+              "defaultStep": "No Entitlement to Revoke",
+              "type": "choice"
+            },
+            "No Entitlement to Revoke": {
+              "actionId": "sp:operator-success",
+              "description": "No Entitlement to Revoke",
+              "type": "success"
+            },
+            "Revoke Standalone Entitlement": {
+              "actionId": "sp:access:manage",
+              "attributes": {
+                "comments": "Automated Leaver Workflow - Removing Standalone Entitlement",
+                "removeIdentity.$": "$.loop.context.id",
+                "requestType": "REVOKE_ACCESS",
+                "requestedItems.$": "$.loop.loopInput"
+              },
+              "nextStep": "Standalone Entitlement Revoked",
+              "type": "action",
+              "versionNumber": 1
+            },
+            "Standalone Entitlement Revoked": {
+              "actionId": "sp:operator-success",
+              "type": "success"
+            }
+          }
+        },
+        "nextStep": "Get Revocable Access",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "No Revocable Access": {
+        "actionId": "sp:operator-success",
+        "description": "No standing entitlements to revoke",
+        "type": "success"
+      },
+      "Revoke Revocable Access": {
+        "actionId": "sp:access:manage",
+        "attributes": {
+          "comments": "Automated Leaver Workflow - Removing standing access",
+          "removeIdentity.$": "$.trigger.id",
+          "requestType": "REVOKE_ACCESS",
+          "requestedItems.$": "$.getRevocableAccess.body[*]"
+        },
+        "nextStep": "Standing Access Revoked",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "Standing Access Revoked": {
+        "actionId": "sp:operator-success",
+        "description": "Leaver standing access removed",
+        "type": "success"
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "bd09ebba96384fb9a78a661ef7871a35",
+    "name": "48565"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "bd09ebba96384fb9a78a661ef7871a35",
+    "name": "48565"
+  },
+  "trigger": {
+    "type": "EXTERNAL",
+    "attributes": {
+      "clientId": "98846043-a388-4f53-9e8f-24bed0dfb15e",
+      "id": "idn:external-http",
+      "url": "/beta/workflows/execute/external/3d55dbd0-3002-4541-b227-f806f3a88a72"
+    }
+  }
+}

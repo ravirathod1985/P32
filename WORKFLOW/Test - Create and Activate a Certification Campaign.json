@@ -1,0 +1,105 @@
+{
+  "id": "37b5495a-cd45-4c01-ad2c-e5eee598f7a2",
+  "name": "Test - Create and Activate a Certification Campaign",
+  "description": "Create and activate a certification campaign for every identity that has changed departments.",
+  "created": "2023-09-14T07:37:38.959624893Z",
+  "modified": "2023-09-14T07:37:38.959624893Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "definition": {
+    "start": "Compare Strings",
+    "steps": {
+      "Compare Strings": {
+        "choiceList": [
+          {
+            "comparator": "StringMatches",
+            "nextStep": "Create Certification Campaign",
+            "variableA.$": "$.trigger.changes[?(@.attribute == \"department\")].attribute",
+            "variableB": "department"
+          }
+        ],
+        "defaultStep": "success",
+        "description": "Only create the campaign for identities who change departments.  This doesn't look for a specific department.",
+        "type": "choice"
+      },
+      "Create Certification Campaign": {
+        "actionId": "sp:create-campaign",
+        "attributes": {
+          "duration": "2w",
+          "identityId.$": "$.trigger.identity.id",
+          "name.$": "$.trigger.identity.name"
+        },
+        "description": "Create an identity certification campaign any identity that changed departments.  Name it after the identity so we know who is being certified.",
+        "nextStep": "Get Identity",
+        "type": "action",
+        "versionNumber": 1
+      },
+      "Get Identity": {
+        "actionId": "sp:get-identity",
+        "attributes": {
+          "id.$": "$.trigger.identity.id"
+        },
+        "description": "Get the identity's attributes so we can look up their manager.",
+        "nextStep": "Get Identity 2",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Get Identity 2": {
+        "actionId": "sp:get-identity",
+        "attributes": {
+          "id.$": "$.getIdentity.managerRef.id"
+        },
+        "description": "This node is used to gather information about the user's manager to populate their email.",
+        "nextStep": "Send Email 1",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "Send Email 1": {
+        "actionId": "sp:send-email",
+        "attributes": {
+          "body": "Dear ${recipName}, <br><p>This notification is to inform you that <b style=\"\">${displayName}</b> has recently changed departments. </p> <br><p>A Certification campaign named <b style=\"\">${campaignName} </b>has been generated for your review. </p> <br><p> Thank you <br>Security & Compliance</p>",
+          "context": {
+            "campaignName.$": "$.createCertificationCampaign.attributes.name",
+            "displayName.$": "$.getIdentity.attributes.displayName",
+            "recipName.$": "$.getIdentity2.attributes.displayName"
+          },
+          "recipientEmailList.$": "$.getIdentity2.attributes.email",
+          "replyTo": null,
+          "subject": "Direct Report department change"
+        },
+        "description": "Send an email to the identity's manager so they know there is a certification campaign pending for their employee that they need to complete.",
+        "nextStep": "success 1",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "success": {
+        "description": "Don't do anything else, since the identity didn't change departments.",
+        "type": "success"
+      },
+      "success 1": {
+        "type": "success"
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "filter.$": "$.changes[?(@.attribute == \"department\")]",
+      "id": "idn:identity-attributes-changed"
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "id": "f68960a3-b19d-495d-8581-cf840aa8a69b",
+  "name": "Test Hello World",
+  "description": "This is a basic example workflow.",
+  "created": "2023-07-04T05:33:11.639414814Z",
+  "modified": "2024-05-01T10:40:57.334642819Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "definition": {
+    "start": "Compare Strings",
+    "steps": {
+      "Compare Strings": {
+        "choiceList": [
+          {
+            "comparator": "StringMatches",
+            "nextStep": "End Step — Success",
+            "variableA.$": "$.trigger.requestedBy.name",
+            "variableB": "\"Adam Admin\""
+          }
+        ],
+        "defaultStep": "End Step — Failure",
+        "type": "choice"
+      },
+      "End Step — Failure": {
+        "failureName": "Non OHI",
+        "type": "failure"
+      },
+      "End Step — Success": {
+        "type": "success"
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "filter.$": "$.requestedItemsStatus[?(@.name == \"HardwareManagement - Access\")]",
+      "id": "idn:access-request-post-approval"
+    }
+  }
+}

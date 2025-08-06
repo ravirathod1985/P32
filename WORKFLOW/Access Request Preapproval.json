@@ -1,0 +1,59 @@
+{
+  "id": "74e9d5a4-b718-4ea7-b4f0-bbddbc2bc86e",
+  "name": "Access Request Preapproval",
+  "description": "Receive and respond to the access request preapproval event trigger.  This workflow does preliminary processing on every access request to automatically determine if it should move on to the next approver in the chain or if it should fail immediately.",
+  "created": "2023-05-10T14:24:15.649710973Z",
+  "modified": "2023-05-10T14:24:15.649710973Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "definition": {
+    "start": "HTTP Request",
+    "steps": {
+      "HTTP Request": {
+        "actionId": "sp:http",
+        "attributes": {
+          "authenticationType": null,
+          "jsonRequestBody": {
+            "output": {
+              "approved": true,
+              "approver": "Workflow",
+              "comment": "This access has passed workflow approval."
+            },
+            "secret": "{{$.trigger._metadata.secret}}"
+          },
+          "method": "post",
+          "requestContentType": "json",
+          "url.$": "$.trigger._metadata.callbackURL"
+        },
+        "nextStep": "success",
+        "type": "action",
+        "versionNumber": 2
+      },
+      "success": {
+        "type": "success"
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d7970c2560",
+    "name": "12073"
+  },
+  "trigger": {
+    "type": "EXTERNAL",
+    "attributes": {
+      "clientId": "862aa98b-f39b-490c-97af-49d23ad18102",
+      "id": "idn:external-http",
+      "url": "/beta/workflows/execute/external/a0e1c956-556c-4c2f-9c19-82ae9b71e1dc"
+    }
+  }
+}

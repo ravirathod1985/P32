@@ -1,0 +1,30 @@
+{
+  "id": "0437b083-3f68-4903-baa0-33d29db6400f",
+  "name": "T",
+  "description": "",
+  "created": "2023-06-26T16:11:30.078761985Z",
+  "modified": "2023-06-26T16:11:30.078761985Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "definition": {
+    "steps": {}
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "trigger": {
+    "type": "",
+    "attributes": {}
+  }
+}

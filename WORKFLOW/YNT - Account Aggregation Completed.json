@@ -1,0 +1,43 @@
+{
+  "id": "4a41b32b-8451-4552-a922-ade4e3e133dd",
+  "name": "YNT - Account Aggregation Completed",
+  "description": "YNT - Account Aggregation Completed",
+  "created": "2023-07-04T05:21:14.553497972Z",
+  "modified": "2023-07-04T05:24:55.207900251Z",
+  "modifiedBy": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "definition": {
+    "start": "Get Identity",
+    "steps": {
+      "Get Identity": {
+        "actionId": "sp:get-identity",
+        "attributes": {
+          "id": "2c9180877f4b7fd4017f51d8a8b060c2"
+        },
+        "description": "Get",
+        "type": "action",
+        "versionNumber": 2
+      }
+    }
+  },
+  "enabled": false,
+  "creator": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "owner": {
+    "type": "IDENTITY",
+    "id": "2c9180887f4b7fdb017f51d88bd02b35",
+    "name": "27286"
+  },
+  "trigger": {
+    "type": "EVENT",
+    "attributes": {
+      "id": "idn:account-aggregation-completed"
+    }
+  }
+}
